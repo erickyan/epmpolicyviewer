@@ -1,0 +1,4273 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Policies merge="false" changeId="198294364518110" version="5">
+    <Policy action="10" id="17355161" name="General configuration" order="4000" serverPolicyId="{b78e10a5-883c-4a9d-8cb6-baaf15c17e24}">
+        <Alert id="{88a15027-fafa-4174-ac4f-02ccad07393d}" trigger="10" type="Dialog"></Alert>
+        <Alert id="{329e6a5c-126c-4bf6-9ccd-09a18939011c}" ostype="3" trigger="10" type="Dialog"></Alert>
+        <Alert id="{54d19d23-3f34-401c-a676-10d70f15e47d}" trigger="17" type="Dialog"></Alert>
+        <Alert id="{9dd398d7-6183-4708-904b-d8cb5b64470c}" trigger="21" type="Dialog"></Alert>
+        <Alert id="{ebe9b5ea-7b47-4d20-bb96-cb00182f991a}" trigger="22" type="Dialog"></Alert>
+        <Alert id="{60a55fcb-c696-4aaa-816a-12b96a865136}" ostype="3" trigger="22" type="Dialog"></Alert>
+        <Alert id="{717953aa-3e16-4ca6-9d86-3f779f879ca3}" trigger="29" type="Dialog"></Alert>
+        <Alert id="{edaed672-9fbe-4456-a729-314889993b29}" ostype="3" trigger="29" type="Dialog"></Alert>
+        <Configuration>
+            <Connection>
+                <IgnoreIncorrectCertificates>False</IgnoreIncorrectCertificates>
+                <DisconnectTimeout>300</DisconnectTimeout>
+                <SOAPTimeout>30</SOAPTimeout>
+                <AccessTokenRefreshTime>7200</AccessTokenRefreshTime>
+                <UseNativeWinHttp4TLS12>False</UseNativeWinHttp4TLS12>
+            </Connection>
+            <PASProtection>
+                <PASPVersion></PASPVersion>
+                <PASPHash></PASPHash>
+                <FlushIntervalSec>5</FlushIntervalSec>
+                <MaxBytesPerHour>10485760</MaxBytesPerHour>
+                <AggregationInterval>600</AggregationInterval>
+                <RestartPASAgentMaxTimes>5</RestartPASAgentMaxTimes>
+                <CollectProtectedAccounts>False</CollectProtectedAccounts>
+                <ProtectedAccountsInterval>0</ProtectedAccountsInterval>
+                <AntiCodeInjection>False</AntiCodeInjection>
+            </PASProtection>
+            <Common>
+                <ProtPassEx3 exclude="true">••••••••</ProtPassEx3>
+                <ProtPassEnable>True</ProtPassEnable>
+                <DomainId>00000000-0000-0000-0000-000000000000</DomainId>
+                <BootStartDriver>False</BootStartDriver>
+                <CollectAgentTrace>True</CollectAgentTrace>
+                <PolicyUsageInTrace>2</PolicyUsageInTrace>
+                <NewFilesInTrace>False</NewFilesInTrace>
+                <ProtectUserGroups>0</ProtectUserGroups>
+                <NetworkShareSupport>Full</NetworkShareSupport>
+                <CmdClientValidation>Strong</CmdClientValidation>
+                <AllowPassphraseFileSource>True</AllowPassphraseFileSource>
+                <LKM>False</LKM>
+                <IdpConf>
+                    <MinUid>15000</MinUid>
+                    <MinGid>15000</MinGid>
+                    <CacheRefreshIntervalHours>6</CacheRefreshIntervalHours>
+                    <UseLongName>true</UseLongName>
+                    <DefaultHomeDirectory>/home/%u</DefaultHomeDirectory>
+                    <DefaultLoginShell>/bin/bash</DefaultLoginShell>
+                    <PrivateGroupsEnabled>false</PrivateGroupsEnabled>
+                </IdpConf>
+                <AllowKernelUpgrade>False</AllowKernelUpgrade>
+                <UseIPCSecureBus>False</UseIPCSecureBus>
+            </Common>
+            <DataCollection>
+                <SendPolicyUsage>True</SendPolicyUsage>
+                <RushMode>False</RushMode>
+                <NewFileEvents>
+                    <Send>False</Send>
+                </NewFileEvents>
+                <CollectFullMeshData>False</CollectFullMeshData>
+                <ReportWindowsFiles>False</ReportWindowsFiles>
+                <PidInRestrictionEvents>True</PidInRestrictionEvents>
+                <KeepPolicyUsageForDays>30</KeepPolicyUsageForDays>
+                <PolicyUsageFlushIntervalSec>28800</PolicyUsageFlushIntervalSec>
+                <KeepPrivLackForDays>30</KeepPrivLackForDays>
+                <PrivLackFlushIntervalSec>1800</PrivLackFlushIntervalSec>
+                <OperationalStatusIndicationIntervalSec>60</OperationalStatusIndicationIntervalSec>
+                <MaxEventsSizeInMemory>20971520</MaxEventsSizeInMemory>
+                <MaxEventsSizeOnDisk>209715200</MaxEventsSizeOnDisk>
+                <MaxHourlyEvents>
+                    <PrivLack>250</PrivLack>
+                    <File>100</File>
+                    <PolicyUsage>200</PolicyUsage>
+                    <Restrict>100</Restrict>
+                    <NetAccess>500</NetAccess>
+                </MaxHourlyEvents>
+                <WriteWMI>False</WriteWMI>
+                <WriteEventLog>False</WriteEventLog>
+                <ToReportTempFiles>False</ToReportTempFiles>
+                <ExtendedPrivacy>False</ExtendedPrivacy>
+                <ExtendedPrivacyScript>
+                    <Run>False</Run>
+                    <EmbeddedScript>
+                        <ScriptName></ScriptName>
+                        <ScriptContent></ScriptContent>
+                    </EmbeddedScript>
+                </ExtendedPrivacyScript>
+                <SystemUserEvents>False</SystemUserEvents>
+                <SendUserGroups>True</SendUserGroups>
+                <RunEventsOnceOnly>False</RunEventsOnceOnly>
+                <FullLogMaxSize>1000000000</FullLogMaxSize>
+                <VfnetNotifyOnConnect>False</VfnetNotifyOnConnect>
+                <FileExts>EXE:MSI:MSP:MSU</FileExts>
+                <IncludeDlls>False</IncludeDlls>
+                <MaxLogSizeMb>1024</MaxLogSizeMb>
+                <MaxUploadAttemptsPerHour>20</MaxUploadAttemptsPerHour>
+                <LinuxSendChildProcEvents>True</LinuxSendChildProcEvents>
+                <MacFullMeshScan>
+                    <BinaryScanning>True</BinaryScanning>
+                    <Extensions>DMG:PKG:MPKG</Extensions>
+                </MacFullMeshScan>
+                <LoginAggregationInterval>600</LoginAggregationInterval>
+                <LoginSendingInterval>30</LoginSendingInterval>
+                <VfSipEx3 exclude="true"></VfSipEx3>
+                <EventReportingMode>
+                    <Application>0</Application>
+                    <RestrictedAccess>0</RestrictedAccess>
+                    <ThreatProtection>0</ThreatProtection>
+                    <PolicyAudit>0</PolicyAudit>
+                    <SigninAudit>0</SigninAudit>
+                    <Deception>0</Deception>
+                    <Video>0</Video>
+                    <FileChange>0</FileChange>
+                    <Ransomware>0</Ransomware>
+                </EventReportingMode>
+            </DataCollection>
+            <Telemetry>
+                <MuteByOS></MuteByOS>
+                <MuteByTopics></MuteByTopics>
+                <MuteByVersions></MuteByVersions>
+                <SendTimeIntervalSeconds>-1</SendTimeIntervalSeconds>
+                <MaxPayloadSizeBytes>65536</MaxPayloadSizeBytes>
+            </Telemetry>
+            <Policies>
+                <DiscoverSourceURL>True</DiscoverSourceURL>
+                <MonitorSipFiles>False</MonitorSipFiles>
+                <UseExtAttrs>True</UseExtAttrs>
+                <MonitorSystemProcess>True</MonitorSystemProcess>
+                <RestBatchCmdLineSym>True</RestBatchCmdLineSym>
+                <ProtectFilesByElevInst>False</ProtectFilesByElevInst>
+                <ExcludeAllSystemProcs>True</ExcludeAllSystemProcs>
+                <ScriptsDigitalSignature>True</ScriptsDigitalSignature>
+                <BlockDetoursLoading>False</BlockDetoursLoading>
+                <ShellToolsFolder>
+                    <ShowDesktopIcon>True</ShowDesktopIcon>
+                    <DesktopIcon>DEFAULT</DesktopIcon>
+                </ShellToolsFolder>
+                <HookCcmExec>True</HookCcmExec>
+                <HeartBeatTimeout>60</HeartBeatTimeout>
+                <FailTimeout>300</FailTimeout>
+                <ScriptTimeout>10</ScriptTimeout>
+                <DNSResolveTTL>3600</DNSResolveTTL>
+                <PolicyUpdate>
+                    <Rate>0</Rate>
+                    <Time>3600</Time>
+                    <RandomDelay>600</RandomDelay>
+                </PolicyUpdate>
+                <PolicyRecording>
+                    <KeepMoviesTimeoutInDays>14</KeepMoviesTimeoutInDays>
+                    <MinFreeDiskSpaceInMb>1024</MinFreeDiskSpaceInMb>
+                    <MaxUsedDiskSpaceInMb>2048</MaxUsedDiskSpaceInMb>
+                    <MaximumMovieLengthInMinutes>10</MaximumMovieLengthInMinutes>
+                    <AllowProgramRunIfNoRecording>True</AllowProgramRunIfNoRecording>
+                    <LocationType>0</LocationType>
+                    <BitRate>83886080</BitRate>
+                    <RetryTimeout>600</RetryTimeout>
+                    <MovieUploadFolder></MovieUploadFolder>
+                    <Username></Username>
+                    <PasswordEx3 exclude="true"></PasswordEx3>
+                    <BandwidthMB>10.0</BandwidthMB>
+                </PolicyRecording>
+                <MacOSAllowRootDelegationForRootPrograms>True</MacOSAllowRootDelegationForRootPrograms>
+                <MacOSProhibitSudoersFileModification>1</MacOSProhibitSudoersFileModification>
+                <ValidateOTP>True</ValidateOTP>
+                <ImageFileValidation>True</ImageFileValidation>
+                <SudoOptionsIgnored>"-E", "--preserve-env", "--", "-u"</SudoOptionsIgnored>
+                <MacOSMuteFilesToBeIgnoredAlways>False</MacOSMuteFilesToBeIgnoredAlways>
+                <MacOSFileVaultAdminWorkaround>False</MacOSFileVaultAdminWorkaround>
+                <AllowedInterpreters>"/usr/bin/bash","/bin/bash","/usr/bin/sh","/bin/sh","/usr/libexec/platform-python","/usr/bin/python","/usr/bin/python3","/usr/bin/perl","/usr/bin/ruby"</AllowedInterpreters>
+                <SudoersSecurePaths>"/usr/local/bin","/usr/bin","/bin","/usr/sbin","/sbin","/Applications/CyberArk EPM.app/Contents/Helpers"</SudoersSecurePaths>
+                <SudoersSecurePathsLinux>"/usr/local/bin", "/usr/bin", "/bin", "/usr/sbin", "/sbin"</SudoersSecurePathsLinux>
+                <EnableSudoListing>False</EnableSudoListing>
+                <LinuxDefaultEnvVariables>
+                    <DefaultKeepList>COLORS, DISPLAY, HOSTNAME, HISTSIZE, KDEDIR, LS_COLORS, MAIL, PS1, PS2, QTDIR, USERNAME, LANG, LC_ADDRESS, LC_CTYPE, LC_COLLATE, LC_IDENTIFICATION, LC_MEASUREMENT, LC_MESSAGES, LC_MONETARY, LC_NAME, LC_NUMERIC, LC_PAPER, LC_TELEPHONE, LC_TIME, LC_ALL, LANGUAGE, LINGUAS, _XKB_CHARSET, XAUTHORITY, TEMP</DefaultKeepList>
+                    <DefaultDeleteList>IFS, CDPATH, LOCALDOMAIN, RES_OPTIONS, HOSTALIASES, NLSPATH, PATH_LOCALE, LD_LIBRARY_PATH, TERMINFO, TERMINFO_DIRS, TERMPATH, TERMCAP, ENV, BASH_ENV, PS4, GLOBIGNORE, SHELLOPTS, JAVA_TOOL_OPTIONS, PERLIO_DEBUG, PERLLIB, PERL5LIB, PERL5OPT, PERL5DBFPATH, NULLCMD, READNULLCMD, ZDOTDIR, TMPPREFIX, PYTHONHOME, PYTHONPATH, PYTHONINSPECT, RUBYLIB, RUBYOPT</DefaultDeleteList>
+                </LinuxDefaultEnvVariables>
+                <PoliciesTargetMatchingMethod>ID</PoliciesTargetMatchingMethod>
+                <SetPdfFilesEA>False</SetPdfFilesEA>
+                <SetBlackoutTime>60</SetBlackoutTime>
+                <UseIDPFastMembership>False</UseIDPFastMembership>
+                <SudoersAllowsUserSpecificationOverriding>False</SudoersAllowsUserSpecificationOverriding>
+                <RestrictExplorerChildrenHandles>True</RestrictExplorerChildrenHandles>
+                <MacAllowOtherAuthenticationPlugins>False</MacAllowOtherAuthenticationPlugins>
+                <VerifyPublisherTrustOverNetwork>False</VerifyPublisherTrustOverNetwork>
+            </Policies>
+            <EndUserNotifications>
+                <ShowBalloonTips>True</ShowBalloonTips>
+                <ShowTrayIcon>True</ShowTrayIcon>
+                <TrayIcon>DEFAULT</TrayIcon>
+                <HideRunAsVerb>False</HideRunAsVerb>
+                <HideARPEntry>False</HideARPEntry>
+                <ShowFilePropPage>True</ShowFilePropPage>
+                <HideGetSupportInfo>False</HideGetSupportInfo>
+                <ShowBalloonOnPolicyUpdate>False</ShowBalloonOnPolicyUpdate>
+                <RefreshDesktopOnPolicyUpdate>True</RefreshDesktopOnPolicyUpdate>
+                <SudoGraceValidationPeriod>300</SudoGraceValidationPeriod>
+                <SudoNoPassword>False</SudoNoPassword>
+                <StepupGraceValidationPeriod>5</StepupGraceValidationPeriod>
+                <AllowedPreloaders></AllowedPreloaders>
+                <EPMDialogInfraOptions>
+                    <IsFallBackEnabledToIE>True</IsFallBackEnabledToIE>
+                    <MinAgentVersionForWV>25.6</MinAgentVersionForWV>
+                </EPMDialogInfraOptions>
+            </EndUserNotifications>
+            <RemoteInstallation>
+                <DiscoveryCancelTimeout>120000</DiscoveryCancelTimeout>
+                <InstallationCancelTimeout>300000</InstallationCancelTimeout>
+            </RemoteInstallation>
+            <Network>
+                <DownloadTimeout>3600000</DownloadTimeout>
+                <PingTimeout>1000</PingTimeout>
+            </Network>
+            <ChallengeResponse>
+                <EnableChallengeResponse>False</EnableChallengeResponse>
+                <EnableRunWithAuthorizationToken>False</EnableRunWithAuthorizationToken>
+                <RunWithAuthorizationToken>Run with Authorization Token</RunWithAuthorizationToken>
+                <NumberOfAttempts>3</NumberOfAttempts>
+                <DecryptionPublicCertificateEx3 exclude="true"></DecryptionPublicCertificateEx3>
+                <ShortCodeEncryptionPhraseEx3 exclude="true"></ShortCodeEncryptionPhraseEx3>
+            </ChallengeResponse>
+            <SuspendPolicies>
+                <EnableSuspendPolicies>False</EnableSuspendPolicies>
+                <UserGroupType>UNKNOWN</UserGroupType>
+            </SuspendPolicies>
+            <ElevationAuthorizationGroup>
+                <EnableElevationAuthorizationGroup>False</EnableElevationAuthorizationGroup>
+                <UserGroupType>UNKNOWN</UserGroupType>
+            </ElevationAuthorizationGroup>
+            <AzureActiveDirectory>
+                <TenantID>00000000-0000-0000-0000-000000000000</TenantID>
+                <ClientID>00000000-0000-0000-0000-000000000000</ClientID>
+                <EnableAzureAD>False</EnableAzureAD>
+                <AzureType>COMMERCIAL</AzureType>
+                <ClientSecretEx3 exclude="true"></ClientSecretEx3>
+                <EnableFullCacheRefresh>True</EnableFullCacheRefresh>
+                <FullCacheRefreshIntervalInHours>12</FullCacheRefreshIntervalInHours>
+            </AzureActiveDirectory>
+            <IdaptiveIntegration>
+                <IdaptiveTimeout>10</IdaptiveTimeout>
+                <IdaptiveTenantId></IdaptiveTenantId>
+            </IdaptiveIntegration>
+            <WebAuthentication>
+                <Active>False</Active>
+                <Name></Name>
+                <OpenIDConfigurationURL></OpenIDConfigurationURL>
+                <ClientID></ClientID>
+                <RedirectURI>com.cyberark.epm://login</RedirectURI>
+                <UserDomain></UserDomain>
+                <AcrValues></AcrValues>
+            </WebAuthentication>
+            <ESIConfigs>
+                <TOTPAlgorithm>SHA512</TOTPAlgorithm>
+            </ESIConfigs>
+            <IdentityProvidersCache>
+                <RefreshOnLogin>true</RefreshOnLogin>
+                <RefreshOnReceivingPolices>true</RefreshOnReceivingPolices>
+                <RefreshOnRestart>true</RefreshOnRestart>
+                <PeriodicRefreshInterval>12</PeriodicRefreshInterval>
+            </IdentityProvidersCache>
+        </Configuration>
+        <Messages>
+            <Message id="VF_SF_FOLDER_NAME">CyberArk EPM Control Panel</Message>
+            <Message id="VF_SHELL_CHALLENGERESPONSE_MENU_TEXT">Request Authorization</Message>
+            <Message id="VF_SHELL_ELEVATE_MENU_TEXT">Run with Elevated Privileges</Message>
+        </Messages>
+    </Policy>
+    <Policy action="16" id="17355162" name="[EXCLUDE FILES POLICY EAGLES]" order="1" serverPolicyId="{b78e10a5-883c-4a9d-8cb6-baaf15c17e24}">
+        <Targets></Targets>
+    </Policy>
+    <Policy action="19" id="17355163" name="[EXCLUDE PATHS POLICY MAC]" order="0" serverPolicyId="{b78e10a5-883c-4a9d-8cb6-baaf15c17e24}">
+        <Targets>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{f6b5433f-1f87-400f-b106-ced988fca116}">
+                <Publisher caseSensitive="True" compareAs="exact">CrowdStrike Inc. (X9E956P446)</Publisher>
+                <Location>/Applications/Falcon.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{ac71efd8-1cdf-46f2-b20d-b7caaf21ccda}">
+                <Publisher caseSensitive="True" compareAs="exact">Sentinel Labs Inc. (4AYE5J54KN)</Publisher>
+                <Location>/Library/Sentinel/sentinel-agent.bundle/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{2821b617-45c4-4696-a344-739080173dcc}">
+                <Publisher caseSensitive="True" compareAs="exact">Sentinel Labs Inc. (4AYE5J54KN)</Publisher>
+                <Location>/Applications/SentinelOne/SentinelOne Extensions.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{ce0f7b9c-33ea-4130-8dba-ba504e36994c}">
+                <Publisher caseSensitive="True" compareAs="exact">Microsoft Corporation (UBF8T346G9)</Publisher>
+                <Location>/Applications/Microsoft Defender ATP.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{20dda326-4dce-498b-9f25-ca9d549c6999}">
+                <Publisher caseSensitive="True" compareAs="exact">Zscaler inc (PCBCQZJ7S7)</Publisher>
+                <Location>/Library/Application Support/Zscaler/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{4195c2d0-141f-4b9d-950e-00be6f4b8eea}">
+                <Publisher caseSensitive="True" compareAs="exact">Zscaler inc (PCBCQZJ7S7)</Publisher>
+                <Location>/Applications/Zscaler/Zscaler.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{c1c72ae9-590b-4b01-bf7e-1a0302059a79}">
+                <Publisher caseSensitive="True" compareAs="exact">Palo Alto Networks (PXPZ95SK77)</Publisher>
+                <Location>/Applications/GlobalProtect.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{b7781ecd-8038-41ec-9e3b-ee20388e07aa}">
+                <Publisher caseSensitive="True" compareAs="exact">CoSoSys (TV3T7A76P4)</Publisher>
+                <Location>/Applications/EndpointProtectorClient.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{e6c3935d-cb80-4926-9413-b5527db69e55}">
+                <Publisher caseSensitive="True" compareAs="exact">Qualys Inc. (CLRUMG7LZ6)</Publisher>
+                <Location>/Applications/QualysCloudAgent.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{3333c803-cb66-4632-9c28-59849df84cd5}">
+                <Publisher caseSensitive="True" compareAs="exact">Cisco (DE8Y96K9QP)</Publisher>
+                <Location>/Applications/Cisco/Cisco AnyConnect Secure Mobility Client.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{7038fa39-083a-4611-b875-0629eb8a1dde}">
+                <Publisher caseSensitive="True" compareAs="exact">Cisco (DE8Y96K9QP)</Publisher>
+                <Location>/opt/cisco/anyconnect/bin/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{f5ab8a75-f23d-475a-84cb-09afe0081082}">
+                <Publisher caseSensitive="True" compareAs="exact">Cisco (DE8Y96K9QP)</Publisher>
+                <Location>/Applications/Cisco/Cisco AnyConnect DART.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{a101307b-77e4-4b90-bab0-256389afcc2e}">
+                <Publisher caseSensitive="True" compareAs="exact">Cisco (DE8Y96K9QP)</Publisher>
+                <Location>/Applications/Cisco/Cisco AnyConnect Socket Filter.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{eba497a4-cc30-44c3-aa09-7682d7a77c8c}">
+                <Publisher caseSensitive="True" compareAs="exact">Cisco (DE8Y96K9QP)</Publisher>
+                <Location>/Applications/Cisco Proximity.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{8f623d67-5219-499f-b4f9-83006068dbbf}">
+                <Publisher caseSensitive="True" compareAs="exact">Cisco (DE8Y96K9QP)</Publisher>
+                <Location>/opt/cisco/anyconnect/NVM/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{3d6d9333-11a5-4c95-b38d-5ff8952503fa}">
+                <Publisher caseSensitive="True" compareAs="exact">Microsoft Corporation (UBF8T346G9)</Publisher>
+                <Location>/Applications/Visual Studio.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{02fb42cc-0f71-4a24-a70c-9255b44471b6}">
+                <Publisher caseSensitive="True" compareAs="exact">Atlassian Pty Ltd (UPXU4CQZ5P)</Publisher>
+                <Location>/Applications/Sourcetree.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{bee529c1-b57c-4bba-98d9-d09cc1d546d7}">
+                <Publisher caseSensitive="True" compareAs="exact">Oracle America, Inc. (VB5E2TV963)</Publisher>
+                <Location>/Applications/MySQLWorkbench.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{5b0b3949-b0b8-43ea-8648-bce85f516e87}">
+                <Publisher caseSensitive="True" compareAs="exact">Postdot Technologies, Inc (H7H8Q7M5CK)</Publisher>
+                <Location>/Applications/Postman.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{d8975dae-8d67-4e94-af88-22a14e7433dd}">
+                <Publisher caseSensitive="True" compareAs="exact">VMware, Inc. (EG7KH642X6)</Publisher>
+                <Location>/Applications/VMware Fusion.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{c45c746f-1843-49eb-be3f-df64ef7b6967}">
+                <Publisher caseSensitive="True" compareAs="exact">VMware, Inc. (EG7KH642X6)</Publisher>
+                <Location>/Library/Application Support/VMware/VMware Fusion</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{253d1b24-52a0-4af3-bd05-0282a7a27dae}">
+                <Publisher caseSensitive="True" compareAs="exact">Microsoft Corporation (UBF8T346G9)</Publisher>
+                <Location>/Applications/Visual Studio Code.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{d41d5335-7c82-4b41-afa0-8fd7d4d84bcb}">
+                <Publisher caseSensitive="True" compareAs="exact">Xamarin Inc (7V723M9SQ5)</Publisher>
+                <Location>/Library/Frameworks/Xamarin.iOS.framework/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{210ea35d-39fe-449f-a23f-c36bf6fd5cf5}">
+                <Publisher caseSensitive="True" compareAs="exact">JetBrains s.r.o. (2ZEFAR8TH3)</Publisher>
+                <Location>/Applications/IntelliJ IDEA CE.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{8eb7d80f-cc9c-416d-9670-cd6b6c15114f}">
+                <Publisher caseSensitive="True" compareAs="exact">JetBrains s.r.o. (2ZEFAR8TH3)</Publisher>
+                <Location>/Applications/PhpStorm.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{8baa350c-79da-4266-86ad-e7d1c0fa1d2c}">
+                <Publisher caseSensitive="True" compareAs="exact">JetBrains s.r.o. (2ZEFAR8TH3)</Publisher>
+                <Location>/Applications/GoLang.app/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{2370643d-fd51-4eb3-b9e0-598e275cf566}">
+                <Publisher caseSensitive="True" compareAs="exact">JetBrains s.r.o. (2ZEFAR8TH3)</Publisher>
+                <Location>/Applications/PyCharm CE.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{d7e9ce51-6b2e-4217-b479-aa3b898ccc4b}">
+                <Publisher caseSensitive="True" compareAs="exact">Docker Inc (9BNSXJN65R)</Publisher>
+                <Location>/Applications/Docker.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{a2209c71-8418-4efa-82c7-eea886d448a4}">
+                <Publisher caseSensitive="True" compareAs="exact">GitHub (VEKTX9H2N7)</Publisher>
+                <Location>/Applications/GitHub Desktop.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{07ce1e7e-0d9c-4312-a7ed-2d64056fc2e5}">
+                <Publisher caseSensitive="True" compareAs="exact">Scooter Software Inc. (BS29TEJF86)</Publisher>
+                <Location>/Applications/Beyond Compare.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{cf5141bc-bb30-4f46-b5d2-e1bb1e09fabc}">
+                <Publisher caseSensitive="True" compareAs="exact">Ned Deily (DJ3H93M7VJ)</Publisher>
+                <Location>/Library/Frameworks/Python.framework/Versions/</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{e6245267-e6a6-496e-a8c6-30dd25aaa72e}">
+                <Publisher caseSensitive="True" compareAs="exact">Ned Deily (DJ3H93M7VJ)</Publisher>
+                <Location>/Applications/Python 3.7/Python Launcher.app</Location>
+            </MacExclude>
+            <MacExclude ignoreFileOperations="True" ignoreProcessLaunches="True" targetId="{4b55a007-ee5b-481b-b973-9d41dc1beb12}">
+                <Publisher caseSensitive="True" compareAs="exact">Sublime HQ Pty Ltd (Z6D26JE4Y4)</Publisher>
+                <Location>/Applications/Sublime Text.app</Location>
+            </MacExclude>
+        </Targets>
+    </Policy>
+    <Policy action="12" excludeType="newFiles" id="17355164" name="[IGNORED LOCATIONS FOR NEW APPS POLICY]" order="1" serverPolicyId="{b78e10a5-883c-4a9d-8cb6-baaf15c17e24}">
+        <Targets>
+            <Exclude targetId="{49a2de6e-c548-4ee3-8658-c3bbbe6de12f}">
+                <Location>%WINDIR%\Installer</Location>
+            </Exclude>
+            <Exclude targetId="{fc167420-72d7-4c83-ba86-2c6db643dc58}">
+                <Location>*\Local Settings\Temporary Internet Files</Location>
+            </Exclude>
+            <Exclude targetId="{3f630475-9fb5-4952-8ba7-194f8b239129}">
+                <Location>*\Local Settings\Temp\Temporary Internet Files</Location>
+            </Exclude>
+            <Exclude targetId="{59b7613b-4123-4c6a-b0a6-592228916933}">
+                <Location>*\LocalService\Temp\Temporary Internet Files</Location>
+            </Exclude>
+            <Exclude targetId="{cb5947fd-45c5-46a7-b213-9d8b165dd1a2}">
+                <Location>*\Microsoft\Windows\Temporary Internet Files</Location>
+            </Exclude>
+            <Exclude targetId="{1a04d5cc-8652-426d-880e-133ec7b7cc96}">
+                <Location>*\Google\Chrome\User Data</Location>
+            </Exclude>
+            <Exclude targetId="{e9ed2656-470c-4c98-ba78-96fec0c7edb6}">
+                <Location>*\Mozilla\Firefox\Profiles</Location>
+            </Exclude>
+            <Exclude targetId="{aefa58bc-1946-403d-b5b6-f7ca7212dd12}">
+                <Location>*\Local Settings\Application Data\Apple Computer\Safari\</Location>
+            </Exclude>
+            <Exclude targetId="{b5bb8fb3-b740-412c-a191-9ba4114b2091}">
+                <Location>*\Roaming\AppleComputer\Safari</Location>
+            </Exclude>
+            <Exclude targetId="{661c6469-bf00-4b51-a58a-9b3421983d32}">
+                <Location>*\AppData\Local\Temp</Location>
+            </Exclude>
+            <Exclude targetId="{9ee72fc6-7bf2-4eee-a652-9926e7dd8f88}">
+                <Location>%WINDIR%\SoftwareDistribution\Download</Location>
+            </Exclude>
+            <Exclude targetId="{88126310-fb15-4607-a82b-dad4b0ae262b}">
+                <Location>%WINDIR%\winsxs</Location>
+            </Exclude>
+            <Exclude targetId="{6b967d24-c7f8-4b20-8c12-1ec8cc305990}">
+                <Location>%WINDIR%\SoftwareDistribution\SelfUpdate\Packages</Location>
+            </Exclude>
+            <Exclude targetId="{27c1bc7f-dd09-4f84-ac80-6d2e0f0fa10e}">
+                <Location>*:\RECYCLER</Location>
+            </Exclude>
+            <Exclude targetId="{9168db2a-2afd-426f-a5da-13c4b554f47d}">
+                <Location>*:\$Recycle.Bin</Location>
+            </Exclude>
+            <Exclude targetId="{9b791c70-c39b-42c9-a71e-df44ae1ff6a8}">
+                <Location>%WINDIR%\assembly</Location>
+            </Exclude>
+            <Exclude targetId="{bf02b4bc-0b10-42b0-a6f3-7a781809e7c3}">
+                <Location>%SystemDrive%\Config.msi</Location>
+            </Exclude>
+            <Exclude targetId="{edadfb5b-86e7-46dd-9f98-f4bee7eb6ca2}">
+                <Location>*:\System Volume Information</Location>
+            </Exclude>
+            <Exclude targetId="{1749e4f3-3050-4aa0-b1aa-95df12e0ddd5}">
+                <Location>*\AppData\Local\Microsoft\Windows\INetCache\IE</Location>
+            </Exclude>
+            <Exclude targetId="{242eb1aa-3619-44cf-a7a1-6e2d7b896bf4}">
+                <Location>*\AppData\Local\Microsoft\Windows\INetCache\Low</Location>
+            </Exclude>
+            <Exclude targetId="{1c060561-b04a-4be2-a725-e5fdb50ee5cb}">
+                <Location>%WINDIR%\System32\spool</Location>
+            </Exclude>
+            <Exclude targetId="{a1f9e7fc-5fa1-4662-af6c-5675de5a3312}">
+                <Location>%WINDIR%\Microsoft.NET\assembly</Location>
+            </Exclude>
+            <Exclude targetId="{542ba3e2-5777-43d4-83c0-f35cc11f6291}">
+                <Location>%SystemDrive%\Windows.old</Location>
+            </Exclude>
+            <Exclude targetId="{457c8d38-7a8a-4452-bca7-82bc8aeb0649}">
+                <Location>%SystemDrive%\$WINDOWS.~BT</Location>
+            </Exclude>
+            <Exclude targetId="{99ab5e5e-88a9-43c4-a565-ab2a9a1ee350}">
+                <Location>%SystemDrive%\$Windows.~WS</Location>
+            </Exclude>
+            <Exclude targetId="{d9d4530a-e109-4556-bf84-3c57c96862f4}">
+                <Location>%ProgramFiles%\WindowsApps</Location>
+            </Exclude>
+            <Exclude targetId="{a7a33278-0635-4f75-9481-005209edc614}">
+                <Location>%WINDIR%\rescache</Location>
+            </Exclude>
+            <Exclude targetId="{00e03157-6936-4854-aa4e-9f91bf9c6ab0}">
+                <Location>%SystemRoot%\Microsoft.NET\Framework\*\Temporary ASP.NET Files</Location>
+            </Exclude>
+            <Exclude targetId="{77505952-7c65-471d-a4ed-9b9d0d2f0c97}">
+                <Location>*\AppData\Local\Temp\Temporary ASP.NET Files</Location>
+            </Exclude>
+            <Exclude targetId="{ed629f9b-9cca-4b13-8845-6513afe54868}">
+                <Location>*\AppData\Local\Packages\Microsoft.MicrosoftEdge_*\AC\*\Cache</Location>
+            </Exclude>
+            <Exclude targetId="{7e694cb4-8098-46e5-8706-580c2fdeeb9c}">
+                <FileName>*.ps1</FileName>
+                <Location>%SystemRoot%\Temp</Location>
+            </Exclude>
+            <Exclude targetId="{1d0ec283-8ddc-4dd5-b280-3fdb99fb167a}">
+                <FileName>*.ps1</FileName>
+                <Location>%SystemRoot%\ccm\systemtemp</Location>
+            </Exclude>
+            <Exclude targetId="{f8142f45-24ff-4386-9476-55fe363eb5cc}">
+                <FileName>*.ps1</FileName>
+                <Location>%SystemRoot%\ccmtemp</Location>
+            </Exclude>
+        </Targets>
+    </Policy>
+    <Policy action="12" id="17355165" name="[EXCLUDE FILES POLICY]" order="1" serverPolicyId="{b78e10a5-883c-4a9d-8cb6-baaf15c17e24}">
+        <Targets>
+            <Exclude targetId="{a3771b83-4d43-4c7a-937c-56ae0f4ff8b1}">
+                <Location>%ProgramFiles(x86)%\Symantec\Symantec Endpoint Protection</Location>
+            </Exclude>
+            <Exclude targetId="{3db9a0d9-eb85-4b56-bab7-2154f9ddf638}">
+                <Location>%ProgramFiles%\Symantec\Symantec Endpoint Protection</Location>
+            </Exclude>
+            <Exclude targetId="{abe454be-96bb-40f0-91e6-ada41e115add}">
+                <Location>%ProgramFiles(x86)%\Sophos\Sophos Anti-Virus</Location>
+            </Exclude>
+            <Exclude targetId="{290ee92c-3f3e-4163-b716-87002d1a9c6f}">
+                <Location>%ProgramFiles%\Sophos\Sophos Anti-Virus</Location>
+            </Exclude>
+            <Exclude targetId="{d812ad3e-d275-4a23-8111-d7cf1b952b6c}">
+                <Location>%ProgramFiles(x86)%\McAfee\VirusScan Enterprise</Location>
+            </Exclude>
+            <Exclude targetId="{deacede1-1593-4b6c-8e56-04166e75381e}">
+                <Location>%ProgramFiles%\McAfee\VirusScan Enterprise</Location>
+            </Exclude>
+            <Exclude targetId="{08f2d43a-c463-4dae-99d2-def1d11f7691}">
+                <Location>%ProgramFiles(x86)%\McAfee\Endpoint Security</Location>
+            </Exclude>
+            <Exclude targetId="{06972e74-fbd5-458f-9a37-a6718e167f85}">
+                <Location>%ProgramFiles%\McAfee\Endpoint Security</Location>
+            </Exclude>
+            <Exclude targetId="{035eaf6c-6d8a-46af-b389-d918f7edcecb}">
+                <Location>%ProgramFiles(x86)%\Common Files\McAfee</Location>
+            </Exclude>
+            <Exclude targetId="{fbc5dd74-e82e-4bd1-b61f-895c536b35e4}">
+                <Location>%ProgramFiles%\Common Files\McAfee</Location>
+            </Exclude>
+            <Exclude targetId="{f25da0ac-dd12-47c5-b073-56cd7f96b266}">
+                <Location>%ProgramFiles%\ESET</Location>
+            </Exclude>
+            <Exclude targetId="{9d200ec2-f4aa-4c93-aeab-07a38fa01b25}">
+                <Location>%ProgramFiles(x86)%\Kaspersky Lab\</Location>
+            </Exclude>
+            <Exclude targetId="{cd48c5dd-a89f-49ec-af4d-bd9239051610}">
+                <Location>%ProgramFiles%\Kaspersky Lab\</Location>
+            </Exclude>
+            <Exclude targetId="{dfe31ef7-c7f8-4fcc-88ce-4d9fbe37ef60}">
+                <Location>%ProgramFiles(x86)%\Trend Micro\</Location>
+            </Exclude>
+            <Exclude targetId="{30b1461a-3be4-4390-9153-3a41b2f9f4ae}">
+                <Location>%ProgramFiles%\Trend Micro\</Location>
+            </Exclude>
+            <Exclude targetId="{987f8c5a-58fd-45b8-a68a-19e991e0c5bc}">
+                <Location>%ProgramFiles(x86)%\Windows Defender\</Location>
+            </Exclude>
+            <Exclude targetId="{5ed3230e-47a2-48fa-91bf-ef074f42b92a}">
+                <Location>%ProgramFiles%\Windows Defender\</Location>
+            </Exclude>
+            <Exclude targetId="{3a345bc3-f994-4a6c-9b30-02d6a65ef2ae}">
+                <Location>%ProgramFiles%\AVAST Software\Avast</Location>
+            </Exclude>
+            <Exclude targetId="{d9e6daec-9341-42c9-93e0-ea102bcbba8e}">
+                <Location>%ProgramFiles(x86)%\AVG\Av</Location>
+            </Exclude>
+            <Exclude targetId="{c0015648-3106-4c78-b34d-6028a8ca00bc}">
+                <Location>%ProgramFiles%\Common Files\AV\avast! Antivirus</Location>
+            </Exclude>
+            <Exclude targetId="{21bd73a0-e976-4c2b-acff-87b72cd7725c}">
+                <Location>%ProgramFiles%\Windows Defender Advanced Threat Protection\</Location>
+            </Exclude>
+            <Exclude targetId="{fde2ec37-9bcb-4d36-a036-113625d4bea5}">
+                <Location>%ProgramData%\Microsoft\Windows Defender\</Location>
+            </Exclude>
+            <Exclude targetId="{1621c323-b3a0-4189-a35c-bb5097dae427}">
+                <Location>%ProgramData%\Microsoft\Windows Defender Advanced Threat Protection\</Location>
+            </Exclude>
+        </Targets>
+    </Policy>
+    <Policy action="13" id="17355160" internalType="805" macMav="11.10.0.0" name="Intune Software Distribution" order="4220" serverPolicyId="{520ef819-4255-425a-ab18-ef78a1fa1912}" winMav="11.10.0.0">
+        <Targets>
+            <MacExecutable softwareDistributorName="Intune Software Distribution" targetId="{53011f5c-2749-4d53-b13d-3caa60c701aa}">
+                <Publisher caseSensitive="True" compareAs="exact">Microsoft Corporation (UBF8T346G9)</Publisher>
+                <Location>/Library/Intune/</Location>
+            </MacExecutable>
+        </Targets>
+    </Policy>
+    <Policy action="13" id="17355158" internalType="805" macMav="11.10.0.0" name="VMWare Workspace ONE" order="4220" serverPolicyId="{c34aa877-d01d-4b05-86eb-ea6e677d2463}" winMav="11.10.0.0">
+        <Targets>
+            <MacExecutable inheritable="True" softwareDistributorName="VMWare Workspace ONE" targetId="{268877d9-4e04-4032-91c3-3114125227be}">
+                <Publisher>Wandering WiFi LLC (S2ZMFGQM93)</Publisher>
+                <Location>/Applications/Workspace ONE Intelligent Hub.app/Contents/</Location>
+            </MacExecutable>
+            <MacExecutable inheritable="True" softwareDistributorName="VMWare Workspace ONE" targetId="{80808585-e5b7-4a25-951d-80e9047ce4c2}">
+                <Publisher>Wandering WiFi LLC (S2ZMFGQM93)</Publisher>
+                <Location>/Library/Application Support/AirWatch/</Location>
+            </MacExecutable>
+        </Targets>
+    </Policy>
+    <Policy action="13" id="17355157" internalType="805" macMav="11.10.0.0" name="Jamf Software Distribution" order="4220" serverPolicyId="{4be318b7-a8e9-4a96-bfc4-43c8d3920f74}" winMav="11.10.0.0">
+        <Targets>
+            <MacExecutable inheritable="True" softwareDistributorName="Jamf Software Distribution" targetId="{3f6ab604-fefa-4233-9d33-10dde9ef6d96}">
+                <Publisher>JAMF Software (483DWKW443)</Publisher>
+                <Location>/usr/local/jamf/</Location>
+            </MacExecutable>
+            <MacExecutable inheritable="True" softwareDistributorName="Jamf Software Distribution" targetId="{ca92894a-5312-4d69-b56c-4dd3bc74c16c}">
+                <Publisher>JAMF Software (483DWKW443)</Publisher>
+                <Location>/Library/Application Support/JAMF/</Location>
+            </MacExecutable>
+        </Targets>
+    </Policy>
+    <Policy action="13" id="17355159" internalType="805" macMav="11.10.0.0" name="Kandji Software Distribution" order="4220" serverPolicyId="{f6f15c9e-7f9b-4d35-912d-1455239316bb}" winMav="11.10.0.0">
+        <Targets>
+            <MacExecutable softwareDistributorName="Kandji Software Distribution" targetId="{8ec9b3a2-6e0f-429e-98f2-81f2a31927b5}">
+                <Publisher caseSensitive="True" compareAs="exact">Kandji, Inc. (P3FGV63VK7)</Publisher>
+                <Location caseSensitive="True">/Applications/Kandji Self Service.app/</Location>
+            </MacExecutable>
+            <MacExecutable softwareDistributorName="Kandji Software Distribution" targetId="{86b4adb8-56aa-4f0a-bdb5-0b24dcb96597}">
+                <Publisher caseSensitive="True" compareAs="exact">Kandji, Inc. (P3FGV63VK7)</Publisher>
+                <Location caseSensitive="True">/Library/Kandji/Kandji Agent.app</Location>
+            </MacExecutable>
+            <MacExecutable softwareDistributorName="Kandji Software Distribution" targetId="{7f3af320-fc1f-4d03-b92a-67aa221d9eb1}">
+                <Publisher caseSensitive="True" compareAs="exact">Kandji, Inc. (P3FGV63VK7)</Publisher>
+                <Location caseSensitive="True">/Library/Application Support/Kandji</Location>
+            </MacExecutable>
+        </Targets>
+    </Policy>
+    <GUI>
+        <Dialog id="{60a55fcb-c696-4aaa-816a-12b96a865136}" isDefault="True" name="Request for Authorization" type="37">&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+ &lt;head&gt;
+  &lt;title&gt;Request for Authorization&lt;/title&gt;
+ &lt;/head&gt;
+ &lt;body onload="Page_onLoad()" onclick="resetTimeout()" onkeypress="resetTimeout()" class="DialogWidth" style="background-color: #EEEFEE"&gt;
+   
+  &lt;title&gt;Request for Authorization&lt;/title&gt;
+  &lt;style type="text/css"&gt;
+
+    .DialogWidth
+    {
+    width: 580px;
+    }  
+
+&lt;/style&gt;
+  &lt;style type="text/css"&gt;VfMacCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/style&gt;
+  &lt;meta name="VfDialogType" content="VF_DLG_MAC_CHALLENGE_RESPONSE"&gt;
+  &lt;meta name="VfTemplateVersion" content="11.10"&gt;
+  &lt;meta name="VfVariables" content="FILE_PATH,FILE_NAME,FILE_DESCRIPTION,BUNDLE_NAME,BUNDLE_ID,BUNDLE_PATH,BUNDLE_VERSION,PUBLISHER,COMPANYNAME_NAME,COMMAND_LINE"&gt; 
+  &lt;input type="hidden" id="DialogTimeout" value="300"&gt; &lt;input type="hidden" id="DialogIcon" value=""&gt; &lt;input type="hidden" id="DefaultLanguge" value="en"&gt; &lt;input type="hidden" id="LongRequestFieldsMask" value="1"&gt; &lt;!-- I.e. EvfChallengeDataType.VF_FILE_NAME --&gt;
+  &lt;div class="Status Info" style="width: 580px"&gt;&lt;/div&gt;
+  &lt;div class="WatermarkContent DialogWidth"&gt;
+   &lt;div style="height:3px; background-color: #3165bd"&gt;&lt;/div&gt;
+   &lt;div class="HeaderForm"&gt;
+    &lt;table id="tblTitleArea" cellpadding="0" cellspacing="0" style="height: 90px;margin-right: 20px"&gt;
+     &lt;tbody&gt;
+      &lt;tr&gt;
+       &lt;td style="padding-left:20px;"&gt;&lt;img id="imgLogo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAfSURBVGhD7cEBAQAAAIIg/69uSEAAAAAAAAAAAMCJGiQwAAHA29C/AAAAAElFTkSuQmCC" style="width:34px;height:34px;margin-right:15px;display:none;" vfsrc="" vfsourcetype="CustomImage" alt=""&gt;&lt;/td&gt;
+       &lt;td id="divCaptionArea" class="CaptionArea" style=""&gt;&lt;span id="lblCaption" class="Caption" style=""&gt;Request for Authorization&lt;/span&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+     &lt;/tbody&gt;
+    &lt;/table&gt;
+   &lt;/div&gt;
+   &lt;div class="mac-thematic-break" style="height: 0px; margin-top: -10px;"&gt;
+    &lt;div style="max-height: 450px; margin-right: 7px; word-break: break-word;"&gt;
+     &lt;table cellpadding="0" cellspacing="0"&gt;
+      &lt;tbody&gt;
+       &lt;tr&gt;
+        &lt;td&gt;
+         &lt;div id="divInfoArea" style="padding-top: 5px"&gt;
+          &lt;div id="divExplanationArea" style="margin-bottom: 15px"&gt;
+           &lt;span id="lblExplanation"&gt;You have to obtain an Authorization Code in order to run this Application. 
+            &lt;br&gt; Please contact your Administrator and quote the Request ID displayed below.&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;table cellspacing="0"&gt;
+           &lt;tbody&gt;
+            &lt;tr id="tdInfo1Area" style=""&gt;
+             &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo1Name" style=""&gt;Description&lt;/span&gt;&lt;/td&gt;
+             &lt;td style="width:20px;"&gt;&lt;/td&gt;
+             &lt;td style=""&gt;&lt;span id="lblInfo1Value" style=""&gt;&amp;lt;$VF_FILE_NAME&amp;gt;&lt;/span&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr id="tdInfo2Area" style=""&gt;
+             &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo2Name" style=""&gt;Path&lt;/span&gt;&lt;/td&gt;
+             &lt;td style="width:20px;"&gt;&lt;/td&gt;
+             &lt;td style=""&gt;&lt;span id="lblInfo2Value" style=""&gt;&amp;lt;$VF_FILE_PATH&amp;gt;&lt;/span&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr id="tdInfo3Area" style=""&gt;
+             &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo3Name" style=""&gt;Publisher&lt;/span&gt;&lt;/td&gt;
+             &lt;td style="width:20px;"&gt;&lt;/td&gt;
+             &lt;td style=""&gt;&lt;span id="lblInfo3Value" style=""&gt;&amp;lt;$VF_PUBLISHER&amp;gt;&lt;/span&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+           &lt;/tbody&gt;
+          &lt;/table&gt;
+         &lt;/div&gt;
+         &lt;br&gt;
+         &lt;div id="divRequestIdArea" style="width:327px;display:block;"&gt;
+          &lt;span id="lblRequestId" style=""&gt;Request ID&lt;/span&gt;
+          &lt;br&gt;
+          &lt;div style=""&gt;
+           &lt;input id="txtRequestId" type="text" class="Txt" style="width:300px;height:34px;margin-top:5px;" readonly tabindex="1" autofocus&gt;
+           &lt;div class="divImgCopyRequestId" style="padding-left:10px;padding-top:10px;"&gt;
+            &lt;img id="imgCopyRequestId" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAATCAYAAAB2pebxAAAAAXNSR0IArs4c6QAAAVVJREFUOBFjZIACh4L9Ap+/MbDA+NhoNm72f8f7rd6hyzE2NPxn2vh0/2YGhv9e6JLY+MzMTI5nZjgeQJZj2fb6iArIAFYmRoO//9neI0uis9mYmP4en2H1FF2c5e/vf+wgQXlJ8eurG7R/gdjWZUd4WX/9Zgax0QHI2yCx32ysf4922XwGsRmN0w7q/vv/55KKtATYsDvPXu5i+P/fHiRJEDAyHuOXYnRGCcj7L16aMv5nMGdlYtX+x8T4A58h//7+YfvH8P/052eMliiGAAXZGRgZfp6caXcNnwEwOcPUfd8ZGRg4mGAClNCjhmCG3iAKE2ZWjmfAuF6/ql7rN6ZDiRNhOjXV/O252c5BjIzAtEomoEqYoCR7JgaW9/8Y/nIbpe9LY/zP+JOAw1j/Mfzj+8f8/z0wOFCBUdrelv8MjD5ACaxFAVz1////GBgZd5yb5VQOAN6Razm8JZiHAAAAAElFTkSuQmCC" style="border-top-width:0px;border-right-width:0px;border-bottom-width:0px;border-left-width:0px;width:17px;height:19px;" alt="Copy" onclick="copyToClipboard('txtRequestId')"&gt;
+           &lt;/div&gt;
+          &lt;/div&gt;
+         &lt;/div&gt;
+         &lt;div id="divFileIdArea" style="width:480px;display:none;"&gt;
+          &lt;span id="lblFileId" style="display:none;"&gt;Request ID&lt;/span&gt;
+          &lt;br&gt;
+          &lt;textarea id="txtFileId" style="width:480px;height:70px;margin-top:5px;display:none;" readonly tabindex="3"&gt;&lt;/textarea&gt;
+          &lt;div class="divImgCopyFileId" style="display:none;"&gt;
+           &lt;img id="imgCopyFileId" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAATCAYAAAB2pebxAAAAAXNSR0IArs4c6QAAAVVJREFUOBFjZIACh4L9Ap+/MbDA+NhoNm72f8f7rd6hyzE2NPxn2vh0/2YGhv9e6JLY+MzMTI5nZjgeQJZj2fb6iArIAFYmRoO//9neI0uis9mYmP4en2H1FF2c5e/vf+wgQXlJ8eurG7R/gdjWZUd4WX/9Zgax0QHI2yCx32ysf4922XwGsRmN0w7q/vv/55KKtATYsDvPXu5i+P/fHiRJEDAyHuOXYnRGCcj7L16aMv5nMGdlYtX+x8T4A58h//7+YfvH8P/052eMliiGAAXZGRgZfp6caXcNnwEwOcPUfd8ZGRg4mGAClNCjhmCG3iAKE2ZWjmfAuF6/ql7rN6ZDiRNhOjXV/O252c5BjIzAtEomoEqYoCR7JgaW9/8Y/nIbpe9LY/zP+JOAw1j/Mfzj+8f8/z0wOFCBUdrelv8MjD5ACaxFAVz1////GBgZd5yb5VQOAN6Razm8JZiHAAAAAElFTkSuQmCC" style="border-top-width:0px;border-right-width:0px;border-bottom-width:0px;border-left-width:0px;width:17px;height:19px;display:none;" alt="Copy" onclick="copyToClipboard('txtFileId')"&gt;
+          &lt;/div&gt;
+         &lt;/div&gt;
+         &lt;br&gt;
+         &lt;div id="divAutorizationCodeArea" vfhidable="false"&gt;
+          &lt;span id="lblAutorizationCode"&gt;Authorization Code&lt;/span&gt;
+          &lt;br&gt;
+          &lt;textarea id="txtAutorizationCode" style="width: 533px; height: 70px; margin-top: 5px; display: block; resize: none;" tabindex="2"&gt;&lt;/textarea&gt;
+         &lt;/div&gt;
+        &lt;/td&gt;
+       &lt;/tr&gt;
+      &lt;/tbody&gt;
+     &lt;/table&gt;
+     &lt;br&gt;
+     &lt;br&gt;
+     &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+      &lt;tbody&gt;
+       &lt;tr id="divButtonArea" style="width: 100%"&gt;
+        &lt;td class="Buttons"&gt;
+         &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+          &lt;tbody&gt;
+           &lt;tr&gt;
+            &lt;td style="width:100%"&gt;&lt;/td&gt;
+            &lt;td align="right"&gt;
+             &lt;button id="btnCancel" type="submit" style="margin-right:10px;" onclick="external.JsOnCancel()" vfactionbutton="false" accesskey="C" tabindex="5"&gt;&lt;u&gt;C&lt;/u&gt;ancel&lt;/button&gt;
+            &lt;/td&gt;
+            &lt;td align="right"&gt;
+             &lt;button id="btnOK" type="submit" onclick="external.JsOnOk()" vfhidable="true" vfactionbutton="true" accesskey="O" tabindex="4" style=""&gt;&lt;u&gt;O&lt;/u&gt;k&lt;/button&gt;
+            &lt;/td&gt;
+            &lt;!-- Don't call validateJustification because macOS Agent validates Justification by himself --&gt;
+           &lt;/tr&gt;
+          &lt;/tbody&gt;
+         &lt;/table&gt;
+        &lt;/td&gt;
+       &lt;/tr&gt;
+      &lt;/tbody&gt;
+     &lt;/table&gt;
+     &lt;div style="height: 20px;"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+   &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;VfCommonScript_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/script&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;
+var ActionButton  = EButtons.Cancel;    // Button which will be "clicked" automatically when timeout will be expired but no user action taken.
+
+function Page_onLoad()
+{
+var isPreviewMode = IsPreviewMode();
+
+if (!isPreviewMode)
+{
+RequestLanguage();
+substituteVars( ["lblCaption", "lblExplanation", "lblInfo1Name", "lblInfo1Value", "lblInfo2Name", "lblInfo2Value", "lblInfo3Name", "lblInfo3Value", "lblRequestId", "lblFileId", "lblAutorizationCode" ]);
+InitOfflineRequestArea();
+
+InitTimeout   = getTimeout(InitTimeout);
+Timeout       = InitTimeout;
+
+btnOKText     = document.getElementById("btnOK").innerHTML;
+btnCancelText = document.getElementById("btnCancel").innerHTML;
+
+setTimeout(function() { showTimeout(); }, 20);
+}
+}
+
+function copyToClipboard(ctrlId)
+{
+var ctrl = document.getElementById(ctrlId);
+if (ctrl != null)
+//window.clipboardData.setData("Text", ctrl.value);
+external.JsCopyToClipboard(ctrl.value);
+}
+&lt;/script&gt;
+  &lt;input type="hidden" ctrlid="DialogTitle" lang="en" value="Request for Authorization"&gt;&lt;input type="hidden" ctrlid="lblCaption" lang="en" value="Request for Authorization"&gt;&lt;input type="hidden" ctrlid="lblInfo1Name" lang="en" value="Description"&gt;&lt;input type="hidden" ctrlid="lblInfo1Value" lang="en" value="&amp;amp;lt;$VF_FILE_NAME&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblInfo2Name" lang="en" value="Path"&gt;&lt;input type="hidden" ctrlid="lblInfo2Value" lang="en" value="&amp;amp;lt;$VF_FILE_PATH&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblInfo3Name" lang="en" value="Publisher"&gt;&lt;input type="hidden" ctrlid="lblInfo3Value" lang="en" value="&amp;amp;lt;$VF_PUBLISHER&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblExplanation" lang="en" value="You have to obtain an Authorization Code in order to run this Application. &amp;lt;br&amp;gt;
+ Please contact your Administrator and quote the Request ID displayed below."&gt;&lt;input type="hidden" ctrlid="lblRequestId" lang="en" value="Request ID"&gt;&lt;input type="hidden" ctrlid="lblFileId" lang="en" value="Request ID"&gt;&lt;input type="hidden" ctrlid="lblAutorizationCode" lang="en" value="Authorization Code"&gt;&lt;input type="hidden" ctrlid="btnOK" lang="en" value="&amp;lt;u&amp;gt;O&amp;lt;/u&amp;gt;k"&gt;&lt;input type="hidden" ctrlid="btnCancel" lang="en" value="&amp;lt;u&amp;gt;C&amp;lt;/u&amp;gt;ancel"&gt;
+ &lt;/body&gt;
+&lt;/html&gt;</Dialog>
+        <Dialog id="{329e6a5c-126c-4bf6-9ccd-09a18939011c}" isDefault="True" name="About" type="36">&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+ &lt;head&gt;
+  &lt;title&gt;About&lt;/title&gt;
+ &lt;/head&gt;
+ &lt;body onload="Page_onLoad()" class="DialogWidth" style="background-color: #EEEFEE"&gt;
+   
+  &lt;title&gt;About&lt;/title&gt;
+  &lt;style type="text/css"&gt;
+.DialogWidth {
+width: 580px;
+}
+&lt;/style&gt;
+  &lt;style type="text/css"&gt;VfMacCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/style&gt;
+  &lt;meta name="VfDialogType" content="VF_DLG_MAC_ABOUT"&gt;
+  &lt;meta name="VfTemplateVersion" content="7.2"&gt;
+  &lt;meta name="VfVariables" content=""&gt; 
+  &lt;input type="hidden" id="DialogIcon" value=""&gt; &lt;input type="hidden" id="DefaultLanguge" value="en"&gt;
+  &lt;div class="WatermarkContent DialogWidth"&gt;
+   &lt;div style="height:3px; background-color: #3165bd"&gt;&lt;/div&gt;
+   &lt;div&gt;
+    &lt;div style="height: 106px;margin-right: 20px"&gt;
+     &lt;table id="tblTitleArea" cellpadding="0" cellspacing="0"&gt;
+      &lt;tbody&gt;
+       &lt;tr&gt;
+        &lt;td class="HeaderIcon" style="padding-left:20px;padding-top: 19px"&gt;&lt;img src="data:image/png;base64,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"&gt;&lt;/td&gt;
+       &lt;/tr&gt;
+       &lt;tr&gt;
+        &lt;td id="divCaptionArea" class="CaptionArea" vfhidable="false" vfeditable="false" style="padding-left: 20px;padding-top: 10px"&gt;&lt;span id="lblCaption" class="CaptionCyberArk"&gt;About Cyberark EPM software&lt;/span&gt;&lt;/td&gt;
+       &lt;/tr&gt;
+      &lt;/tbody&gt;
+     &lt;/table&gt;
+    &lt;/div&gt;
+    &lt;div class="mac-thematic-break"&gt;&lt;/div&gt;
+    &lt;table cellpadding="0" cellspacing="0" style="padding-right:20px"&gt;
+     &lt;tbody&gt;
+      &lt;tr&gt;
+       &lt;td class="tdIndentLeft"&gt;
+        &lt;div id="divIndentLeft" style="width:20px"&gt;&lt;/div&gt;
+       &lt;/td&gt;
+       &lt;td&gt;
+        &lt;div id="divProductDetailsArea" vfhidable="false" vfeditable="false" style="margin-top: 21px"&gt;
+         &lt;span id="lblProductDetails" style="line-height: 25px"&gt;&amp;lt;$VF_AGENT_PRODUCTNAME&amp;gt; 
+          &lt;br&gt; &amp;lt;$VF_AGENT_VERSION&amp;gt; 
+          &lt;br&gt; &amp;lt;$VF_AGENT_COPYRIGHT&amp;gt;&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div id="divPolicyUpdateArea" vfhidable="false" vfeditable="false" style="margin-top: 20px; line-height: 20px"&gt;
+         &lt;span id="lblPolicyUpdate"&gt;Last Policy update: &amp;lt;$VF_AGENT_LAST_POLICY_UPDATE&amp;gt;&lt;/span&gt;
+        &lt;/div&gt;
+       &lt;/td&gt;
+       &lt;td class="tdIndentRight"&gt;&amp;nbsp;&lt;/td&gt;
+      &lt;/tr&gt;
+     &lt;/tbody&gt;
+    &lt;/table&gt;
+    &lt;table cellpadding="0" cellspacing="0" style="width:100%; padding-right:20px; margin-top: 44px"&gt;
+     &lt;tbody&gt;
+      &lt;tr id="divButtonArea"&gt;
+       &lt;td style="width:100%; text-align:right; padding-right:3px"&gt;
+        &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+         &lt;tbody&gt;
+          &lt;tr&gt;
+           &lt;td style="width:100%"&gt;&lt;/td&gt;
+           &lt;td align="right"&gt;
+            &lt;button id="btnOK" type="submit" vfeditable="false" class="Btn Def" autofocus onclick="external.JsOnOk()" vfactionbutton="true" accesskey="C" tabindex="1"&gt;&lt;u&gt;C&lt;/u&gt;lose&lt;/button&gt;
+           &lt;/td&gt;
+          &lt;/tr&gt;
+         &lt;/tbody&gt;
+        &lt;/table&gt;
+       &lt;/td&gt;
+      &lt;/tr&gt;
+     &lt;/tbody&gt;
+    &lt;/table&gt;
+    &lt;div style="height: 20px;"&gt;&lt;/div&gt;
+   &lt;/div&gt;
+   &lt;script language="javascript" type="text/javascript"&gt;VfCommonScript_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/script&gt;
+   &lt;script language="javascript" type="text/javascript"&gt;
+function Page_onLoad()
+{
+var isPreviewMode = IsPreviewMode();
+if (!isPreviewMode)
+{
+RequestLanguage();
+
+substituteVars( ["lblCaption", "lblProductDetails", "lblPolicyUpdate" ]);
+}
+}
+&lt;/script&gt;
+  &lt;/div&gt;
+  &lt;input type="hidden" ctrlid="DialogTitle" lang="en" value="About"&gt;&lt;input type="hidden" ctrlid="lblCaption" lang="en" value="About Cyberark EPM software"&gt;&lt;input type="hidden" ctrlid="lblProductDetails" lang="en" value="&amp;amp;lt;$VF_AGENT_PRODUCTNAME&amp;amp;gt; &amp;lt;br&amp;gt;
+ &amp;amp;lt;$VF_AGENT_VERSION&amp;amp;gt; &amp;lt;br&amp;gt;
+ &amp;amp;lt;$VF_AGENT_COPYRIGHT&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblPolicyUpdate" lang="en" value="Last Policy update: &amp;amp;lt;$VF_AGENT_LAST_POLICY_UPDATE&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="btnOK" lang="en" value="&amp;lt;u&amp;gt;C&amp;lt;/u&amp;gt;lose"&gt;
+ &lt;/body&gt;
+&lt;/html&gt;</Dialog>
+        <Dialog id="{edaed672-9fbe-4456-a729-314889993b29}" isDefault="True" name="Run using authorization code" type="38">&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+ &lt;head&gt;
+  &lt;title&gt;Run using authorization code&lt;/title&gt;
+ &lt;/head&gt;
+ &lt;body onload="Page_onLoad()" onclick="resetTimeout()" onkeypress="resetTimeout()" class="DialogWidth" style="background-color: #EEEFEE"&gt;
+   
+  &lt;title&gt;Run using authorization code&lt;/title&gt;
+  &lt;style type="text/css"&gt;
+
+    .DialogWidth
+    {
+    width: 580px;
+    }  
+
+&lt;/style&gt;
+  &lt;style type="text/css"&gt;VfMacCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/style&gt;
+  &lt;meta name="VfDialogType" content="VF_DLG_MAC_AUTHORIZATION_CODE"&gt;
+  &lt;meta name="VfTemplateVersion" content="11.9"&gt;
+  &lt;meta name="VfVariables" content="FILE_PATH,FILE_NAME,FILE_DESCRIPTION,BUNDLE_NAME,BUNDLE_ID,BUNDLE_PATH,BUNDLE_VERSION,PUBLISHER,COMPANYNAME_NAME,COMMAND_LINE"&gt; 
+  &lt;input type="hidden" id="DialogTimeout" value="300"&gt; &lt;input type="hidden" id="DialogIcon" value=""&gt; &lt;input type="hidden" id="DefaultLanguge" value="en"&gt;
+  &lt;div class="Status Info" style="width: 580px"&gt;&lt;/div&gt;
+  &lt;div class="WatermarkContent DialogWidth"&gt;
+   &lt;div style="height:3px; background-color: #3165bd"&gt;&lt;/div&gt;
+   &lt;div class="HeaderForm"&gt;
+    &lt;table id="tblTitleArea" cellpadding="0" cellspacing="0" style="height: 90px;margin-right: 20px"&gt;
+     &lt;tbody&gt;
+      &lt;tr&gt;
+       &lt;td style="padding-left:20px;"&gt;&lt;img id="imgLogo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAfSURBVGhD7cEBAQAAAIIg/69uSEAAAAAAAAAAAMCJGiQwAAHA29C/AAAAAElFTkSuQmCC" style="width:35px;height:35px;display:none;" vfsrc="" vfsourcetype="CustomImage" alt=""&gt;&lt;/td&gt;
+       &lt;td id="divCaptionArea" class="CaptionArea" style=""&gt;&lt;span id="lblCaption" class="Caption" style=""&gt;Run using authorization code&lt;/span&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+     &lt;/tbody&gt;
+    &lt;/table&gt;
+   &lt;/div&gt;
+   &lt;div class="mac-thematic-break" style="height: 0px; margin-top: -10px;"&gt;
+    &lt;div style="max-height: 450px; margin-right: 7px; word-break: break-word;"&gt;
+     &lt;table cellpadding="0" cellspacing="0"&gt;
+      &lt;tbody&gt;
+       &lt;tr&gt;
+        &lt;td&gt;
+         &lt;div id="divInfoArea" style="padding-top: 5px"&gt;
+          &lt;div id="divExplanationArea" style="margin-bottom: 15px"&gt;
+           &lt;span id="lblExplanation"&gt;You have to obtain an Authorization Code in order to run this Application. 
+            &lt;br&gt; Please contact your Administrator.&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;table cellspacing="0"&gt;
+           &lt;tbody&gt;
+            &lt;tr id="tdInfo1Area" style=""&gt;
+             &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo1Name" style=""&gt;Description&lt;/span&gt;&lt;/td&gt;
+             &lt;td style="width:20px;"&gt;&lt;/td&gt;
+             &lt;td style=""&gt;&lt;span id="lblInfo1Value" style=""&gt;&amp;lt;$VF_FILE_NAME&amp;gt;&lt;/span&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr id="tdInfo2Area" style=""&gt;
+             &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo2Name" style=""&gt;Path&lt;/span&gt;&lt;/td&gt;
+             &lt;td style="width:20px;"&gt;&lt;/td&gt;
+             &lt;td style=""&gt;&lt;span id="lblInfo2Value" style=""&gt;&amp;lt;$VF_FILE_PATH&amp;gt;&lt;/span&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr id="tdInfo3Area" style=""&gt;
+             &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo3Name" style=""&gt;Publisher&lt;/span&gt;&lt;/td&gt;
+             &lt;td style="width:20px;"&gt;&lt;/td&gt;
+             &lt;td style=""&gt;&lt;span id="lblInfo3Value" style=""&gt;&amp;lt;$VF_PUBLISHER&amp;gt;&lt;/span&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+           &lt;/tbody&gt;
+          &lt;/table&gt;
+         &lt;/div&gt;
+         &lt;br&gt;
+         &lt;div id="divAutorizationCodeArea" vfhidable="false"&gt;
+          &lt;span id="lblAutorizationCode"&gt;Authorization Code&lt;/span&gt;
+          &lt;br&gt;
+          &lt;textarea id="txtAutorizationCode" style="width: 533px; height:70px; margin-top: 5px; display: block; resize: none;" rows="3" tabindex="1" autofocus&gt;&lt;/textarea&gt;
+         &lt;/div&gt;
+        &lt;/td&gt;
+       &lt;/tr&gt;
+      &lt;/tbody&gt;
+     &lt;/table&gt;
+     &lt;br&gt;
+     &lt;br&gt;
+     &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+      &lt;tbody&gt;
+       &lt;tr id="divButtonArea" style="width: 100%"&gt;
+        &lt;td class="Buttons"&gt;
+         &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+          &lt;tbody&gt;
+           &lt;tr&gt;
+            &lt;td style="width:100%"&gt;&lt;/td&gt;
+            &lt;td align="right"&gt;
+             &lt;button id="btnCancel" type="submit" style="margin-right:10px;" onclick="external.JsOnCancel()" vfactionbutton="false" accesskey="C" tabindex="3"&gt;&lt;u&gt;C&lt;/u&gt;ancel&lt;/button&gt;
+            &lt;/td&gt;
+            &lt;td align="right"&gt;
+             &lt;button id="btnOK" type="submit" onclick="external.JsOnOk()" vfhidable="true" vfactionbutton="true" accesskey="O" tabindex="2" style=""&gt;&lt;u&gt;O&lt;/u&gt;k&lt;/button&gt;
+            &lt;/td&gt;
+            &lt;!-- Don't call validateJustification because macOS Agent validates Justification by himself --&gt;
+           &lt;/tr&gt;
+          &lt;/tbody&gt;
+         &lt;/table&gt;
+        &lt;/td&gt;
+       &lt;/tr&gt;
+      &lt;/tbody&gt;
+     &lt;/table&gt;
+     &lt;div style="height: 20px;"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+   &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;VfCommonScript_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/script&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;
+var ActionButton  = EButtons.Cancel;    // Button which will be "clicked" automatically when timeout will be expired but no user action taken.
+
+function Page_onLoad()
+{
+var isPreviewMode = IsPreviewMode();
+
+if (!isPreviewMode)
+{
+RequestLanguage();
+substituteVars( ["lblCaption", "lblExplanation", "lblInfo1Name", "lblInfo1Value", "lblInfo2Name", "lblInfo2Value", "lblInfo3Name", "lblInfo3Value", "lblRequestId", "lblFileId", "lblAutorizationCode" ]);
+InitOfflineRequestArea();
+
+InitTimeout   = getTimeout(InitTimeout);
+Timeout       = InitTimeout;
+
+btnOKText     = document.getElementById("btnOK").innerHTML;
+btnCancelText = document.getElementById("btnCancel").innerHTML;
+
+setTimeout(function() { showTimeout(); }, 20);
+}
+}
+
+function copyToClipboard(ctrlId)
+{
+var ctrl = document.getElementById(ctrlId);
+if (ctrl != null)
+//window.clipboardData.setData("Text", ctrl.value);
+external.JsCopyToClipboard(ctrl.value);
+}
+&lt;/script&gt;
+  &lt;input type="hidden" ctrlid="DialogTitle" lang="en" value="Run using authorization code"&gt;&lt;input type="hidden" ctrlid="lblCaption" lang="en" value="Run using authorization code"&gt;&lt;input type="hidden" ctrlid="lblInfo1Name" lang="en" value="Description"&gt;&lt;input type="hidden" ctrlid="lblInfo1Value" lang="en" value="&amp;amp;lt;$VF_FILE_NAME&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblInfo2Name" lang="en" value="Path"&gt;&lt;input type="hidden" ctrlid="lblInfo2Value" lang="en" value="&amp;amp;lt;$VF_FILE_PATH&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblInfo3Name" lang="en" value="Publisher"&gt;&lt;input type="hidden" ctrlid="lblInfo3Value" lang="en" value="&amp;amp;lt;$VF_PUBLISHER&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblExplanation" lang="en" value="You have to obtain an Authorization Code in order to run this Application. &amp;lt;br&amp;gt;
+ Please contact your Administrator."&gt;&lt;input type="hidden" ctrlid="lblAutorizationCode" lang="en" value="Authorization Code"&gt;&lt;input type="hidden" ctrlid="btnOK" lang="en" value="&amp;lt;u&amp;gt;O&amp;lt;/u&amp;gt;k"&gt;&lt;input type="hidden" ctrlid="btnCancel" lang="en" value="&amp;lt;u&amp;gt;C&amp;lt;/u&amp;gt;ancel"&gt;
+ &lt;/body&gt;
+&lt;/html&gt;</Dialog>
+        <Dialog id="{ebe9b5ea-7b47-4d20-bb96-cb00182f991a}" isDefault="True" name="Request for Authorization" type="21">&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+ &lt;head&gt;
+  &lt;title&gt;Request for Authorization&lt;/title&gt;
+ &lt;/head&gt;
+ &lt;body onload="Page_onLoad()" onclick="resetTimeout()" onkeypress="resetTimeout()" class="DialogWidth"&gt;
+   
+  &lt;title&gt;Request for Authorization&lt;/title&gt;
+  &lt;style type="text/css"&gt;
+.DialogWidth {
+width: 580px;
+}
+&lt;/style&gt;
+  &lt;style type="text/css"&gt;
+VfWinCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684
+&lt;/style&gt;
+  &lt;meta name="VfDialogType" content="VF_DLG_CHALLENGE_RESPONSE"&gt;
+  &lt;meta name="VfTemplateVersion" content="4.21"&gt;
+  &lt;meta name="VfVariables" content="TARGET_DISPLAY_NAME,FILE_PATH,FILE_NAME,FILE_DESCRIPTION,VERSION,PRODUCT_VERSION,PRODUCT_NAME,COMPANYNAME_NAME,LEGAL_COPYRIGHT,PUBLISHER,COMMAND_LINE,CLSID,CODE_URL,MIME_TYPE,IMAGE_NAME,ERROR_TEXT"&gt; 
+  &lt;input type="hidden" id="DialogTimeout" value="300"&gt; &lt;input type="hidden" id="DialogIcon" value=""&gt; &lt;input type="hidden" id="DefaultLanguge" value="en"&gt; &lt;input type="hidden" id="LongRequestFieldsMask" value="1"&gt; &lt;!-- I.e. EvfChallengeDataType.VF_FILE_NAME --&gt;
+  &lt;epmconfiguration epmauthselectedcontrols="divFileIdArea,divAutorizationCodeArea"&gt;&lt;/epmconfiguration&gt;
+  &lt;div class="Status Info" style="width: 590px"&gt;&lt;/div&gt;
+  &lt;div class="WatermarkContent DialogWidth"&gt;
+   &lt;div class="HeaderForm"&gt;
+    &lt;table id="tblTitleArea" cellpadding="0" cellspacing="0"&gt;
+     &lt;tbody&gt;
+      &lt;tr&gt;
+       &lt;td style="vertical-align:top;"&gt;&lt;img id="imgLogo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAfSURBVGhD7cEBAQAAAIIg/69uSEAAAAAAAAAAAMCJGiQwAAHA29C/AAAAAElFTkSuQmCC" style="width:35px;height:35px;display:none;" vfsrc="" vfsourcetype="CustomImage" alt=""&gt;&lt;/td&gt;
+       &lt;td id="divCaptionArea" class="CaptionArea" style=""&gt;&lt;span id="lblCaption" class="Caption" style=""&gt;Request for Authorization&lt;/span&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+     &lt;/tbody&gt;
+    &lt;/table&gt;
+   &lt;/div&gt;
+   &lt;table cellpadding="0" cellspacing="0"&gt;
+    &lt;tbody&gt;
+     &lt;tr&gt;
+      &lt;td class="tdIndentLeft"&gt;&amp;nbsp;&lt;/td&gt;
+      &lt;td&gt;
+       &lt;div id="divInfoArea" style="padding-top: 5px"&gt;
+        &lt;div id="divExplanationArea" style="margin-bottom: 15px"&gt;
+         &lt;span id="lblExplanation"&gt;You have to obtain an Authorization Code in order to run this Application. Please contact your Administrator and quote the Request ID displayed below.&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;table cellspacing="0"&gt;
+         &lt;tbody&gt;
+          &lt;tr id="tdInfo1Area" style=""&gt;
+           &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo1Name" style=""&gt;File name&lt;/span&gt;&lt;/td&gt;
+           &lt;td style=""&gt;&lt;span id="lblInfo1Value" style=""&gt;&amp;lt;$VF_FILE_NAME&amp;gt;&lt;/span&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+          &lt;tr id="tdInfo2Area" style=""&gt;
+           &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo2Name" style=""&gt;Path&lt;/span&gt;&lt;/td&gt;
+           &lt;td style=""&gt;&lt;span id="lblInfo2Value" style=""&gt;&amp;lt;$VF_FILE_PATH&amp;gt;&lt;/span&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+          &lt;tr id="tdInfo3Area" style=""&gt;
+           &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo3Name" style=""&gt;Description&lt;/span&gt;&lt;/td&gt;
+           &lt;td style=""&gt;&lt;span id="lblInfo3Value" style=""&gt;&amp;lt;$VF_FILE_DESCRIPTION&amp;gt;&lt;/span&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+         &lt;/tbody&gt;
+        &lt;/table&gt;
+       &lt;/div&gt;
+       &lt;div id="divRequestIdArea" style="width:300px;display:none;"&gt;
+        &lt;span id="lblRequestId" style="display:none;"&gt;Request ID&lt;/span&gt;
+        &lt;br&gt;
+        &lt;input id="txtRequestId" type="text" class="Txt" style="width:300px;margin-top:5px;display:none;" readonly tabindex="1" autofocus&gt;
+        &lt;div class="divImgCopyRequestId" style="display:none;"&gt;
+         &lt;img id="imgCopyRequestId" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAATCAYAAAB2pebxAAAAAXNSR0IArs4c6QAAAVVJREFUOBFjZIACh4L9Ap+/MbDA+NhoNm72f8f7rd6hyzE2NPxn2vh0/2YGhv9e6JLY+MzMTI5nZjgeQJZj2fb6iArIAFYmRoO//9neI0uis9mYmP4en2H1FF2c5e/vf+wgQXlJ8eurG7R/gdjWZUd4WX/9Zgax0QHI2yCx32ysf4922XwGsRmN0w7q/vv/55KKtATYsDvPXu5i+P/fHiRJEDAyHuOXYnRGCcj7L16aMv5nMGdlYtX+x8T4A58h//7+YfvH8P/052eMliiGAAXZGRgZfp6caXcNnwEwOcPUfd8ZGRg4mGAClNCjhmCG3iAKE2ZWjmfAuF6/ql7rN6ZDiRNhOjXV/O252c5BjIzAtEomoEqYoCR7JgaW9/8Y/nIbpe9LY/zP+JOAw1j/Mfzj+8f8/z0wOFCBUdrelv8MjD5ACaxFAVz1////GBgZd5yb5VQOAN6Razm8JZiHAAAAAElFTkSuQmCC" style="border-top-width:0px;border-right-width:0px;border-bottom-width:0px;border-left-width:0px;width:17px;height:19px;display:none;" alt="Copy" onclick="copyToClipboard('txtRequestId')" tabindex="2"&gt;
+        &lt;/div&gt;
+       &lt;/div&gt;
+       &lt;div id="divFileIdArea" style="width:480px;display:block;"&gt;
+        &lt;span id="lblFileId" style=""&gt;Request ID&lt;/span&gt;
+        &lt;br&gt;
+        &lt;textarea id="txtFileId" style="width:480px;height:70px;margin-top:5px;" readonly tabindex="3"&gt;&lt;/textarea&gt;
+        &lt;div class="divImgCopyFileId" style=""&gt;
+         &lt;img id="imgCopyFileId" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAATCAYAAAB2pebxAAAAAXNSR0IArs4c6QAAAVVJREFUOBFjZIACh4L9Ap+/MbDA+NhoNm72f8f7rd6hyzE2NPxn2vh0/2YGhv9e6JLY+MzMTI5nZjgeQJZj2fb6iArIAFYmRoO//9neI0uis9mYmP4en2H1FF2c5e/vf+wgQXlJ8eurG7R/gdjWZUd4WX/9Zgax0QHI2yCx32ysf4922XwGsRmN0w7q/vv/55KKtATYsDvPXu5i+P/fHiRJEDAyHuOXYnRGCcj7L16aMv5nMGdlYtX+x8T4A58h//7+YfvH8P/052eMliiGAAXZGRgZfp6caXcNnwEwOcPUfd8ZGRg4mGAClNCjhmCG3iAKE2ZWjmfAuF6/ql7rN6ZDiRNhOjXV/O252c5BjIzAtEomoEqYoCR7JgaW9/8Y/nIbpe9LY/zP+JOAw1j/Mfzj+8f8/z0wOFCBUdrelv8MjD5ACaxFAVz1////GBgZd5yb5VQOAN6Razm8JZiHAAAAAElFTkSuQmCC" style="border-top-width:0px;border-right-width:0px;border-bottom-width:0px;border-left-width:0px;width:17px;height:19px;" alt="Copy" onclick="copyToClipboard('txtFileId')" tabindex="4"&gt;
+        &lt;/div&gt;
+       &lt;/div&gt;
+       &lt;div id="divAutorizationCodeArea" vfhidable="false"&gt;
+        &lt;span id="lblAutorizationCode"&gt;Authorization Code&lt;/span&gt;
+        &lt;br&gt;
+        &lt;textarea tabindex="5" id="txtAutorizationCode" style="width: 480px; height: 70px; margin-top: 5px"&gt;&lt;/textarea&gt;
+       &lt;/div&gt;
+      &lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+   &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+    &lt;tbody&gt;
+     &lt;tr id="divButtonArea" style="width: 100%"&gt;
+      &lt;td class="Buttons"&gt;
+       &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+        &lt;tbody&gt;
+         &lt;tr&gt;
+          &lt;td style="width:100%"&gt;&lt;/td&gt;
+          &lt;td align="right"&gt;
+           &lt;button tabindex="7" id="btnCancel" type="button" class="Btn" onclick="external.JsOnCancel()" vfhidable="false" accesskey="C"&gt;&lt;u&gt;C&lt;/u&gt;ancel&lt;/button&gt;
+          &lt;/td&gt;
+          &lt;td align="right"&gt;
+           &lt;button tabindex="6" id="btnOK" type="submit" class="Btn Def" onclick="if (!IsPreviewMode() &amp;amp;&amp;amp; !validateJustification()) return; external.JsOnOk()" accesskey="O"&gt;&lt;u&gt;O&lt;/u&gt;K&lt;/button&gt;
+          &lt;/td&gt;
+         &lt;/tr&gt;
+        &lt;/tbody&gt;
+       &lt;/table&gt;
+      &lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;VfCommonScript_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/script&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;
+var ActionButton  = EButtons.Cancel;    // Button which will be "clicked" automatically when timeout will be expired but no user action taken.
+
+function Page_onLoad()
+{
+var isPreviewMode = IsPreviewMode();
+
+if (!isPreviewMode)
+{
+RequestLanguage();
+substituteVars( ["lblCaption", "lblExplanation", "lblInfo1Name", "lblInfo1Value", "lblInfo2Name", "lblInfo2Value", "lblInfo3Name", "lblInfo3Value", "lblRequestId", "lblFileId", "lblAutorizationCode" ]);
+InitOfflineRequestArea();
+
+InitTimeout   = getTimeout(InitTimeout);
+Timeout       = InitTimeout;
+
+btnOKText     = document.getElementById("btnOK").innerHTML;
+btnCancelText = document.getElementById("btnCancel").innerHTML;
+
+setTimeout(function() { showTimeout(); }, 20);
+}
+}
+
+function copyToClipboard(ctrlId)
+{
+var ctrl = document.getElementById(ctrlId);
+if (ctrl != null)
+//window.clipboardData.setData("Text", ctrl.value);
+external.JsCopyToClipboard(ctrl.value);
+}
+&lt;/script&gt;
+  &lt;input type="hidden" ctrlid="DialogTitle" lang="en" value="Request for Authorization"&gt;&lt;input type="hidden" ctrlid="lblCaption" lang="en" value="Request for Authorization"&gt;&lt;input type="hidden" ctrlid="lblInfo1Name" lang="en" value="File name"&gt;&lt;input type="hidden" ctrlid="lblInfo1Value" lang="en" value="&amp;amp;lt;$VF_FILE_NAME&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblInfo2Name" lang="en" value="Path"&gt;&lt;input type="hidden" ctrlid="lblInfo2Value" lang="en" value="&amp;amp;lt;$VF_FILE_PATH&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblInfo3Name" lang="en" value="Description"&gt;&lt;input type="hidden" ctrlid="lblInfo3Value" lang="en" value="&amp;amp;lt;$VF_FILE_DESCRIPTION&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblExplanation" lang="en" value="You have to obtain an Authorization Code in order to run this Application. Please contact your Administrator and quote the Request ID displayed below."&gt;&lt;input type="hidden" ctrlid="lblRequestId" lang="en" value="Request ID"&gt;&lt;input type="hidden" ctrlid="lblFileId" lang="en" value="Request ID"&gt;&lt;input type="hidden" ctrlid="lblAutorizationCode" lang="en" value="Authorization Code"&gt;&lt;input type="hidden" ctrlid="btnOK" lang="en" value="&amp;lt;u&amp;gt;O&amp;lt;/u&amp;gt;K"&gt;&lt;input type="hidden" ctrlid="btnCancel" lang="en" value="&amp;lt;u&amp;gt;C&amp;lt;/u&amp;gt;ancel"&gt;
+ &lt;/body&gt;
+&lt;/html&gt;</Dialog>
+        <Dialog id="{9dd398d7-6183-4708-904b-d8cb5b64470c}" isDefault="True" name="Request Approval" type="20">&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+ &lt;head&gt;
+  &lt;title&gt;Request Approval&lt;/title&gt;
+ &lt;/head&gt;
+ &lt;body onload="Page_onLoad()" class="DialogWidth"&gt;
+   
+  &lt;title&gt;Request Approval&lt;/title&gt;
+  &lt;style type="text/css"&gt;
+.DialogWidth {
+width: 580px;
+}
+&lt;/style&gt;
+  &lt;style type="text/css"&gt;
+VfWinCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684
+&lt;/style&gt;
+  &lt;meta name="VfDialogType" content="VF_DLG_POLICY_PROPAGATE"&gt;
+  &lt;meta name="VfTemplateVersion" content="4.9"&gt;
+  &lt;meta name="VfVariables" content="TARGET_DISPLAY_NAME,FILE_PATH,FILE_NAME,FILE_DESCRIPTION,VERSION,PRODUCT_VERSION,PRODUCT_NAME,COMPANYNAME_NAME,LEGAL_COPYRIGHT,PUBLISHER,COMMAND_LINE,CLSID,CODE_URL,MIME_TYPE,IMAGE_NAME"&gt; 
+  &lt;input type="hidden" id="DialogTimeout" value="30"&gt; &lt;input type="hidden" id="DialogIcon" value=""&gt; &lt;input type="hidden" id="DefaultLanguge" value="en"&gt;
+  &lt;div class="Status Success" style="width: 590px"&gt;&lt;/div&gt;
+  &lt;div class="WatermarkContent DialogWidth"&gt;
+   &lt;div class="Header"&gt;
+    &lt;table id="tblTitleArea" cellpadding="0" cellspacing="0"&gt;
+     &lt;tbody&gt;
+      &lt;tr&gt;
+       &lt;td style="vertical-align:middle;"&gt;&lt;img id="imgLogo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAfSURBVGhD7cEBAQAAAIIg/69uSEAAAAAAAAAAAMCJGiQwAAHA29C/AAAAAElFTkSuQmCC" style="width:35px;height:35px;display:none;" vfsrc="" vfsourcetype="CustomImage" alt=""&gt;&lt;/td&gt;
+       &lt;td class="HeaderIcon"&gt;&lt;img src="data:image/png;base64,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"&gt;&lt;/td&gt;
+       &lt;td id="divCaptionArea" class="CaptionArea" style=""&gt;&lt;span id="lblCaption" class="Caption" style=""&gt;Request Approval&lt;/span&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+     &lt;/tbody&gt;
+    &lt;/table&gt;
+   &lt;/div&gt;
+   &lt;table style="width: 100%" cellpadding="0" cellspacing="0"&gt;
+    &lt;tbody&gt;
+     &lt;tr&gt;
+      &lt;td class="tdIndentLeft"&gt;&amp;nbsp;&lt;/td&gt;
+      &lt;td&gt;
+       &lt;div id="divMessageArea"&gt;
+        &lt;span id="lblMessage"&gt;Dear &amp;lt;$VF_USER_DISPLAYNAME&amp;gt;,
+         &lt;br&gt; Your requests that have been approved:&lt;/span&gt;
+       &lt;/div&gt;
+       &lt;div id="divAppListArea"&gt;&amp;lt;$VF_REQUEST_INFO&amp;gt;&lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td class="tdIndentRight"&gt;&amp;nbsp;&lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+   &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+    &lt;tbody&gt;
+     &lt;tr id="divButtonArea" style="width: 100%"&gt;
+      &lt;td class="Buttons"&gt;
+       &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+        &lt;tbody&gt;
+         &lt;tr&gt;
+          &lt;td style="width:100%"&gt;&lt;/td&gt;
+          &lt;td align="right"&gt;
+           &lt;button id="btnOK" type="submit" class="Btn Def" onclick="external.JsOnOk()" accesskey="C" tabindex="1" autofocus&gt;&lt;u&gt;C&lt;/u&gt;lose&lt;/button&gt;
+          &lt;/td&gt;
+         &lt;/tr&gt;
+        &lt;/tbody&gt;
+       &lt;/table&gt;
+      &lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;VfCommonScript_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/script&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;
+var ActionButton = EButtons.OK;    // Button which will be "clicked" automatically when timeout will be expired but no user action taken.
+function Page_onLoad()
+{
+var isPreviewMode = IsPreviewMode();
+if (!isPreviewMode)
+{
+RequestLanguage();
+substituteVars( ["lblCaption", "lblMessage", "divAppListArea" ]);
+
+InitTimeout   = getTimeout(InitTimeout);
+Timeout       = InitTimeout;
+
+btnOKText     = document.getElementById("btnOK").innerHTML;
+
+setTimeout(function() { showTimeout(); }, 20);
+}
+}
+&lt;/script&gt;
+  &lt;input type="hidden" ctrlid="DialogTitle" lang="en" value="Request Approval"&gt;&lt;input type="hidden" ctrlid="lblCaption" lang="en" value="Request Approval"&gt;&lt;input type="hidden" ctrlid="lblMessage" lang="en" value="Dear &amp;amp;lt;$VF_USER_DISPLAYNAME&amp;amp;gt;,&amp;lt;br&amp;gt;
+Your requests that have been approved:"&gt;&lt;input type="hidden" ctrlid="btnOK" lang="en" value="&amp;lt;u&amp;gt;C&amp;lt;/u&amp;gt;lose"&gt;
+ &lt;/body&gt;
+&lt;/html&gt;</Dialog>
+        <Dialog id="{717953aa-3e16-4ca6-9d86-3f779f879ca3}" isDefault="True" name="Run using authorization code" type="28">&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+ &lt;head&gt;
+  &lt;title&gt;Run using authorization code&lt;/title&gt;
+ &lt;/head&gt;
+ &lt;body onload="Page_onLoad()" onclick="resetTimeout()" onkeypress="resetTimeout()" class="DialogWidth"&gt;
+   
+  &lt;title&gt;Run using authorization code&lt;/title&gt;
+  &lt;style type="text/css"&gt;
+.DialogWidth {
+width: 580px;
+}
+&lt;/style&gt;
+  &lt;style type="text/css"&gt;
+VfWinCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684
+&lt;/style&gt;
+  &lt;meta name="VfDialogType" content="VF_DLG_AUTHORIZATION_CODE"&gt;
+  &lt;meta name="VfTemplateVersion" content="4.11"&gt;
+  &lt;meta name="VfVariables" content="TARGET_DISPLAY_NAME,FILE_PATH,FILE_NAME,FILE_DESCRIPTION,VERSION,PRODUCT_VERSION,PRODUCT_NAME,COMPANYNAME_NAME,LEGAL_COPYRIGHT,PUBLISHER,COMMAND_LINE,CLSID,CODE_URL,MIME_TYPE,IMAGE_NAME,ERROR_TEXT"&gt; 
+  &lt;input type="hidden" id="DialogTimeout" value="300"&gt; &lt;input type="hidden" id="DialogIcon" value=""&gt; &lt;input type="hidden" id="DefaultLanguge" value="en"&gt; &lt;epmconfiguration epmauthselectedcontrols="divAutorizationCodeArea"&gt;&lt;/epmconfiguration&gt;
+  &lt;div class="Status Info" style="width: 590px"&gt;&lt;/div&gt;
+  &lt;div class="WatermarkContent DialogWidth"&gt;
+   &lt;div class="HeaderForm"&gt;
+    &lt;table id="tblTitleArea" cellpadding="0" cellspacing="0"&gt;
+     &lt;tbody&gt;
+      &lt;tr&gt;
+       &lt;td style="vertical-align:top;"&gt;&lt;img id="imgLogo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAfSURBVGhD7cEBAQAAAIIg/69uSEAAAAAAAAAAAMCJGiQwAAHA29C/AAAAAElFTkSuQmCC" style="width:35px;height:35px;display:none;" vfsrc="" vfsourcetype="CustomImage" alt=""&gt;&lt;/td&gt;
+       &lt;td id="divCaptionArea" class="CaptionArea" style=""&gt;&lt;span id="lblCaption" class="Caption" style=""&gt;&lt;b&gt;Run using authorization code&lt;/b&gt;&lt;/span&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+     &lt;/tbody&gt;
+    &lt;/table&gt;
+   &lt;/div&gt;
+   &lt;table cellpadding="0" cellspacing="0"&gt;
+    &lt;tbody&gt;
+     &lt;tr&gt;
+      &lt;td class="tdIndentLeft"&gt;&amp;nbsp;&lt;/td&gt;
+      &lt;td&gt;
+       &lt;div id="divInfoArea" style="padding-top: 5px"&gt;
+        &lt;div id="divExplanationArea" style="margin-bottom: 15px"&gt;
+         &lt;span id="lblExplanation"&gt;You have to obtain an Authorization Code in order to run this Application. Please contact your Administrator.&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;table cellspacing="0"&gt;
+         &lt;tbody&gt;
+          &lt;tr id="tdInfo1Area" style=""&gt;
+           &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo1Name" style=""&gt;File name&lt;/span&gt;&lt;/td&gt;
+           &lt;td style=""&gt;&lt;span id="lblInfo1Value" style=""&gt;&amp;lt;$VF_FILE_NAME&amp;gt;&lt;/span&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+          &lt;tr id="tdInfo2Area" style=""&gt;
+           &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo2Name" style=""&gt;Path&lt;/span&gt;&lt;/td&gt;
+           &lt;td style=""&gt;&lt;span id="lblInfo2Value" style=""&gt;&amp;lt;$VF_FILE_PATH&amp;gt;&lt;/span&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+          &lt;tr id="tdInfo3Area" style=""&gt;
+           &lt;td style="font-weight:bold;"&gt;&lt;span id="lblInfo3Name" style=""&gt;Description&lt;/span&gt;&lt;/td&gt;
+           &lt;td style=""&gt;&lt;span id="lblInfo3Value" style=""&gt;&amp;lt;$VF_FILE_DESCRIPTION&amp;gt;&lt;/span&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+         &lt;/tbody&gt;
+        &lt;/table&gt;
+       &lt;/div&gt;
+       &lt;div id="divAutorizationCodeArea" vfhidable="false"&gt;
+        &lt;span id="lblAutorizationCode"&gt;Authorization Code&lt;/span&gt;
+        &lt;br&gt;
+        &lt;textarea id="txtAutorizationCode" style="width: 480px; margin-top: 5px" rows="3" tabindex="1" autofocus&gt;&lt;/textarea&gt;
+       &lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td class="tdIndentRight"&gt;&amp;nbsp;&lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+   &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+    &lt;tbody&gt;
+     &lt;tr id="divButtonArea" style="width: 100%"&gt;
+      &lt;td class="Buttons"&gt;
+       &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+        &lt;tbody&gt;
+         &lt;tr&gt;
+          &lt;td style="width:100%"&gt;&lt;/td&gt;
+          &lt;td align="right"&gt;
+           &lt;button id="btnCancel" type="button" class="Btn" onclick="external.JsOnCancel()" vfhidable="false" accesskey="C" tabindex="3"&gt;&lt;u&gt;C&lt;/u&gt;ancel&lt;/button&gt;
+          &lt;/td&gt;
+          &lt;td align="right"&gt;
+           &lt;button id="btnOK" type="submit" class="Btn Def" onclick="if (!IsPreviewMode() &amp;amp;&amp;amp; !validateJustification()) return; external.JsOnOk()" accesskey="O" tabindex="2"&gt;&lt;u&gt;O&lt;/u&gt;K&lt;/button&gt;
+          &lt;/td&gt;
+         &lt;/tr&gt;
+        &lt;/tbody&gt;
+       &lt;/table&gt;
+      &lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;VfCommonScript_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/script&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;
+var ActionButton  = EButtons.Cancel;    // Button which will be "clicked" automatically when timeout will be expired but no user action taken.
+
+function Page_onLoad()
+{
+var isPreviewMode = IsPreviewMode();
+
+if (!isPreviewMode)
+{
+RequestLanguage();
+substituteVars( ["lblCaption", "lblExplanation", "lblInfo1Name", "lblInfo1Value", "lblInfo2Name", "lblInfo2Value", "lblInfo3Name", "lblInfo3Value", "lblRequestId", "lblFileId", "lblAutorizationCode" ]);
+InitOfflineRequestArea();
+
+InitTimeout   = getTimeout(InitTimeout);
+Timeout       = InitTimeout;
+
+btnOKText     = document.getElementById("btnOK").innerHTML;
+btnCancelText = document.getElementById("btnCancel").innerHTML;
+
+setTimeout(function() { showTimeout(); }, 20);
+}
+}
+
+function copyToClipboard(ctrlId)
+{
+var ctrl = document.getElementById(ctrlId);
+if (ctrl != null)
+//window.clipboardData.setData("Text", ctrl.value);
+external.JsCopyToClipboard(ctrl.value);
+}
+&lt;/script&gt;
+  &lt;input type="hidden" ctrlid="DialogTitle" lang="en" value="Run using authorization code"&gt;&lt;input type="hidden" ctrlid="lblCaption" lang="en" value="&amp;lt;b&amp;gt;Run using authorization code&amp;lt;/b&amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblInfo1Name" lang="en" value="File name"&gt;&lt;input type="hidden" ctrlid="lblInfo1Value" lang="en" value="&amp;amp;lt;$VF_FILE_NAME&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblInfo2Name" lang="en" value="Path"&gt;&lt;input type="hidden" ctrlid="lblInfo2Value" lang="en" value="&amp;amp;lt;$VF_FILE_PATH&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblInfo3Name" lang="en" value="Description"&gt;&lt;input type="hidden" ctrlid="lblInfo3Value" lang="en" value="&amp;amp;lt;$VF_FILE_DESCRIPTION&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblExplanation" lang="en" value="You have to obtain an Authorization Code in order to run this Application. Please contact your Administrator."&gt;&lt;input type="hidden" ctrlid="lblAutorizationCode" lang="en" value="Authorization Code"&gt;&lt;input type="hidden" ctrlid="btnOK" lang="en" value="&amp;lt;u&amp;gt;O&amp;lt;/u&amp;gt;K"&gt;&lt;input type="hidden" ctrlid="btnCancel" lang="en" value="&amp;lt;u&amp;gt;C&amp;lt;/u&amp;gt;ancel"&gt;
+ &lt;/body&gt;
+&lt;/html&gt;</Dialog>
+        <Dialog id="{54d19d23-3f34-401c-a676-10d70f15e47d}" isDefault="True" name="Restart Computer" type="15">&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+ &lt;head&gt;
+  &lt;title&gt;Restart Computer&lt;/title&gt;
+ &lt;/head&gt;
+ &lt;body onload="Page_onLoad()" class="DialogWidth"&gt;
+   
+  &lt;title&gt;Restart Computer&lt;/title&gt;
+  &lt;style type="text/css"&gt;
+.DialogWidth {
+width: 580px;
+}
+&lt;/style&gt;
+  &lt;style type="text/css"&gt;
+VfWinCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684
+&lt;/style&gt;
+  &lt;meta name="VfDialogType" content="VF_DLG_SERVICE_RESTART"&gt;
+  &lt;meta name="VfTemplateVersion" content="4.11"&gt;
+  &lt;meta name="VfVariables" content=""&gt; 
+  &lt;input type="hidden" id="DialogIcon" value=""&gt; &lt;input type="hidden" id="DefaultLanguge" value="en"&gt;
+  &lt;div class="Status Warning" style="width: 590px"&gt;&lt;/div&gt;
+  &lt;div class="WatermarkContent DialogWidth"&gt;
+   &lt;div class="Header"&gt;
+    &lt;table id="tblTitleArea" cellpadding="0" cellspacing="0"&gt;
+     &lt;tbody&gt;
+      &lt;tr&gt;
+       &lt;td style="vertical-align:middle;"&gt;&lt;img id="imgLogo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAfSURBVGhD7cEBAQAAAIIg/69uSEAAAAAAAAAAAMCJGiQwAAHA29C/AAAAAElFTkSuQmCC" style="width:35px;height:35px;display:none;" vfsrc="" vfsourcetype="CustomImage" alt=""&gt;&lt;/td&gt;
+       &lt;td class="HeaderIcon"&gt;&lt;img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAYAAADhAJiYAAAAAXNSR0IArs4c6QAAA/ZJREFUWAntmFuITlEUx//7M+NSLinXoiYaY1xC7pQpCg9ukUvkMsMT4xq55p5CGtd4YKYYCeVFeeCBkTdqSLk9uxRyZ8Yw3/Y7h286fd93zpxzjHiw63T27LXWf//PWmuvtb8x+s1hT2kRENt56mW1wSzRReaxRyK2JYa2XGN5lfM8h8xbGZ2zFRr6O5gmrrG9o1zd1T3sm6uZ+inJ39IjiD3VYo0whlmMEd9Dd7WG/QrxynJTrFqzWB+V0DrWhqkCSjFHLA8Rqu58/0P2vAqR6d69yakqZH3USr3MPMIYccTzkFUZmxqCtCpjv4RKkbRXrXZnyP7EAh4Yb0/K4qWNfvjIDqJTzzPIT8dvPZKH7BW1AOgoHnis1jrgB4psG7JX6B21jicjjEiEONzrCFU+W5SaWarz2wfZexJ8PbqjSPAFfnrZ1kOzp77kcbQfAHKZRJ7tBSOM+yCZNCXakFp3PVOuW5DqqbYqcEmmhAHv8B5K6hDg9cpxj3s65DDIDvcuunXIkuBSR33SDq8saB6KEEk6CTJTANphFupZEKBXRhupxnMnILsMD/f3yvzmjRICqCVkDgH8QAN5Rx0ttQWTd5A6Esa0UUIEaSOEekBoqRmib2FAvTpucUy4GEV83FyvLNs8kBCh6oHResicJWGrsgGEWiumARvdxkv7OQBtgmwCCeGZMoDqaJ9Oj4o9SPAkZWAZeF0AcWqU7/AlhHcmAOAk8i4zXy98EUIKaMC3+bhTYK6wp2nKPiMrIfdq4SSy9EQDdNDHNvpyK23C6BOZ6JvgWQlxy1nFlxRwz1kZMpGdrv6mMYZmrl4Tus1gj6PPzcymn1Gp7Rl1JWseo3ydijw1m1H6mr3AZYNBNa5Jl6X/TQVPkOJ3WO/AbaHQLNBnr06mh+q0ly9oTrxXexWD5g6RMGQcDDfBRYJL3fjwzUG44kiO5Enizkh3GSfn8FK7QPA0IftU8HylNuV7RQ0ecl1pSTZLa+isPV6loDmAvcm5p/qgN5xMp3eFG7nubaCGwnvYa9BAiLg69+DBRHitmawvXqXAeZLOb9UJnQRvJxShBrnzEoutKE8kItNSRi4he5Yrp8UrRlVU5PMpYai31XX0vv/SvRbKJqXUWsfY8z5PWepg/PRQjXay2J6rxYqUbtg3Hf0m98hCSsQYlWhlWDtHj4Pg/Lgs5ckj5O5dypAD/Sns1SweB3x5FMCm0iW5K8GagVP6JiCzEzJvqSROPP/O+Nkrv8Fjm5OIRTA7F+c3VFOxd3ul1SXwinIgU81kDkf2K96KfN9pElKGQiy3K9wwtpKKWev+w2A05HKaZIOoIJaazQmnlZRENf2v/98D/7wHfgDR5CSJsDdzDgAAAABJRU5ErkJggg=="&gt;&lt;/td&gt;
+       &lt;td id="divCaptionArea" class="CaptionArea" style=""&gt;&lt;span id="lblCaption" class="Caption" style=""&gt;Restart Computer&lt;/span&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+     &lt;/tbody&gt;
+    &lt;/table&gt;
+   &lt;/div&gt;
+   &lt;table cellpadding="0" cellspacing="0"&gt;
+    &lt;tbody&gt;
+     &lt;tr&gt;
+      &lt;td class="tdIndentLeft"&gt;&amp;nbsp;&lt;/td&gt;
+      &lt;td&gt;
+       &lt;div id="divMessageArea"&gt;
+        &lt;span id="lblMessage"&gt;Your computer must be restarted to complete the CyberArk EPM Agent upgrade. Before clicking on the "Restart Now" button be sure to save all your work. Note: Until the computer is restarted, some components will not run correctly.&lt;/span&gt;
+       &lt;/div&gt;
+       &lt;!--&lt;div id="divRestartNowArea" style="margin-top: 20px"&gt;
+&lt;span id="lblRestartNow" style="height:20px; vertical-align:middle; margin-right:5px"&gt;Remind me in:&lt;/span&gt;
+&lt;select id="cmbRestartNow" style="border: 1px solid #b8c2c5; width: 150px; padding: 3px 3px 3px 10px" tabindex="1" autofocus&gt;
+&lt;option value="0"&gt;1 minute&lt;/option&gt;
+&lt;option value="1" selected="selected"&gt;10 minutes&lt;/option&gt;
+&lt;option value="2"&gt;1 hour&lt;/option&gt;
+&lt;option value="3"&gt;4 hours&lt;/option&gt;
+&lt;/select&gt;
+&lt;/div&gt;--&gt;
+       &lt;table id="divRestartNowArea" style="margin-top: 25px" cellpadding="0" cellspacing="0"&gt;
+        &lt;tbody&gt;
+         &lt;tr&gt;
+          &lt;td style="height:24px; vertical-align:middle; padding-right:15px"&gt;&lt;span id="lblRestartNow"&gt;Remind me in:&lt;/span&gt;&lt;/td&gt;
+          &lt;td style="height:24px; vertical-align:middle; padding: 0px 3px 0px 5px; border: 1px solid #b8c2c5"&gt;&lt;span style="overflow: hidden; float: left; border: none"&gt; &lt;select id="cmbRestartNow" style="background-color: none; border: none; outline: none; margin: -2px; float: left; width: 150px;"&gt; &lt;option value="0"&gt;1 minute&lt;/option&gt; &lt;option value="1" selected&gt;10 minutes&lt;/option&gt; &lt;option value="2"&gt;1 hour&lt;/option&gt; &lt;option value="3"&gt;4 hours&lt;/option&gt; &lt;/select&gt; &lt;/span&gt;&lt;/td&gt;
+         &lt;/tr&gt;
+        &lt;/tbody&gt;
+       &lt;/table&gt;
+      &lt;/td&gt;
+      &lt;td class="tdIndentRight"&gt;&amp;nbsp;&lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+   &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+    &lt;tbody&gt;
+     &lt;tr id="divButtonArea" style="width: 100%"&gt;
+      &lt;td class="Buttons"&gt;
+       &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+        &lt;tbody&gt;
+         &lt;tr&gt;
+          &lt;td style="width:100%"&gt;&lt;/td&gt;
+          &lt;td align="right"&gt;
+           &lt;button id="btnRemindLater" type="button" class="Btn" style="width: 85px" onclick="external.JsOnRemindLater()" accesskey="P" tabindex="3"&gt;&lt;u&gt;P&lt;/u&gt;ostpone&lt;/button&gt;
+          &lt;/td&gt;
+          &lt;td align="right"&gt;
+           &lt;button id="btnRestartNow" type="submit" class="Btn Def" style="width: 100px" onclick="external.JsOnRestartNow()" accesskey="R" tabindex="2"&gt;&lt;u&gt;R&lt;/u&gt;estart now&lt;/button&gt;
+          &lt;/td&gt;
+         &lt;/tr&gt;
+        &lt;/tbody&gt;
+       &lt;/table&gt;
+      &lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;VfCommonScript_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/script&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;
+function Page_onLoad()
+{
+var isPreviewMode = IsPreviewMode();
+if (!isPreviewMode)
+{
+RequestLanguage();
+substituteVars( [ "lblCaption", "lblMessage", "lblRestartNow" ]);
+}
+}
+&lt;/script&gt;
+  &lt;input type="hidden" ctrlid="DialogTitle" lang="en" value="Restart Computer"&gt;&lt;input type="hidden" ctrlid="lblCaption" lang="en" value="Restart Computer"&gt;&lt;input type="hidden" ctrlid="lblMessage" lang="en" value="Your computer must be restarted to complete the CyberArk EPM Agent upgrade. Before clicking on the &amp;quot;Restart Now&amp;quot; button be sure to save all your work. Note: Until the computer is restarted, some components will not run correctly."&gt;&lt;input type="hidden" ctrlid="lblRestartNow" lang="en" value="Remind me in:"&gt;&lt;input type="hidden" ctrlid="btnRestartNow" lang="en" value="&amp;lt;u&amp;gt;R&amp;lt;/u&amp;gt;estart now"&gt;&lt;input type="hidden" ctrlid="btnRemindLater" lang="en" value="&amp;lt;u&amp;gt;P&amp;lt;/u&amp;gt;ostpone"&gt;
+ &lt;/body&gt;
+&lt;/html&gt;</Dialog>
+        <Dialog id="{88a15027-fafa-4174-ac4f-02ccad07393d}" isDefault="True" name="About" type="9">&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+ &lt;head&gt;
+  &lt;title&gt;About&lt;/title&gt;
+ &lt;/head&gt;
+ &lt;body onload="Page_onLoad()" class="DialogWidth"&gt;
+   
+  &lt;title&gt;About&lt;/title&gt;
+  &lt;style type="text/css"&gt;
+.DialogWidth {
+width: 580px;
+}
+&lt;/style&gt;
+  &lt;style type="text/css"&gt;
+VfWinCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684
+&lt;/style&gt;
+  &lt;meta name="VfDialogType" content="VF_DLG_ABOUT"&gt;
+  &lt;meta name="VfTemplateVersion" content="4.22"&gt;
+  &lt;meta name="VfVariables" content="PRODUCT_VERSION,PRODUCT_NAME,COMPANYNAME_NAME,LEGAL_COPYRIGHT"&gt; 
+  &lt;input type="hidden" id="DialogIcon" value=""&gt; &lt;input type="hidden" id="DefaultLanguge" value="en"&gt;
+  &lt;div class="Status Info" style="width: 590px"&gt;&lt;/div&gt;
+  &lt;div class="WatermarkContent DialogWidth"&gt;
+   &lt;div class="Header" style="padding-bottom: 20px"&gt;
+    &lt;table id="tblTitleArea" cellpadding="0" cellspacing="0"&gt;
+     &lt;tbody&gt;
+      &lt;tr&gt;
+       &lt;td class="HeaderIcon" style="padding: 0px; margin: 0px"&gt;&lt;img src="data:image/png;base64,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"&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+       &lt;td id="divCaptionArea" class="CaptionArea" vfhidable="false" vfeditable="false" style="height: auto; padding-top: 10px"&gt;&lt;span id="lblCaption" class="Caption_CyberArk"&gt;About Cyberark EPM software&lt;/span&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+     &lt;/tbody&gt;
+    &lt;/table&gt;
+   &lt;/div&gt;
+   &lt;table cellpadding="0" cellspacing="0"&gt;
+    &lt;tbody&gt;
+     &lt;tr&gt;
+      &lt;td class="tdIndentLeft"&gt;&amp;nbsp;&lt;/td&gt;
+      &lt;td&gt;
+       &lt;div id="divProductDetailsArea" vfhidable="false" vfeditable="false" style="margin-top: 20px"&gt;
+        &lt;span id="lblProductDetails" style="line-height: 22px"&gt;&amp;lt;$VF_AGENT_PRODUCTNAME&amp;gt; 
+         &lt;br&gt; &amp;lt;$VF_AGENT_VERSION&amp;gt; 
+         &lt;br&gt; &amp;lt;$VF_AGENT_COPYRIGHT&amp;gt;&lt;/span&gt;
+       &lt;/div&gt;
+       &lt;div id="divPolicyUpdateArea" vfhidable="false" vfeditable="false" style="margin-top: 20px"&gt;
+        &lt;span id="lblPolicyUpdate"&gt;Last Policy update: &amp;lt;$VF_AGENT_LAST_POLICY_UPDATE&amp;gt;&lt;/span&gt;
+       &lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td class="tdIndentRight"&gt;&amp;nbsp;&lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+   &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+    &lt;tbody&gt;
+     &lt;tr id="divButtonArea" style="width: 100%"&gt;
+      &lt;td class="Buttons"&gt;
+       &lt;table cellpadding="0" cellspacing="0" style="width:100%"&gt;
+        &lt;tbody&gt;
+         &lt;tr&gt;
+          &lt;td style="width:100%"&gt;&amp;nbsp;&lt;/td&gt;
+          &lt;td align="right"&gt;
+           &lt;button id="btnOK" type="submit" vfeditable="false" class="Btn Def" onclick="external.JsOnOk()" accesskey="C" tabindex="0" autofocus&gt;&lt;u&gt;C&lt;/u&gt;lose&lt;/button&gt;
+          &lt;/td&gt;
+         &lt;/tr&gt;
+        &lt;/tbody&gt;
+       &lt;/table&gt;
+      &lt;/td&gt;
+     &lt;/tr&gt;
+    &lt;/tbody&gt;
+   &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;VfCommonScript_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684&lt;/script&gt;
+  &lt;script language="javascript" type="text/javascript"&gt;
+function Page_onLoad()
+{
+var isPreviewMode = IsPreviewMode();
+if (!isPreviewMode)
+{
+RequestLanguage();
+
+substituteVars( ["lblCaption", "lblProductDetails", "lblPolicyUpdate" ]);
+}
+}
+&lt;/script&gt;
+  &lt;input type="hidden" ctrlid="DialogTitle" lang="en" value="About"&gt;&lt;input type="hidden" ctrlid="lblCaption" lang="en" value="About Cyberark EPM software"&gt;&lt;input type="hidden" ctrlid="lblProductDetails" lang="en" value="&amp;amp;lt;$VF_AGENT_PRODUCTNAME&amp;amp;gt; &amp;lt;br&amp;gt;
+ &amp;amp;lt;$VF_AGENT_VERSION&amp;amp;gt; &amp;lt;br&amp;gt;
+ &amp;amp;lt;$VF_AGENT_COPYRIGHT&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="lblPolicyUpdate" lang="en" value="Last Policy update: &amp;amp;lt;$VF_AGENT_LAST_POLICY_UPDATE&amp;amp;gt;"&gt;&lt;input type="hidden" ctrlid="btnOK" lang="en" value="&amp;lt;u&amp;gt;C&amp;lt;/u&amp;gt;lose"&gt;
+ &lt;/body&gt;
+&lt;/html&gt;</Dialog>
+        <CommonCode id="VfCommonScript_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684">/* File version = "2.3" */
+
+/* History:
+   2.0 - Add trace to monitor language resolving (2025/06/09).
+   2.1 - Add divStepUpAuthorization and lblStepUpAuthorization to JsSetFeatureValue function (2025/06/10).
+   2.2 - Add divJustificationTypeArea elements EPM-57766 (2025/11/04)
+   2.3 - Fix setting default value for DefaultJustificationHoursLimit EPM-58726 (2025/11/13)
+*/
+
+/// &lt;summary&gt;
+/// List of Buttons defined for this dialog.
+/// &lt;/summary&gt;
+var EButtons =  
+{ 
+OK      : 1, 
+Cancel  : 2,
+StopNow : 3    
+} 
+
+var ETraceLevel =  
+{ 
+DEBUG : 2, 
+INFO  : 3,
+WARNING: 4, 
+ERROR: 5
+} 
+    
+var InitTimeout    = 30;
+var Timeout        = 30;             // in seconds
+var ActionButton   = EButtons.OK;    // Button which will be "clicked" automatically when timeout will be expired but no user action taken.
+var TimerId        = -1;
+
+var btnOKText      = "";
+var btnCancelText  = "";
+var btnStopNowText = "";
+
+if (typeof(chrome) != "undefined" &amp;&amp; chrome != null &amp;&amp; chrome.webview != null &amp;&amp; chrome.webview.hostObjects != null &amp;&amp; chrome.webview.hostObjects.sync.external != null)
+{
+    external = chrome.webview.hostObjects.sync.external;
+}
+
+function JsGetVersion()
+{
+/// &lt;summary&gt;
+/// V.1 - Script supports JsOnDocumentReady so host must wait for this call (instead of perform some tasks in WebBrowser's DocumentComplete event).
+/// &lt;/summary&gt;
+
+return 2;
+}
+
+function gup(name)
+{
+name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+var regexS = "[\\?&amp;]" + name + "=([^&amp;#]*)";
+var regex = new RegExp(regexS);
+var results = regex.exec(window.location.href);
+if (results == null)
+return "";
+else
+return results[1];
+}
+
+function substituteVars(ctrlIds)
+{
+/// &lt;summary&gt;
+/// Substitues variables in inner HTML of given controls with real values requested from caller.
+/// &lt;/suumary&gt;
+/// &lt;param name="ctrlIds" type="Array"&gt;List of control Id's to process&lt;/param&gt;
+/// &lt;returns&gt;Nothing&lt;/returns&gt;
+
+var vars = new Array(); // All variables required by this page.
+        
+// Get list of all variables required by this page.
+
+for (var i = 0; i &lt; ctrlIds.length; i++)
+{
+var ctrl = document.getElementById(ctrlIds[i]);
+if (ctrl == null)
+continue;
+
+var isCtrlVisible = ctrl.style.display == null || 
+                            ctrl.style.display == ""   || 
+                            ctrl.style.display == "block";
+
+        if ((!isCtrlVisible) &amp;&amp; (ctrlIds[i] != "lblUserName"))
+            continue;
+
+var text = "";
+if (ctrl.tagName.toLowerCase() == "input" &amp;&amp; typeof(ctrl.value) != "undefined")
+text = ctrl.value;
+else
+text = ctrl.innerHTML;
+        
+text = text.replace(/&amp;lt;/g, "&lt;").replace(/&amp;gt;/g, "&gt;");
+       
+var x = null;
+var regex = new RegExp("(?=&lt;\\$VF_)(.*?)&gt;", "g");
+do 
+{
+x = regex.exec(text);
+
+if (x != null)
+{
+var varName = x[0];
+
+vars[varName] = varName;
+}
+
+} while (x != null)
+}
+
+// Get values of all variables.
+
+for (var varName in vars)
+{
+try
+{
+var val = null;
+if (varName == "&lt;$VF_REQUEST_ID&gt;")
+val = OnGetVariableRequestId();
+else
+val = external.JsOnGetVariable(varName);
+
+vars[varName] = val;
+}
+catch(ex)
+{
+vars[varName] = varName;
+}
+}
+
+// Substitute values instead of variable names.
+
+for (var i = 0; i &lt; ctrlIds.length; i++)
+{
+var ctrl = document.getElementById(ctrlIds[i]);
+if (ctrl == null)
+continue;
+
+var text = "";
+if (ctrl.tagName.toLowerCase() == "input" &amp;&amp; typeof(ctrl.value) != "undefined")
+text = ctrl.value;
+else
+text = ctrl.innerHTML;
+
+text = text.replace(/&amp;lt;/g, "&lt;").replace(/&amp;gt;/g, "&gt;");
+
+for (var varName in vars)
+{
+var val = vars[varName];
+
+var regex = new RegExp(varName.replace("$", "\\$"), "g");
+
+text = text.replace(regex, val);
+}
+
+if (ctrl.tagName.toLowerCase() == "input" &amp;&amp; typeof(ctrl.value) != "undefined")
+{
+ctrl.value = text;
+}
+else
+{
+text = fitLine(ctrl, text);
+ctrl.innerHTML = text;
+}
+}
+
+// Notify host about completing
+
+try
+{
+external.JsOnDocumentReady();
+}
+catch (ex) { }
+}
+
+function getTimeout(defaultTimeout)
+{
+try
+{
+var inp = document.getElementById("DialogTimeout");
+if (inp != null)
+return parseInt(inp.value, /* radix = */ 10);
+else
+return defaultTimeout;
+}
+catch(ex)
+{
+return defaultTimeout;
+}
+}
+
+function showTimeout(customWidth)
+{
+var actionButton = null;
+var buttonText   = "";
+
+switch (ActionButton)
+{
+case EButtons.OK:       
+actionButton = document.getElementById("btnOK");        
+buttonText   = btnOKText;
+break;
+
+case EButtons.Cancel:   
+actionButton = document.getElementById("btnCancel");    
+buttonText   = btnCancelText;
+break;
+
+case EButtons.StopNow:   
+actionButton = document.getElementById("btnStopNow");    
+buttonText   = btnStopNowText;
+break;
+}
+
+if (actionButton != null)
+{
+var text = buttonText;
+
+if (Timeout &lt;= 10)
+{
+if (typeof customWidth !== 'undefined')
+actionButton.style.width = customWidth + 'px';
+
+text = buttonText + " (" + Timeout + ")";
+}
+
+var tagName = actionButton.tagName.toLowerCase();
+
+if (tagName == "input")
+actionButton.value = text;
+else if (tagName == "button")
+actionButton.innerHTML = text;
+}
+
+// Notify external host about timeout progress
+try
+{
+external.JsOnProgressTimeout(Timeout);
+}
+catch(ex) { }
+            
+if (--Timeout &gt;= 0)  
+{
+if (typeof customWidth !== 'undefined')
+TimerId = setTimeout(function() { showTimeout(customWidth); }, 1000);
+else
+TimerId = setTimeout(function() { showTimeout(); }, 1000);
+}
+else
+{
+if (actionButton != null &amp;&amp; typeof(actionButton.click) != "undefined")
+{
+actionButton.click();
+}
+}
+}
+
+function resetTimeout()
+{
+Timeout = InitTimeout;    
+
+try
+{
+external.JsOnResetTimeout();
+}   
+catch(ex) { }     
+}
+
+function stopTimeout()
+{       
+try
+{
+if (TimerId != -1)
+{
+clearTimeout(TimerId);
+TimerId = -1;
+}
+}
+catch(ex) { }
+}
+
+function IsPreviewMode()
+{
+var isPreviewMode = false;
+try
+{
+if (external != null)
+isPreviewMode = external.JsIsPreviewMode();
+else
+isPreviewMode = true;   // "external" still not initialized; for more security behave as in Preview (i.e.without scripts).
+}
+catch(ex) 
+{ 
+}
+
+return isPreviewMode;
+}
+
+function InitJustificationArea()
+{
+try
+{
+if (JsIsFeatureEnabled("divJustificationArea"))
+{
+var options = document.getElementsByName("optJustificationOption");
+
+var isChecked = false;
+var isVisible = false;
+
+for (var i = 0; i &lt; options.length; i++)
+{
+var opt = options[i];
+if (opt != null)
+{
+var isOptVisible = opt.style.display == null || 
+                                       opt.style.display == ""   || 
+                                       opt.style.display == "block";
+
+if (isOptVisible)
+{
+opt.checked = true;
+isChecked   = true;
+isVisible   = true;
+onJustificationOptionClick(opt.id);
+break;
+}
+}
+}
+
+if (!isVisible)
+{
+// When no option is visible, but entire feature is enabled 
+// suppose that only txtJustification textarea appears on the dialog.
+onJustificationOptionClick("optJustificationManual");
+}
+}
+}
+catch(ex) {}
+}
+
+function onJustificationOptionClick(optId)
+{
+try
+{
+var opt = document.getElementById(optId);
+if (opt != null)
+opt.blur();
+
+var txtJustification = document.getElementById("txtJustification");
+if (txtJustification != null)
+{
+if (optId == "optJustificationManual")
+{
+txtJustification.disabled = false;
+txtJustification.focus();   
+}
+else
+{
+txtJustification.disabled = true;
+}
+}
+        
+}
+catch(ex) 
+{ 
+}
+}
+
+function validateJustification()
+{
+/// &lt;summary&gt;
+/// Returns "false" when "txtJustification" is visible but not completed by user.
+/// Otherwise "true" is returned.
+/// &lt;/summary&gt;
+
+try
+{
+if (!JsIsFeatureEnabled("divJustificationArea"))
+return true;    // Entire Justification feature is disable.
+
+// Check by flag whether we need to perform validation.
+var needValidateJustification = true;
+var inp = document.getElementById("NeedValidateJustification");
+if (inp != null &amp;&amp; inp.value != null)
+needValidateJustification = inp.value.toLowerCase() == "true" || inp.value == "1";  
+if (!needValidateJustification)
+return true;
+
+// Check whether one of visible options is checked
+var visibleOptionExists = false;
+var checkedOption = null;
+var options = document.getElementsByName("optJustificationOption");
+for (var i = 0; i &lt; options.length; i++)
+{
+var opt = options[i];
+if (opt == null)
+continue;
+
+if (opt.style.display == "none")
+continue;
+
+visibleOptionExists = true;
+
+if (opt.checked)
+{
+checkedOption = opt; 
+break;
+}   
+}
+
+if (!visibleOptionExists)
+{
+// Even when no visible option exists, txtJustification itself can be visible.
+var txtJustification = document.getElementById("txtJustification");
+if (txtJustification == null || txtJustification.style.display == "none")
+return true;                // No visible option exists =&gt; justification should not be provided.
+else
+checkedOption = document.getElementById("optJustificationManual");
+}
+
+if (checkedOption == null)      // Visible option exists but no one is checked by user.
+{
+MsgBoxError("One of option must be checked");
+return false;
+}
+
+// When checked option is a "Manual", additionaly validate a text
+if (checkedOption.id == "optJustificationManual")
+{
+// Get min Justification length
+var minJustificationLength = null;
+inp = document.getElementById("MinJustificationLength");
+if (inp != null &amp;&amp; inp.value != null)
+minJustificationLength = parseInt(inp.value, /* radix = */ 10);
+
+// Get and validate "txtJustification" content
+var txtJustification = document.getElementById("txtJustification");
+if (txtJustification == null)
+return true;
+if (txtJustification.style.display == "none")
+return true;
+
+var text = txtJustification.value;
+if (minJustificationLength == null)
+{
+if (text == null || text.replace(/^\s*/, "").replace(/\s*$/, "") == "")
+{
+MsgBoxError("Illegal empty justification");
+txtJustification.focus();
+return false;
+}
+}
+else
+{
+if (text == null || text.length &lt; minJustificationLength)
+{
+MsgBoxError("Justification must be at least " + minJustificationLength + " characters long.");
+txtJustification.focus();
+return false;
+}
+}
+}
+
+return true;
+}
+catch (ex)
+{
+return true;
+}
+}
+
+function JsGetJustification()
+{
+/// &lt;summary&gt;
+/// Returns string containing Justification.
+/// &lt;/summary&gt;
+
+var text = "";
+
+var visibleOptionExists = false;
+var checkedOption = null;
+var options = document.getElementsByName("optJustificationOption");
+for (var i = 0; i &lt; options.length; i++)
+{
+var opt = options[i];
+if (opt == null)
+continue;
+
+if (opt.style.display == "none")
+continue;
+
+visibleOptionExists = true;
+
+if (opt.checked)
+{
+checkedOption = opt; 
+break;
+}   
+}
+
+if (!visibleOptionExists)
+{
+// Even when no visible option exists, txtJustification itself can be visible.
+var txtJustification = document.getElementById("txtJustification");
+if (txtJustification == null || txtJustification.style.display == "none")
+text = "";                // No visible option exists =&gt; justification should not be provided.
+else
+checkedOption = document.getElementById("optJustificationManual");
+}
+
+if (checkedOption != null)
+{
+if (checkedOption.id == "optJustificationManual")
+{
+var txtJustification = document.getElementById("txtJustification");
+if (txtJustification != null)
+text = txtJustification.value;
+}
+else
+{
+var id  = "lbl" + checkedOption.id.substring(3);
+var lbl = document.getElementById(id);
+if (lbl != null)
+text = lbl.innerText;
+}
+}  
+
+return text;
+}
+
+function InitJustificationTypeArea()
+{
+    try
+    {
+        if (JsIsFeatureEnabled("divJustificationTypeArea"))
+        {
+            var optTemporary = document.getElementById("optJustificationTypeTemporary");
+
+            // Always default to Temporary option when feature is enabled
+            if (optTemporary != null)
+            {
+                optTemporary.checked = true;
+                var defaultValue = document.getElementById("DefaultJustificationHoursLimit");
+                var txtTimeLimit = document.getElementById("txtJustificationTimeLimit");
+                if (txtTimeLimit != null &amp;&amp; defaultValue != null) {
+                    txtTimeLimit.addEventListener('keypress', function (e) {
+                        // prevent non-numeric input
+                        if (!/\d/.test(e.key)) {
+                            e.preventDefault();
+                        }
+                    });
+                    txtTimeLimit.value = defaultValue.value;
+                }
+                onJustificationTypeClick("optJustificationTypeTemporary");
+            }
+        }
+    }
+    catch(ex) {}
+}
+
+function onJustificationTypeClick(optId)
+{
+    try
+    {
+        var opt = document.getElementById(optId);
+        if (opt != null)
+            opt.blur();
+
+        var txtTimeLimit = document.getElementById("txtJustificationTimeLimit");
+
+        if (optId == "optJustificationTypeTemporary")
+        {
+            if (txtTimeLimit != null)
+            {
+                txtTimeLimit.disabled = false;
+                txtTimeLimit.focus();
+            }
+        }
+        else if (optId == "optJustificationTypeOther")
+        {
+            if (txtTimeLimit != null)
+                txtTimeLimit.disabled = true;
+        }
+    }
+    catch(ex) { }
+}
+
+function JsGetJustificationType()
+{
+    var optTemporary = document.getElementById("optJustificationTypeTemporary");
+
+    if (optTemporary != null &amp;&amp; optTemporary.checked)
+    {
+        // Value for JIT Type
+        return "1";
+    }
+
+    // Value for all other types
+    return "2";
+}
+
+function validateJustificationType()
+{
+    if (!JsIsFeatureEnabled("divJustificationTypeArea"))
+        return true;
+
+    var optTemporary = document.getElementById("optJustificationTypeTemporary");
+    var optOther = document.getElementById("optJustificationTypeOther");
+
+    if ((optTemporary == null || !optTemporary.checked) &amp;&amp; (optOther == null || !optOther.checked))
+    {
+        MsgBoxError("Please select a request type");
+        return false;
+    }
+
+    if (optTemporary != null &amp;&amp; optTemporary.checked)
+    {
+        var txtTimeLimit = document.getElementById("txtJustificationTimeLimit");
+        if (txtTimeLimit != null &amp;&amp; (txtTimeLimit.value == "" || txtTimeLimit.value &lt; 1 || txtTimeLimit.value &gt; 120))
+        {
+            MsgBoxError("Please specify a valid time limit between 1-120 hours");
+            txtTimeLimit.focus();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function MsgBoxError(text)
+{
+try
+{
+if (external != null)
+{
+external.JsShowError(text);  
+}
+else
+{
+alert(text);
+}
+}
+catch(ex)
+{
+alert(text);
+} 
+}
+
+function RequestLanguage()
+{
+try
+{
+if (external != null)
+{
+var cultureId = external.JsGetLocaleName(); 
+SetLanguage(cultureId);
+}
+}  
+catch(ex)
+{
+}          
+}
+
+function SetLanguage(cultureId)
+{
+/// &lt;summary&gt;
+/// Update content in order to show texts in given language (or most appropriated one).
+/// &lt;/summary&gt;
+
+TraceInfo("SetLanguage: Dialog is requested to be displayed in '" + cultureId + "' language");
+
+cultureId = ResolveLanguage(cultureId);
+
+TraceInfo("SetLanguage: Dialog is going to be displayed in '" + cultureId + "' language");
+
+var stringHolders = document.getElementsByTagName("input");
+for (var i = 0; i &lt; stringHolders.length; i++)
+{
+try
+{
+var stringHolder = stringHolders[i];
+
+// Check whether stringHolder really contains translated string (should be hidden input with appropriated "lang")
+if (stringHolder.type == null || stringHolder.type.toLowerCase() != "hidden")
+continue;
+
+if (stringHolder.lang == null || stringHolder.lang != cultureId)
+continue; 
+
+TraceStringHolder(stringHolder);
+
+// Get the associated control
+var ctrlId = stringHolder.getAttribute("ctrlid");
+if (ctrlId == "DialogTitle")
+{
+// Special case: translation of Dialog Title
+document.title = stringHolder.value;
+}
+else if (ctrlId == "AutorizationCodeRequest")
+{
+// Special case: translation of composite "AutorizationCodeRequest" control
+var ctrl = document.getElementById("lblRequestId");
+if (ctrl != null)
+ctrl.innerHTML = stringHolder.value;
+
+var ctrl = document.getElementById("lblFileId");
+if (ctrl != null)
+ctrl.innerHTML = stringHolder.value;
+}
+else
+{
+var ctrl = document.getElementById(ctrlId);
+if (ctrl != null)
+{
+var tagName = ctrl.tagName.toLowerCase();
+
+// Change associated control text
+if (tagName == "span" || 
+                        tagName == "h1"   || 
+                        tagName == "h2"   ||
+                        tagName == "a"    ||
+                        tagName == "div"  ||
+                        tagName == "button")
+{
+ctrl.innerHTML = stringHolder.value;  
+}
+
+else if (tagName == "input")
+{
+ctrl.value = stringHolder.value;        
+}
+}
+}
+}
+catch(ex) { }
+}
+}
+
+function TraceStringHolder(stringHolder)
+{
+if (stringHolder == null)
+return;
+
+var ctrlId = stringHolder.getAttribute("ctrlid");
+ctrlId = (ctrlId != null) ? ctrlId : "Unknown Control";
+
+var type = (stringHolder.type != null)  ? stringHolder.type  : "Unknown Type";
+var lang = (stringHolder.lang != null)  ? stringHolder.lang  : "Unknown Language";
+var translated = (stringHolder.value != null) ? stringHolder.value : "No translation";
+
+TraceInfo("SetLanguage: StringHolder found: Control Id = '" + ctrlId + "'; type = '" + type + "'; language = '" + lang + "'; translated = '" + translated + "'.");
+}
+
+function ResolveLanguage(cultureId)
+{
+/// &lt;summary&gt;
+/// Searches for most appropriated language defined for this dialog in following order:
+/// Specific culture (ru-RU) -&gt; Neutral culture (ru) -&gt; Invariant culture (en).
+/// &lt;/summary&gt;
+
+if (cultureId == "en")
+return cultureId;
+
+var defaultLanguage = GetDefaultLanguage();
+TraceInfo("ResolveLanguage: defaultLanguage = " + defaultLanguage);
+
+// Build list of languages defined for this dialog
+var langs = new Array();
+var elems = document.getElementsByName("Language");
+if (elems == null)
+return defaultLanguage;
+
+var isEnglishPresented = false;
+
+for (var i = 0; i &lt; elems.length; i++)
+{
+var elem = elems[i];
+var lang = elem.value;
+langs.push(lang);
+TraceInfo("ResolveLanguage: Language '" + lang + "' is defined.");
+
+if (lang == "en")
+isEnglishPresented = true;
+}
+
+if (!isEnglishPresented)
+langs.push("en");  
+
+// Search for requested language.
+if (_searchLanguage(cultureId))
+{
+TraceInfo("ResolveLanguage: Requested Language '" + cultureId + "' is presented in list of defined Languages.");
+return cultureId;
+}
+
+TraceInfo("ResolveLanguage: Requested Language '" + cultureId + "' is not presented in list of defined Languages.");
+
+// Requested language is not found =&gt; search for parent languages (with respect to language id containing more than 2 parts).
+var originalCultureId = cultureId;
+var indexDash = -1;
+while ((indexDash = cultureId.lastIndexOf('-')) &gt; -1)
+{
+cultureId = cultureId.substring(0, indexDash);
+
+TraceInfo("ResolveLanguage: Trying to find replacement Language '" + cultureId + "'.");
+
+//if (cultureId != "en")  // When "en" is reached (for example, when "en-US" is resolved), default language should be returned. Otherwise default language will be ignored because "en" always is presented.
+{
+if (_searchLanguage(cultureId))
+{
+TraceInfo("ResolveLanguage: Replacement Language '" + cultureId + "' is presented in list of defined Languages.");
+return cultureId;
+}
+}
+}
+
+// Special case: various Chinese language codes (EPM-3735; 2018/07/19)
+// According to Microsoft:  zh-CN == zh-CHS == zh-Hans
+//                          zh-HK == zh-CHT == zh-Hant
+var chineseSimplified  = [ "zh-CN", "zh-CHS", "zh-Hans" ];
+var chineseTraditional = [ "zh-HK", "zh-CHT", "zh-Hant" ];
+
+if (chineseSimplified.indexOf(originalCultureId) &gt; -1)
+{
+var replacementLangId = _findReplacement(chineseSimplified);
+if (replacementLangId != null)
+return replacementLangId;
+}
+else if (chineseTraditional.indexOf(originalCultureId) &gt; -1)
+{
+var replacementLangId = _findReplacement(chineseTraditional);
+if (replacementLangId != null)
+return replacementLangId;
+}
+
+// Parent language is not found too =&gt; return language defined as default for this dialog.
+return defaultLanguage;
+
+function _searchLanguage(cultureId)
+{
+for (var i = 0; i &lt; langs.length; i++)
+{
+if (cultureId == langs[i])
+return true;
+}
+
+return false;
+}
+
+function _findReplacement(interchangeableLangs)
+{
+for (var j = 0; j &lt; interchangeableLangs.length; j++)
+{
+var interchangeableLang = interchangeableLangs[j];
+
+if (_searchLanguage(interchangeableLang))
+return interchangeableLang;
+}
+
+return null;
+}
+}
+
+function GetDefaultLanguage()
+{
+var inp = document.getElementById("DefaultLanguge");
+if (inp != null)
+return inp.value;
+else
+return "en";
+}
+
+function JsIsFeatureEnabled(id)
+{
+/// &lt;summary&gt;
+/// Gets the boolean flag indicating whether feature is present and enabled.
+/// &lt;/summary&gt;
+/// &lt;param name="id" type="string"&gt;Feature id (for example: "divJustificationArea", "divPasswordArea").&lt;/param&gt;
+/// &lt;returns&gt;"True" when feature is present and enabled, otherwise "False" returned&lt;/returns&gt;
+
+var elem = document.getElementById(id);
+if (elem == null)
+return false;   // Feature is not present.
+
+return (elem.style.display != "none");
+}
+
+function JsIsFeatureEnabledEx(id)
+{
+/// &lt;summary&gt;
+/// Gets the boolean flag indicating whether feature is present and enabled.
+/// &lt;/summary&gt;
+/// &lt;param name="id" type="string"&gt;Feature id (for example: "divJustificationArea", "divPasswordArea").&lt;/param&gt;
+/// &lt;returns&gt;"True" when feature is present and enabled, otherwise "False" returned&lt;/returns&gt;
+
+var elem = document.getElementById(id);
+if (elem == null)
+return false;   // Feature is not present.
+
+while (elem) 
+{
+if( typeof(elem.style) !== "undefined" &amp;&amp;
+elem.style !== null &amp;&amp; 
+typeof(elem.style.display) !== "undefined" &amp;&amp;
+elem.style.display !== null &amp;&amp; 
+elem.style.display === "none")
+return false;
+elem = elem.parentNode;
+}
+
+return true;
+}
+
+function JsEnableFeature(id, enable)
+{
+/// &lt;summary&gt;
+/// Enables/disables (in fact show/hide) feature by given id.
+/// &lt;/summary&gt;
+/// &lt;param name="id" type="string"&gt;Feature id (for example: "divJustificationArea", "divPasswordArea").&lt;/param&gt;
+/// &lt;param name="enable" type="bool"&gt;Flag to enable or disable feature.&lt;/param&gt;
+/// &lt;returns&gt;Nothing&lt;/returns&gt;
+
+if (enable &amp;&amp; id == "divPinNoteArea")
+return;     // This HTML element has special handling in JsSetFeatureValue function.
+
+var elem = null;
+if (typeof(id) == "string")
+elem = document.getElementById(id);
+else
+elem = id;
+
+if (elem != null)
+{
+if (elem.tagName.toLowerCase() == "br")
+return;
+
+elem.style.display = enable ? "block" : "none";
+
+// Set visibility for all children
+if (typeof(elem.children) != "undefined" &amp;&amp; elem.children != null &amp;&amp; typeof(elem.children.length) != "undefined")
+{
+for (var i = 0; i &lt; elem.children.length; i++)
+{
+var child = elem.children[i];
+if (child != null)
+JsEnableFeature(child, enable);
+}
+}
+}
+}
+
+function JsSetFeatureAccess(id, isAccessible)
+{
+/// &lt;summary&gt;
+/// Change feature access (in fact enables/disables) by given id.
+/// &lt;/summary&gt;
+/// &lt;param name="id" type="string"&gt;Feature id (for example: "btnOK").&lt;/param&gt;
+/// &lt;param name="isAccessible" type="bool"&gt;Flag to enable or disable feature.&lt;/param&gt;
+/// &lt;returns&gt;Nothing&lt;/returns&gt;
+
+var elem = null;
+if (typeof(id) == "string")
+elem = document.getElementById(id);
+else
+elem = id;
+
+if (elem != null)
+{
+if (elem.tagName.toLowerCase() == "br")
+return;
+
+elem.disabled = !isAccessible;
+
+// Set accessibility for all children
+if (typeof(elem.children) != "undefined" &amp;&amp; elem.children != null &amp;&amp; typeof(elem.children.length) != "undefined")
+{
+for (var i = 0; i &lt; elem.children.length; i++)
+{
+var child = elem.children[i];
+if (child != null)
+JsSetFeatureAccess(child, isAccessible);
+}
+}
+}
+}
+
+function JsGetFeatureValue(id)
+{
+/// &lt;summary&gt;
+/// Gets the value of feature by given id.
+/// &lt;/summary&gt;
+/// &lt;param name="id" type="string"&gt;Feature id (for example: "divJustificationArea", "divPasswordArea", "divEmailArea").&lt;/param&gt;
+/// &lt;returns&gt;Value as string&lt;/returns&gt;
+/// &lt;remarks&gt;JsIsFeatureEnabled must be called before JsGetFeatureValue&lt;/remarks&gt;
+
+var txt = null;
+var chk = null;
+
+switch (id)
+{
+case "divJustificationArea":
+return JsGetJustification();
+
+        case "optJustificationType":
+            return JsGetJustificationType();
+
+        case "txtJustificationTimeLimit":
+            var justificationType = JsGetJustificationType();
+            if (justificationType != "1")
+                return "";
+            txt = document.getElementById("txtJustificationTimeLimit");
+            return (txt != null) ? txt.value : "";
+
+case "UserAuthenticationOption":
+txt = document.getElementById("UserAuthenticationOption");
+return (txt != null) ? txt.value : "";            
+
+case "divUserNameArea":
+txt = document.getElementById("txtUserName");
+if (txt != null &amp;&amp; txt.style.display != "none") 
+return txt.value;
+
+txt = document.getElementById("lblUserName");   // Some of dialogs use labels (span) as User Name holder.
+if (txt != null &amp;&amp; txt.style.display != "none")
+return txt.innerText;
+
+return "";
+
+case "divPasswordArea": 
+case "divPasswordContentArea":
+txt = document.getElementById("txtPassword");
+return (txt != null) ? txt.value : "";
+
+case "divPinArea":      
+txt = document.getElementById("txtPin");
+return (txt != null) ? txt.value : "";
+
+case "divEmailArea":
+txt = document.getElementById("txtEmail");
+return (txt != null) ? txt.value : "";
+
+case "divAutorizationCodeArea":
+txt = document.getElementById("txtAutorizationCode");
+return (txt != null) ? txt.value : "";
+
+case "divPolicyAutoResumeArea":
+chk = document.getElementById("chkPolicyAutoResume");
+return (chk != null) ? (chk.checked ? "true" : "false") : "true";     // "true" is a default value according to TSK-1423.
+}
+
+return "";
+}
+
+function JsSetFeatureValue(id, value)
+{
+/// &lt;summary&gt;
+/// Sets the value of feature by given id.
+/// &lt;/summary&gt;
+/// &lt;param name="id" type="string"&gt;Feature id (for example: "divPinNoteArea").&lt;/param&gt;
+/// &lt;param name="value" type="string"&gt;Value as string&lt;/param&gt;
+/// &lt;returns&gt;Nothing.&lt;/returns&gt;
+
+var isValueDefined = (value != null &amp;&amp; value != "");
+
+switch (id)
+{
+case "divPinArea":      
+{
+var txt = document.getElementById("txtPin");
+if (txt != null) 
+txt.value = isValueDefined ? value : "";
+}
+break;
+
+case "divPasswordArea": 
+case "divPasswordContentArea":
+{
+var txt = document.getElementById("txtPassword");
+if (txt != null) 
+txt.value = isValueDefined ? value : "";
+}
+break;
+
+case "divPinNoteArea":
+{
+var divArea = document.getElementById("divPinNoteArea");
+if (divArea != null)
+divArea.style.display = isValueDefined ? "" : "none";   // Not "block", because "colspan" is broken when &lt;tr&gt; has a style "display:block".
+
+lbl = document.getElementById("lblPinNote");
+if (lbl != null)
+{
+lbl.innerHTML     = value;
+lbl.style.display = isValueDefined ? "" : "none";    
+}
+
+SetFeatureValueTranslations(id, value);
+}
+break;
+
+case "divAutorizationCodeArea":
+{
+var txt = document.getElementById("txtAutorizationCode");
+if (txt != null) 
+txt.value = isValueDefined ? value : "";
+}
+break;
+
+case "lblStepUpAuthentication":
+{
+var lbl = document.getElementById("lblStepUpAuthentication");
+if (lbl != null) 
+lbl.innerHTML = isValueDefined ? value : "";
+
+SetFeatureValueTranslations(id, value);
+}
+break;
+
+case "lblStepUpAuthorization":
+{
+var lbl = document.getElementById("lblStepUpAuthorization");
+if (lbl != null)
+lbl.innerHTML = isValueDefined ? value : "";
+
+SetFeatureValueTranslations(id, value);
+}
+break;
+}
+}
+
+function SetFeatureValueTranslations(id, value)
+{
+/// &lt;summary&gt;
+/// Propagates the value of feature by given id to all translations
+/// (need to fix Agent bug EPM-29732; 2023/07/05)
+/// &lt;/summary&gt;
+
+var translationHolders = document.getElementsByTagName("input");
+for (var i = 0; i &lt; translationHolders.length; i++)
+{
+try
+{
+var translationHolder = translationHolders[i];
+
+// Check whether translationHolder really contains translated string (should be hidden input)
+if (translationHolder.type == null || translationHolder.type.toLowerCase() != "hidden")
+continue;
+
+var ctrlId = translationHolder.getAttribute("ctrlid");
+if (ctrlId == id)
+{
+translationHolder.value = value;
+}
+}
+catch(ex) { }
+}
+}
+
+function InitEmailArea()
+{
+try
+{
+if (JsIsFeatureEnabled("divEmailArea"))
+{
+var val = external.JsOnGetVariable("VF_EMAIL");
+var txt = document.getElementById("txtEmail");
+if (val != null &amp;&amp; txt != null)
+{
+txt.value = val;
+}
+}
+}
+catch(ex) {  }    
+}
+
+function InitOfflineRequestArea()
+{
+try
+{
+var val = OnGetVariableRequestId();
+if (val == null)
+return;
+
+var txtId = "";
+
+if (JsIsFeatureEnabled("divRequestIdArea"))
+txtId = "txtRequestId";
+else if (JsIsFeatureEnabled("divFileIdArea"))
+txtId = "txtFileId";
+
+var txt = document.getElementById(txtId);
+if (txt != null)
+txt.value = val;
+}
+catch(ex) {  }   
+}
+
+function InitAdHocPolicyDialogAppMessageArea()
+{
+var inpKillRunningApps = document.getElementById("KillRunningApps");
+var sKillRunningApps   = inpKillRunningApps.value.toLowerCase();
+var killRunningApps    = sKillRunningApps == "true" || sKillRunningApps == "1";
+
+document.getElementById("lblMessageAppsKill").style.display    =  killRunningApps ? "inline-block" : "none";
+document.getElementById("lblMessageAppsRunning").style.display = !killRunningApps ? "inline-block" : "none";
+}
+
+function OnGetVariableRequestId()
+{
+// &lt;remarks&gt;Caller is responsible to catch exceptions&lt;/remarks&gt;
+
+var val = null;
+
+if (JsIsFeatureEnabled("divRequestIdArea"))
+{
+try
+{
+val = external.JsGetRequestId(0);
+}
+catch (ex)
+{
+// For old Agent which doesn't support JsGetRequestId call we will request variable.
+val = external.JsOnGetVariable("VF_GENERATED_REQUEST_ID");
+}
+}
+
+if (JsIsFeatureEnabled("divFileIdArea"))
+{
+try
+{
+var inputMask = document.getElementById("LongRequestFieldsMask");
+var mask = (inputMask != null) ? parseInt(inputMask.value) : 1;
+val = external.JsGetRequestId(mask);
+}
+catch (ex)
+{
+// For old Agent which doesn't support JsGetRequestId call we will request variable.
+val = external.JsOnGetVariable("VF_GENERATED_FILE_ID");
+}
+}
+    
+return val;  
+}
+
+function JsGetDocumentSize()
+{
+function Size()
+{
+this.Width  = 0;
+this.Height = 0;
+}
+
+var docSize = new Size();
+var right  = 0;
+var bottom = 0;
+var isMacDialog = false;
+            
+for (var i = 0; i &lt; document.all.length; i++) 
+{
+var child = document.all[i];
+
+var tagName = child.tagName.toLowerCase();
+if (tagName == "html" || tagName == "body" || tagName == "form")
+continue;
+
+var id = child.getAttribute("id");
+if (id == "imgBackground" || id == "imgTitleBackground")
+continue;
+
+var className = child.getAttribute("className");
+if (/* still */ className == null)
+className = child.getAttribute("class");
+if (className != null)
+{
+if (className.indexOf("WatermarkImage")   &gt; -1 ||
+                className.indexOf("WatermarkContent") &gt; -1 ||
+                className.indexOf("TitleBackground")  &gt; -1)
+{
+continue;
+}
+}
+
+if (className === "mac-thematic-break") isMacDialog = true;
+
+right = child.offsetLeft + child.offsetWidth;
+if (right &gt; docSize.Width) 
+docSize.Width = right;
+
+bottom = child.offsetTop + child.offsetHeight;
+if (bottom &gt; docSize.Height) 
+docSize.Height = bottom;
+}
+
+var declaredWidth = getDeclaredDialogWidth();
+if (declaredWidth &gt; 0)
+docSize.Width = declaredWidth;
+if (isMacDialog)
+{
+if (docSize.Height &gt; 625) docSize.Height = 625;
+if (docSize.Width &gt; 580) docSize.Width = 580;
+}
+return docSize;
+}
+
+var DialogWidth = 0;
+
+function fitLine(ctrl, text)
+{
+return text;    // Temporary cancel fitLine because it break href's
+
+var charCountToFit = 35;
+
+try
+{  
+// Try to detect actual value of charCountToFit
+
+if (DialogWidth == 0)
+DialogWidth = getDeclaredDialogWidth();
+      
+var currentStyle = getDomElementCurrentStyle(ctrl);
+var bounds       = getBoundingClientRect(ctrl);
+
+if (currentStyle != null &amp;&amp; bounds != null &amp;&amp; DialogWidth &gt; 0)
+{
+var ctrlWidth       = DialogWidth - Math.round(bounds.left);
+var fontSize        = parseInt(currentStyle.fontSize);
+var avgCharWidth    = Math.round(fontSize * 2 / 3);
+            
+charCountToFit      = Math.round(ctrlWidth / avgCharWidth);    
+}
+}
+catch(ex) { }
+
+try
+{
+if (text.length &gt; charCountToFit)
+{
+text = breakLine(text, charCountToFit, /* useHyphen = */ false);
+}
+}
+catch(ex) { }
+
+return text;
+}
+
+function breakLine(source, lineLength, useHyphen)
+{
+/// &lt;summary&gt;
+/// Breaks long string to several lines in order to fit inside some rectangle.
+/// &lt;/summary&gt;
+/// &lt;param name="source"     type="string" optional="false"&gt;String to break&lt;/param&gt;
+/// &lt;param name="lineLength" type="number" optional="true"&gt;Max line length&lt;/param&gt;
+/// &lt;param name="useHyphen"  type="boolean" optional="true"&gt;Indicates whether Hyphen (-) should be used on line break.&lt;/param&gt;
+
+if (typeof (lineLength) == "undefined") lineLength = 70;
+if (typeof (useHyphen)  == "undefined") useHyphen = true;
+
+var res = "";
+
+try
+{
+var continuousCount = 0;
+var isBreaked = false;
+var breakTags = ["&lt;br&gt;", "&lt;br /&gt;", "&lt;br/&gt;"];
+
+for (var k = 0; k &lt; source.length; k++)
+{
+isBreaked = false;
+
+var ch = source.charAt(k);
+if (ch == " ")
+{
+continuousCount = 0;
+isBreaked = true;
+}
+
+if (ch == "&lt;")
+{
+// We shouldn't break inside valid HTML line break tags (for example, "&lt;br&gt;")
+
+for (var i = 0; i &lt; breakTags.length; i++)
+{
+var tag = breakTags[i];
+
+if (k + tag.length &lt;= source.length &amp;&amp; source.substr(k, tag.length).toLowerCase() == tag)
+{
+continuousCount = 0;
+isBreaked = true;
+break;
+}
+}
+}
+
+if (!isBreaked)
+continuousCount++;
+
+if (continuousCount == lineLength)
+{
+if (useHyphen)
+res += "-";
+res += "&lt;br&gt;";
+continuousCount = 0;
+}
+
+res += ch;
+}
+}
+catch (ex)
+{
+res = source;
+}
+
+return res;
+}
+
+function getDomElementCurrentStyle(elem)
+{
+/// &lt;summary&gt;
+/// Gets HTML Element current style (i.e.considering all styles defining in element itself, ingerited from parent elements or specifying in CSS classes).
+/// &lt;/summary&gt;
+/// &lt;param name="elem"&gt;HTML element&lt;/param&gt;
+/// &lt;returns&gt;Style object or null when some error has been occurred&lt;/returns&gt;
+
+try
+{
+if (typeof(elem) == "undefined" || elem == null)
+return null;
+
+if (typeof(elem.currentStyle) != "undefined" &amp;&amp; elem.currentStyle != null)
+{
+return elem.currentStyle;
+}
+
+else if (typeof(window.getComputedStyle) != "undefined")
+{
+window.getComputedStyle(elem);
+}
+
+else
+return null;
+
+}
+catch (ex)
+{
+return null;
+}
+}
+
+function getBoundingClientRect(elem)
+{
+/// &lt;summary&gt;
+/// Gets DOM Element bounding rectangle.
+/// &lt;/summary&gt;
+/// &lt;param name="elem"&gt;DOM element&lt;/param&gt;
+/// &lt;returns&gt;DOM Element bounding rectangle or null when some error has been occurred&lt;/returns&gt;    
+
+try
+{
+if (typeof(elem) == "undefined" || elem == null)
+return null;
+
+if (typeof(elem.getBoundingClientRect) != "undefined")
+return elem.getBoundingClientRect();
+else
+return null;
+}
+catch(ex)
+{
+return null;
+}
+}
+
+function getDeclaredDialogWidth()
+{
+/// &lt;summary&gt;
+/// Gets Dialog width as declared in "DialogWidth" CSS class.
+/// &lt;/summary&gt;    
+
+var dialogWidth = 0;
+
+try
+{
+for (var i = 0; i &lt; document.styleSheets.length; i++)
+{
+var styleSheet = document.styleSheets[i];   // Instance of CSSStyleSheet class. Presenting separate StyleSheet (i.e. each &lt;style&gt;...&lt;/style&gt; or &lt;link ... /&gt; block)
+if (styleSheet != null)
+{
+if (typeof(styleSheet.cssText) != "undefined" &amp;&amp; typeof(styleSheet.cssText.indexOf) != "undefined")// IE has "cssText" property while Chrome doesn't have.
+{
+if (styleSheet.cssText.indexOf("DialogWidth") == -1)
+continue;
+}
+
+var cssRules = null;
+if (typeof(styleSheet.cssRules) != "undefined")
+cssRules = styleSheet.cssRules;
+else if (typeof(styleSheet.rules) != "undefined")
+cssRules = styleSheet.rules;
+
+if (cssRules != null)
+{
+for (var j = 0; j &lt; cssRules.length; j++)
+{
+var cssRule = cssRules[j];   // Instance of CSSStyleRule class. Presenting separate CSS class inside StyleSheet.
+if (cssRule != null &amp;&amp; cssRule.selectorText.indexOf("DialogWidth") &gt; -1)
+{
+dialogWidth = parseInt(cssRule.style.width, /* radix = */ 10);
+break;
+}
+}
+}
+}
+
+if (dialogWidth &gt; 0)
+break;
+}
+}
+catch(ex)
+{
+dialogWidth = 0;
+}
+
+return dialogWidth;
+}
+
+function AddCssToHtml(id, url)
+{
+var objHead = document.getElementsByTagName("head")[0];
+var objCSS = document.createElement("link");
+objCSS.setAttribute("id", id);
+objCSS.setAttribute("rel", "stylesheet");
+objCSS.setAttribute("type", "text/css");
+objCSS.setAttribute("href", url);
+objHead.appendChild(objCSS);
+}
+
+// WARNING! Do not change lines with the following constants:
+// "s" + "c" + "r" + "i" + "p" + "t" and "s" + "r" + "c"
+// Regular expressions is doing bad work...
+function AddJsToHtml(id, url)
+{
+var objHead = document.getElementsByTagName("head")[0];
+var objJS = document.createElement("s" + "c" + "r" + "i" + "p" + "t");
+objJS.setAttribute("id", id);
+objJS.setAttribute("s" + "r" + "c", url);
+objHead.appendChild(objJS);
+}
+
+function InitIdaptiveWidget(btnOK)
+{
+var divIdaptiveArea = document.getElementById("divIdaptiveArea");
+var divIdaptiveForm = document.getElementById("divIdaptiveForm");
+// EPM-17170 - Adding enforce flag in identity dialog and implement it accordingly
+var txtIdaptiveForceUsername = document.getElementById("IdaptiveForceUsername");
+
+if (divIdaptiveArea != null &amp;&amp; divIdaptiveArea.style.display != "none" &amp;&amp; divIdaptiveForm != null)
+{
+divIdaptiveForm.className = "Loading";
+divIdaptiveForm.innerHTML = "&lt;div style=\"padding-top: 35px\"&gt;Loading CyberArk Identity Authentication...&lt;/div&gt;";
+
+if (typeof (btnOK) != "undefined" &amp;&amp; btnOK != null)
+btnOK.setAttribute("disabled", "disable");
+
+// IMPORTANT! The order of the requirements check up has to be following:
+// 1. Check up agent's ability to work with Ipdative - agent's version
+// 2. Check up browser's emulation version
+// This is because we had not browser's emulation increasing for old agents
+// and we will see "old browser version" message for both cases
+
+// 1. Check up agent ability to return config parameter by name - agent's version check up
+var tenantId = "";
+var widgetTimeout = 10;
+try
+{
+tenantId = external.JsOnGetAgentConfigValue("IdaptiveIntegration/IdaptiveTenantId");
+widgetTimeout = parseInt(external.JsOnGetAgentConfigValue("IdaptiveIntegration/IdaptiveTimeout"));
+if (isNaN(widgetTimeout))
+widgetTimeout = 10;
+}
+catch (ex)
+{
+var message = "&lt;b&gt;Unable to load CyberArk Identity Authentication.&lt;/b&gt;&lt;br /&gt;";
+message += "Contact IT support to upgrade the EPM agent on your endpoint.";
+divIdaptiveForm.className = "Error";
+divIdaptiveForm.innerHTML = message;
+return;
+}
+
+// 2. Check browser's emulation version
+var ieVersion = DetectIEVersion();
+if (typeof (ieVersion) != "number" || ieVersion &lt; 11)
+{
+var message = "&lt;b&gt;Unable to load CyberArk Identity Authentication.&lt;/b&gt;&lt;br /&gt;";
+message += "Contact IT support to upgrade your Internet browser.";
+divIdaptiveForm.className = "Error";
+divIdaptiveForm.innerHTML = message;
+return;
+}
+
+if (typeof (tenantId) != "string" || tenantId == null || tenantId == "")
+{
+var message = "&lt;b&gt;Unable to load CyberArk Identity Authentication.&lt;/b&gt;&lt;br /&gt;";
+message += "Contact IT support to complete CyberArk Identity configuration in EPM.";
+divIdaptiveForm.className = "Error";
+divIdaptiveForm.innerHTML = message;
+return;
+}
+
+var isForceUserName = false;
+if (txtIdaptiveForceUsername != null)
+isForceUserName = (/true/i).test(txtIdaptiveForceUsername.value);
+
+try
+{
+var urlIdaptiveCSS = "http://" + tenantId + "/vfslow/lib/uibuild/standalonelogin/css/login.css";
+var urlIdaptiveJS = "http://" + tenantId + "/vfslow/lib/uibuild/standalonelogin/login.js";
+var urlIdaptiveGetOneTimePassword = "https://" + tenantId + "/Security/GetOneTimePassword";
+
+// Load Idaptive JavaScript and CSS
+var linkId = "linkIdaptiveCSS";
+var jsId = "scriptIdaptiveJS";
+if (!document.getElementById(linkId))
+{
+AddCssToHtml(linkId, urlIdaptiveCSS);
+}
+if (!document.getElementById(jsId))
+{
+AddJsToHtml(jsId, urlIdaptiveJS);
+}
+
+var tryCounter = 0;
+var ti = setInterval(function ()
+{
+if (typeof (LaunchLoginView) == "function")
+{
+clearInterval(ti);
+
+var userFromAgent = document.getElementById("lblUserName");
+var userFromAgentText = "";
+if (userFromAgent)
+{
+if ((userFromAgent.innerHTML != "&lt;$VF_USER&gt;") &amp;&amp; (userFromAgent.innerHTML != "&amp;lt;$VF_USER&amp;gt;"))
+userFromAgentText = userFromAgent.innerHTML;
+}
+
+// EPM-17170 - Adding enforce flag in identity dialog and implement it accordingly
+// If isForceUserName=true but there is no UserName then try to get it from agent
+if (isForceUserName &amp;&amp; userFromAgentText == "")
+{
+var val = external.JsOnGetVariable("VF_USER");
+// If agent returned username then use it for Idaptive auth and hide "Enter username" step
+if (type(val) == "string" &amp;&amp; val.length &gt; 0)
+userFromAgentText = val;
+// There is not sence to hide "Enter username" step on the Idaptive widget
+// because we did not receive username from the agent. User has to enter it.
+else
+isForceUserName = false;
+}
+
+LaunchLoginView({
+containerSelector: "#divIdaptiveForm",
+apiFqdn: tenantId,
+allowForgotUsername: false,
+allowRememberMe: false,
+username: userFromAgentText,
+autoSubmitUsername: isForceUserName,
+//appKey: "",
+success: function ()
+{
+LoginUtil.doPost(urlIdaptiveGetOneTimePassword, {}, function (one_time_passcode)
+{
+if (external.JsOnCheckupOneTimePasscode(one_time_passcode))
+{
+if (typeof (btnOK) != "undefined" &amp;&amp; btnOK != null)
+btnOK.removeAttribute("disabled");
+
+var message = "&lt;b&gt;Authentication completed succesfully.&lt;/b&gt;&lt;br /&gt;";
+message += "Click \"OK\" to continue.";
+divIdaptiveForm.className += " Info";
+divIdaptiveForm.innerHTML = message;
+}
+else
+{
+var message = "&lt;b&gt;CyberArk Identity Authentication is unable to complete.&lt;/b&gt;&lt;br /&gt;";
+message += "Try again or contact IT support.";
+divIdaptiveForm.className += " Error";
+divIdaptiveForm.innerHTML = message;
+}
+})
+}
+});
+}
+else if (tryCounter &lt; widgetTimeout * 2)
+{
+tryCounter = tryCounter + 1;
+}
+else
+{
+var message = "&lt;b&gt;CyberArk Identity Authentication has timed out.&lt;/b&gt;&lt;br /&gt;";
+message += "Try again or contact IT support.";
+divIdaptiveForm.className += " Error";
+divIdaptiveForm.innerHTML = message;
+clearInterval(ti);
+}
+}, 500);
+}
+catch (ex)
+{
+var message = "&lt;b&gt;Unable to load CyberArk Identity Authentication.&lt;/b&gt;&lt;br /&gt;";
+message += "Unexpected error: " + ex.message;
+divIdaptiveForm.className = "Error";
+divIdaptiveForm.innerHTML = message;
+if (typeof (ex.description) == "string" &amp;&amp; ex.description != null &amp;&amp; ex.description != "")
+message += "&lt;br /&gt;(" + ex.description + ")";
+divIdaptiveForm.innerHTML = message;
+}
+}
+}
+
+function DetectIEVersion()
+{
+var userAgent = window.navigator.userAgent;
+
+var msie = userAgent.indexOf('MSIE ');
+if (msie &gt; 0)
+return parseInt(userAgent.substring(msie + 5, userAgent.indexOf('.', msie)), 10);
+
+var trident = userAgent.indexOf('Trident/');
+if (trident &gt; 0)
+{
+var rv = userAgent.indexOf('rv:');
+return parseInt(userAgent.substring(rv + 3, userAgent.indexOf('.', rv)), 10);
+}
+
+var edge = userAgent.indexOf('Edge/');
+if (edge &gt; 0)
+return parseInt(userAgent.substring(edge + 5, userAgent.indexOf('.', edge)), 10);
+
+return false;
+}
+
+function TraceInfo(message)    { Trace(ETraceLevel.INFO,    message); }
+function TraceWarning(message) { Trace(ETraceLevel.WARNING, message); }
+function TraceError(message)   { Trace(ETraceLevel.ERROR,   message); }
+
+function Trace(level /*: ETraceLevel */ , message)
+{
+message = "Dialog::" + message;
+
+try
+{
+if (external != null)
+{
+external.JsTrace(level, message); 
+}
+}  
+catch(ex) {}  
+
+TraceBrowserConsole(level, message);
+}
+
+function TraceBrowserConsole(level /* ETraceLevel */ , message)
+{
+try
+{
+var levelDisplayName = "DEBUG";
+switch (level)
+{
+case ETraceLevel.DEBUG: levelDisplayName = "DEBUG";break;
+case ETraceLevel.INFO: levelDisplayName = "INFO";break;
+case ETraceLevel.WARNING: levelDisplayName = "WARNING";break;
+case ETraceLevel.ERROR: levelDisplayName = "ERROR";break;
+}
+
+console.log(levelDisplayName + ": " + message);
+}
+catch(ex) {}  
+}
+
+</CommonCode>
+        <CommonCode id="VfMacCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684">/* File version = "1.0" */
+
+html, body, form
+{
+    height:         400px;
+    font-family:    Arial;
+    font-size:      14px;
+    margin:         0px;
+    padding:        0px;
+    overflow:       hidden;
+}    
+
+.FlatTextBox
+{
+border:         1px solid #b8c2c5;
+font-family:    Arial;
+font-size:      14px;
+}
+ 
+.FlatTextBoxHover
+{
+border:         1px solid #F88104;
+font-family:    Arial;
+font-size:      14px;
+}
+
+.FlatTextBoxDisabled
+{
+border-style:   solid;
+border-color:   #A9B7BE;
+border-width:   1px;
+font-family:    Arial;
+font-size:      14px;
+cursor:    default;
+}
+    
+.TitleBackground
+{
+    position:       absolute;
+    width:          100%;
+    height:         92px;
+    top:            0px;
+    margin:         0px;
+    padding:        0px;
+    z-index:        0;
+}  
+    
+
+.TitleArea
+{
+    position:       absolute;
+    width:          100%;
+    height:         76px;
+    top:            0px;
+    margin:         0px;
+    padding:        0px;
+    z-index:        950;
+    overflow:       hidden;
+} 
+    
+span
+{
+font-family:    Arial;
+font-size:      14px;
+}
+
+input
+{
+font-family:    Arial;
+font-size:      14px;
+}
+    
+.CaptionArea
+{
+    vertical-align: middle;
+}
+    
+.Caption
+{
+    color:          #333333;
+    font-size:      20px;
+    font-family:    Arial;
+    vertical-align: middle;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: normal;
+}
+    
+.WatermarkImage
+{
+    position:       absolute;
+    width:          100%;
+    height:         100%;
+    top:            0px;
+    margin:         0px;
+    padding:        0px;
+    z-index:        0;
+} 
+
+.WatermarkImageFixed
+{
+    position:       absolute;
+    width:          100%;
+    height:         100%;
+    top:            0px;
+    margin:         0px;
+    padding:        0px;
+    z-index:        0;
+} 
+
+
+.WatermarkContent
+{
+    position:       absolute;
+    height:         100%;
+    top:            0px;
+    z-index:        900;
+    overflow:       hidden;
+    margin:         0px;
+    padding:        0px;
+}
+#lblJustification{
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+}
+
+.MessageArea,
+#divStepUpAuthentication{
+  font-size: 14px;
+  margin-top: 20px;
+  font-weight: normal;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.5;
+  letter-spacing: normal;
+}
+    
+#AppListTable
+{
+    width:              100%; 
+    font-size:          14px; 
+    border-collapse:    collapse;
+}
+    
+#AppListTable td
+{
+    border:             #a9b7be 1px solid;
+}
+
+p
+{
+    margin:         0px;
+}
+
+#divInfoArea, #lblInfo1Name, #lblInfo1Value,#lblInfo2Name, #lblInfo2Value,#lblInfo3Name, #lblInfo3Value, #lblInfo4Name, #lblInfo4Value
+{
+  font-size: 14px;
+  line-height: 2.07;
+  letter-spacing: normal;
+}
+
+#divInfoArea
+{
+  word-break: break-word; 
+  overflow: auto;
+}
+
+#divJustificationArea
+{
+  margin-top: 20px;
+  width: 500px;
+  word-break: break-word; 
+  overflow: auto;
+}
+
+#lblInfo1Name, 
+#lblInfo2Name, 
+#lblInfo3Name
+{
+    color:                  #333333;
+}
+
+#lblInfo1Value, 
+#lblInfo2Value, 
+#lblInfo3Value
+{
+    color:                  #333333;
+}
+
+#divRequestIdArea,
+#divFileIdArea {
+    position: relative;
+}
+
+input[type=submit],
+input[type=button],
+button[type=submit],
+button[type=button]
+{
+    min-width:              70px;
+    height:             28px;
+    border-radius:    2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    cursor:             pointer;
+}
+
+input[type=submit]:focus, 
+input[type=button]:focus, 
+button[type=submit]:focus, 
+button[type=button]:focus
+{
+outline:0;/* Removes annouing blue border around buttom after click in Chrome; IE and FF are working OK */
+}
+
+input[type=submit][vfActionButton=true], 
+input[type=button][vfActionButton=true],
+button[type=submit][vfActionButton=true], 
+button[type=button][vfActionButton=true]
+{
+    color:              #FFFFFF;
+    background-color:   #3165BD;
+    border-style:       none;
+    border-width:       0px;
+}
+
+input[type=submit][vfActionButton=true]:hover, 
+input[type=button][vfActionButton=true]:hover,
+button[type=submit][vfActionButton=true]:hover, 
+button[type=button][vfActionButton=true]:hover 
+{
+    background-color:   #047AD4;
+}
+
+input[type=submit][vfActionButton=true]:active, 
+input[type=button][vfActionButton=true]:active,
+button[type=submit][vfActionButton=true]:active, 
+button[type=button][vfActionButton=true]:active  
+{
+    background-color:   #03559B;
+}
+
+input[type=submit][vfActionButton=true]:disabled, 
+input[type=button][vfActionButton=true]:disabled,
+button[type=submit][vfActionButton=true]:disabled, 
+button[type=button][vfActionButton=true]:disabled  
+{
+color:              #FFFFFF;
+background-color:   #B6B6B6;
+cursor:             default;
+}
+
+input[type=submit][vfActionButton=false], 
+input[type=button][vfActionButton=false],
+button[type=submit][vfActionButton=false], 
+button[type=button][vfActionButton=false]
+{
+    color:              #3165BD;
+    background-color:       Transparent;        
+    border-style:       solid;
+    border-width:       1px;
+    border-color:    #3165BD
+}
+
+input[type=submit][vfActionButton=false]:hover, 
+input[type=button][vfActionButton=false]:hover,
+button[type=submit][vfActionButton=false]:hover, 
+button[type=button][vfActionButton=false]:hover  
+{
+    color:              #047AD4;
+    background-color:   #E5F4FF;
+    border-color:    #047AD4;
+}
+
+input[type=submit][vfActionButton=false]:active, 
+input[type=button][vfActionButton=false]:active,
+button[type=submit][vfActionButton=false]:active, 
+button[type=button][vfActionButton=false]:active 
+{
+    color:              #047AD4;
+    background-color:   #DEECF8;
+    border-color:    #047AD4;
+}
+
+input[type=submit][vfActionButton=false]:disabled, 
+input[type=button][vfActionButton=false]:disabled,
+button[type=submit][vfActionButton=false]:disabled, 
+button[type=button][vfActionButton=false]:disabled  
+{
+    color:              #D0D0D0;
+    background-color:   #FFFFFF;
+    border-color:    #DDDDDD;
+    cursor:             default;
+}
+
+#divPasswordArea
+{
+    margin-right:20px; 
+    margin-left: 20px; 
+    margin-top: 30px;
+    word-break: break-word; 
+    overflow: auto;
+
+}
+
+.mac-confirm-title
+{
+    color: #333333; 
+    font-weight: 600; 
+    font-size: 14px
+}
+
+#divUserNameArea
+{
+    margin-top: 15px
+}
+
+#divPasswordContentArea
+{
+    margin-top: 20px
+}
+
+#txtUserName
+{
+    padding-left: 10px; 
+    padding-right: 10px; 
+    width: 280px;
+    height: 34px;
+    border-radius: 2px; 
+    border: solid 1px #a6a6a6; 
+    background-color: #ffffff;
+}
+#lblUserName
+{
+    margin-left: 15px; 
+}
+
+#txtPassword
+{
+    padding-left: 10px; 
+    padding-right: 10px; 
+    width: 280px; 
+    height: 34px; 
+    border-radius: 2px; 
+    border: solid 1px #a6a6a6; 
+    background-color: #ffffff;
+}
+
+.mac-confirm-field-label
+{
+    color: #333333; 
+    font-size: 14px;
+}
+
+.mac-confirm-input-label
+{
+    margin-top: 10px;
+}
+
+span[style*='DISPLAY: block'][id='lblUserPrefix'] {
+  display:inline !important;
+}
+span[style*='DISPLAY: block'][id='lblUserName'] {
+  display:inline !important;
+}
+
+span[style*='display: block'][id='lblUserPrefix'] {
+  display:inline !important;
+}
+span[style*='display: block'][id='lblUserName'] {
+  display:inline !important;
+}
+
+.mac-thematic-break
+{
+   background-color: #c2c1c1; 
+   height: 1px;
+   margin-left: 20px;
+   margin-right: 20px;
+}
+
+.CaptionCyberArk
+{
+    color:          #333333;
+    font-size:      18px;
+    font-family:    Arial;
+    font-weight:    bold;
+    vertical-align: middle;
+}
+
+
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track-piece {
+   background: #d0d0d0;
+   border-radius: 7px;
+
+}
+::-webkit-scrollbar-thumb {
+   background: #a6a6a6;
+   border-radius: 7px;
+}
+
+/* Classes appended to HTML elements by Quill editor */
+
+.ql-align-center {
+    text-align: center;
+}
+
+.ql-align-right {
+    text-align: right;
+}
+
+.ql-align-left {
+    text-align: left;
+}
+
+.ql-align-justify {
+    text-align: justify;
+}
+
+​
+</CommonCode>
+        <CommonCode id="VfWinCss_C15D7A2F-4258-47F8-B3BD-ABB1CC67A684">/* File version = "1.1" */
+
+html, body, form {
+font-family: Arial;
+font-size: 14px;
+margin: 0px;
+padding: 0px;
+overflow: hidden;
+}
+
+.Status {
+border-top-width: 3px;
+border-top-style: solid;
+position: absolute;
+z-index: 999;
+}
+
+.Status.Error {
+border-top-color: #ea112b;
+z-index: 999;
+}
+
+.Status.Info {
+border-top-color: #3165bd;
+z-index: 999;
+}
+
+.Status.Warning {
+border-top-color: #ffb135;
+z-index: 999;
+}
+
+.Status.Success {
+border-top-color: #14b876;
+z-index: 999;
+}
+
+* {
+box-sizing: border-box;
+-moz-box-sizing: border-box;
+-webkit-box-sizing: border-box;
+border: none;
+}
+
+#imgLogo {
+margin-right: 20px;
+}
+
+.HeaderIcon {
+padding-right: 15px;
+}
+
+span, div, table, input, button, textarea {
+font-family: Arial;
+font-size: 14px;
+line-height: 20px;
+}
+
+table {
+border-collapse: collapse;
+}
+
+textarea {
+padding: 6px 10px 6px 10px;
+border: 1px solid #a6a6a6;
+overflow: auto;
+resize: none;
+}
+
+input.Btn,
+input.Btn:visited,
+input.Btn:hover,
+input.Btn:focus,
+input.Btn:active,
+button.Btn,
+button.Btn:visited,
+button.Btn:hover,
+button.Btn:focus,
+button.Btn:active {
+border: 1px solid #3165bd;
+/*filter:chroma(color=#000000);*/
+color: #3165bd;
+background-color: #ffffff;
+text-decoration: none;
+cursor: pointer;
+width: 90px;
+height: 28px;
+margin-left: 10px;
+/*outline: none;*/
+}
+
+input.Btn.Def,
+input.Btn.Def:visited,
+input.Btn.Def:hover,
+input.Btn.Def:focus,
+input.Btn.Def:active, 
+button.Btn.Def,
+button.Btn.Def:visited,
+button.Btn.Def:hover,
+button.Btn.Def:focus,
+button.Btn.Def:active {
+border: 1px solid #3165bd;
+/*filter:chroma(color=#000000);*/
+color: #ffffff;
+background-color: #3165bd;
+text-decoration: none;
+cursor: pointer;
+width: 90px;
+height: 28px;
+margin-left: 10px;
+/*outline: none;*/
+}
+
+input.Btn:disabled,
+input.Btn.Def:disabled,
+input.Btn[disabled=disabled],
+input.Btn.Def[disabled=disabled], 
+button.Btn:disabled,
+button.Btn.Def:disabled,
+button.Btn[disabled=disabled],
+button.Btn.Def[disabled=disabled] {
+color: #a6a6a6;
+border: 1px solid #dddddd;
+}
+
+input.Txt {
+height: 28px;
+padding: 3px 10px 3px 10px;
+border: 1px solid #a6a6a6;
+margin-top: 10px;
+}
+
+*+html input.Txt {
+height: 22px;
+line-height: 22px;
+padding: 3px 10px 3px 10px;
+border: 1px solid #a6a6a6;
+margin-top: 10px;
+}
+
+input.Check,
+input.Radio {
+width: 16px;
+height: 16px;
+padding: 0px;
+margin: 0px;
+cursor: pointer;
+}
+
+*+html .Check,
+*+html .Radio {
+width: auto;
+height: auto;
+padding: 0px;
+margin: 0px;
+cursor: pointer;
+zoom: 1.2;
+}
+
+div.Header {
+padding: 16px 0px 13px 0px;
+margin: 0px 10px 0px 20px;
+border-bottom: #d0d0d0 1px solid;
+}
+
+div.HeaderForm {
+padding: 18px 0px 0px 0px;
+margin: 0px 10px 0px 20px;
+border: none;
+}
+
+.divImgCopyRequestId,
+.divImgCopyFileId {
+position: absolute;
+right: -27px;
+}
+
+*+html .divImgCopyRequestId,
+*+html .divImgCopyFileId {
+position: absolute;
+right: -49px;
+}
+
+.tdIndentLeft {
+width: 20px;
+}
+
+.tdIndentRight {
+width: 10px;
+}
+
+.Buttons {
+width: 100%;
+text-align: right;
+padding: 40px 10px 15px 10px;
+}
+
+.CaptionArea {
+height: 48px;
+vertical-align: middle;
+}
+
+.Caption {
+font-size: 20px;
+font-weight: normal;
+font-style: normal;
+font-stretch: normal;
+line-height: normal;
+letter-spacing: normal;
+vertical-align: middle;
+}
+
+.Caption_CyberArk {
+color: Black;
+font-size: 16px;
+font-family: Arial;
+font-weight: bold;
+vertical-align: middle;
+}
+
+.WatermarkContent {
+position: absolute;
+height: 100%;
+top: 0px;
+z-index: 900;
+overflow: hidden;
+margin: 0px;
+padding: 0px;
+padding-right: 5px;
+background-color: white;
+}
+
+#divInfoArea {
+padding-top: 15px;
+padding-bottom: 15px;
+}
+
+#divExplanationArea {
+padding-bottom: 15px;
+}
+
+#divMessageArea,
+#divAppMessageArea,
+#divJustificationArea,
+#divJustificationTypeArea,
+#divEmailArea,
+#divDontShowMeArea,
+#divPasswordArea,
+#divPolicyAutoResumeArea,
+#divAutorizationCodeArea,
+#divRequestIdArea,
+#divFileIdArea {
+padding-top: 15px;
+}
+
+#divRequestIdArea,
+#divFileIdArea {
+position: relative;
+}
+
+#JustificationOptionArea0,
+#JustificationOptionArea1,
+#JustificationOptionArea2,
+#JustificationOptionArea3,
+#JustificationOptionArea4,
+#JustificationManualArea {
+padding-top: 10px;
+}
+
+.TdRadioInput,
+.TdCheckInput {
+padding: 0px;
+vertical-align: top;
+width: 16px;
+float: left;
+}
+
+.TdRadioInput input,
+.TdCheckInput input {
+margin-top: 2px;
+}
+
+.TdRadioLabel,
+.TdCheckLabel {
+padding-left: 15px;
+margin-left: 15px;
+vertical-align: top;
+width: 510px;
+}
+
+#tdInfo1Area td,
+#tdInfo2Area td,
+#tdInfo3Area td {
+padding-right: 20px;
+padding-bottom: 8px;
+vertical-align: top;
+}
+
+#divAppListArea {
+padding: 6px 10px 6px 10px;
+margin-top: 15px;
+height: 90px;
+border: 1px solid #d0d0d0;
+overflow: auto;
+overflow-x: hidden;
+font-family: Arial;
+font-size: 14px;
+line-height: 20px;
+}
+
+#AppListTable {
+width: 100%;
+}
+
+.InfoName {
+vertical-align: top;
+font-weight: bold;
+padding-right: 10px;
+}
+
+.InfoValue {
+word-wrap: break-word;
+padding-right: 10px;
+max-width: 300px; /* can be overriden for certain dialog by providing style named "InfoValueMaxValue" (with "!important"). */
+width: 300px; /* works instead of max-width to support WebBrowser control emulating IE7 */
+}
+
+p {
+margin: 0px;
+}
+
+/* Styles to ensure wrapping of very long strings in the lblInfo1Value, lblInfo2Value, lblInfo3Value areas (EPM-7279; 2020/07/19) */
+#lblInfo1Value,
+#lblInfo2Value,
+#lblInfo3Value {
+display: inline-block;
+word-break: break-all;
+}
+
+#divStepUpAuthentication {
+margin-top: 15px;
+}
+
+#divStepUpAuthorization {
+margin-top: 15px;
+}
+
+/******************** Idaptive's Widget styles ************************/
+#divIdaptiveArea {
+height: 312px;
+padding-top: 20px;
+border-top: #d0d0d0 1px solid;
+}
+
+#lblIdaptive {
+margin-bottom: 13px;
+}
+
+#divIdaptiveForm,
+#divIdaptiveForm * {
+font-family: Arial;
+font-size: 14px;
+}
+
+#divIdaptiveForm {
+width: 546px;
+height: 257px;
+}
+
+#divIdaptiveForm.EPM,
+#divIdaptiveForm.Loading,
+#divIdaptiveForm.Info,
+#divIdaptiveForm.Error {
+text-align: center;
+color: #333333;
+background-color: transparent;
+background-image: none;
+border-radius: 2px;
+border: #dddddd solid 1px;
+text-align: center;
+}
+
+#divIdaptiveForm.EPM {
+padding-top: 35px;
+background-repeat: no-repeat;
+background-image: url('data:image/png;base64,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');
+}
+
+#divIdaptiveForm.Loading {
+padding: 0px 0px 0px 0px !important;
+color: #333333;
+}
+
+#divIdaptiveForm.Info {
+padding-top: 100px;
+color: #333333;
+}
+
+#divIdaptiveForm.Error {
+padding-top: 100px;
+color: #ea112b;
+}
+
+.web-login {
+display: block !important;
+position: relative !important;
+width: 546px !important;
+height: 287px !important;
+padding: 0px !important;
+margin: 0px !important;
+}
+
+.web-login .login-container {
+margin: 0px !important;
+padding: 0px !important;
+box-shadow: none !important;
+border: none !important;
+border-radius: 0px !important;
+height: 285px !important;
+max-height: 285px !important;
+}
+
+.web-login .login-container .form-wrapper  {
+box-shadow: none !important;
+border: none !important;
+border-radius: 0px !important;
+margin: 0px 0px 0px 0px !important;
+padding: 0px !important;
+}
+
+.web-login .login-container .form-field-container,
+.web-login .label,
+.web-login .combo-label,
+.web-login .login-container .form-field-container .field-label,
+.web-login .login-container .form-field-container .field-wrapper,
+.web-login .login-container .form-field-container .field-wrapper label {
+margin-top: 0px !important;
+}
+
+.web-login .login-container .form-field-container button,
+.web-login .login-container .form-field-container .input-wrapper {
+margin-top: 10px !important;
+}
+
+.web-login .form-wrapper .login-form .form-field-container .combo-list {
+position: absolute !important;
+}
+
+.web-login .login-container .logo-container,
+.web-login .login-container .form-title,
+.web-login .login-container .footer-wrapper {
+display: none;
+}
+
+.web-login .footer {
+display: none !important;
+}
+
+/* Padding before login-password inputs */
+.web-login .input-with-glyph {
+padding-left: 0px !important;
+}
+
+/* Padding before "Start Over" link */
+.web-login .start-over-label {
+margin-left: 0px !important;
+}
+
+.web-login .glyphicon,
+/*.web-login .trigger-icon,*/
+/*.web-login .trigger-icon-open,*/
+.web-login .icon-back {
+display: none !important;
+}
+
+/* Classes appended to HTML elements by Quill editor */
+
+.ql-align-center {
+    text-align: center;
+}
+
+.ql-align-right {
+    text-align: right;
+}
+
+.ql-align-left {
+    text-align: left;
+}
+
+.ql-align-justify {
+    text-align: justify;
+}
+
+/**********************************************************************/
+</CommonCode>
+    </GUI>
+</Policies>

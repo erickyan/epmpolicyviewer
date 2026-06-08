@@ -1,0 +1,52 @@
+# GCP Cloud Build → Artifact Registry → Cloud Run
+# Project: epmpolicyviewer | Region: us-east1
+#
+# One-time setup (run locally with gcloud authenticated):
+#   gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
+#   gcloud artifacts repositories create epm-viewer \
+#     --repository-format=docker --location=us-east1 --project=epmpolicyviewer
+# Connect this repo to Cloud Build (GitHub 2nd gen), then create a trigger on main → this file.
+
+substitutions:
+  _REGION: us-east1
+  _SERVICE: epm-policy-viewer
+  _REPOSITORY: epm-viewer
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:latest
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - --all-tags
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID
+      - --region=${_REGION}
+      - --platform=managed
+      - --min-instances=0
+      - --max-instances=3
+      - --memory=512Mi
+      - --cpu=1
+      - --allow-unauthenticated
+      - --port=8080
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:latest
+
+options:
+  logging: CLOUD_LOGGING_ONLY

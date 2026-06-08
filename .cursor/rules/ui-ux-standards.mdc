@@ -1,0 +1,24 @@
+---
+description: Enterprise UI/UX and styling standards for frontend components
+globs: src/components/**/*.{ts,tsx}, src/pages/**/*.{ts,tsx}, *.tsx
+---
+# UI/UX & Styling Standards
+
+You are an expert UX Designer and Frontend Engineer. When generating React components, you must adhere strictly to these enterprise UI/UX principles:
+
+1. **Design Language (SaaS Dashboard):**
+   - Use a clean, high-density, professional aesthetic.
+   - Default to a neutral palette (Tailwind `slate` or `zinc`) with semantic accents (e.g., `red-500` for critical, `amber-500` for warnings).
+   - Use subtle borders (`border-slate-200`) and soft shadows (`shadow-sm`) to separate content zones. Do not overuse heavy drop shadows.
+
+2. **Component Structure & Spacing:**
+   - Use consistent padding and margins (e.g., `p-4` or `p-6` for cards).
+   - Use CSS Grid and Flexbox for precise alignment. Never use absolute positioning for standard layout flows.
+
+3. **User Feedback (Crucial):**
+   - **Empty States:** Always provide a beautifully styled empty state (e.g., an icon and prompt when no XML file is uploaded yet).
+   - **Loading States:** Include loading spinners or skeleton loaders during file parsing or API calls.
+   - **Interactivity:** Ensure all buttons and file dropzones have clear `:hover`, `:focus`, and `:active` states.
+
+4. **Icons:**
+   - Exclusively use `lucide-react` for icons. Ensure icons are consistently sized (usually `w-5 h-5` or `w-4 h-4`) and aligned with text.

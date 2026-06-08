@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policies>
+  <Policy id="P-1001" name="Allow Corporate Signed Apps" action="10" order="1" />
+  <Policy id="P-1002" name="Block Legacy PowerShell v2" action="12" order="2" />
+  <Policy id="P-1003" name="Elevate Approved Installers" action="10" order="3" />
+  <Policy id="P-1004" name="Exclude Trusted Updaters" action="12" order="4" />
+  <Policy id="P-1005" name="Configuration Baseline - Finance" action="10" order="5" />
+</Policies>

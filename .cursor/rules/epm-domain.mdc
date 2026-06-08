@@ -1,0 +1,17 @@
+---
+description: Domain knowledge and parsing rules for CyberArk EPM XML files
+globs: backend/**/*.ts, backend/**/*.js, *.js
+---
+# EPM Domain Knowledge & Backend Standards
+
+> **Reference:** See `reference/EPM-XML-reference.md` for the condensed EPM XML spec (action values, target/config/GUI elements, dialog types, parsing & encoding rules). Consult it before working on EPM parsing.
+
+You are an expert Backend Engineer working with CyberArk EPM XML payloads.
+
+1. **XML Parsing Constraints (CRITICAL):**
+   - You will use `fast-xml-parser`.
+   - The CyberArk EPM schema stores critical metadata (`id`, `name`, `action`, `order`) as XML attributes, NOT child elements.
+   - You MUST instantiate the parser with: `{ ignoreAttributes: false, attributeNamePrefix: "@_" }`.
+
+2. **Data Mapping:**
+   - Always map the raw parsed XML to clean JavaScript objects/interfaces before sending them to the frontend to ensure the UI doesn't have to deal with `@_` prefixes.
