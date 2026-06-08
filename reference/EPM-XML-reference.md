@@ -2,7 +2,7 @@
 
 Condensed from the official "EPM Policies XML format" spec (source last updated Apr 2020)
 plus the bundled `default_policy.xml`. This is the quick-reference used by the
-EPM Analyzer app; it intentionally focuses on what we parse/display.
+EPM Policy Viewer app; it intentionally focuses on what we parse/display.
 
 ---
 
@@ -161,14 +161,17 @@ definition in the root `<ApplicationGroups>` block. We index those definitions a
 reference's `name` and member applications onto `target.members[]`, shown as nested rows.
 
 **Admin tasks (`<AdminTask>` / `<MacAdminTask>`)**: predefined administrative tasks a standard
-user can be elevated to run. Both carry only a numeric `id` (no name in the XML):
-- `<AdminTask id="N">` → Windows `EvfAdminTaskId` (1–59, e.g. 6 = System Restore, 16 = Windows
-  Firewall, 42 = Services Configuration). We resolve the name via `ADMIN_TASK_LABELS`
-  (`backend/src/epm/labels.ts`, transcribed from the PDF) and set it as `target.name`.
-- `<MacAdminTask id="N">` → macOS `EvfMacAdminTaskId`. CyberArk does **not** publish the numeric
-  enum (it lives in `VfAgentDeclarations.cs`), and the public docs only list System Preferences
-  categories without ids — so these are surfaced generically as `macOS System Preference Task #N`.
-  To name them, add the real enum to `getAdminTaskLabel`.
+user can be elevated to run. Both carry only a numeric `id` (no name in the XML). **The id enums
+are different on Windows vs macOS** — the same number means different things — so they are resolved
+from two separate tables (`WIN_ADMIN_TASK_LABELS` / `MAC_ADMIN_TASK_LABELS` in
+`backend/src/epm/labels.ts`). Source:
+[CyberArk EPM "Application patterns" → Admin task ID](https://docs.cyberark.com/epm/latest/en/content/webservices/applicationpatterns.htm).
+- `<AdminTask id="N">` → Windows admin tasks (1–59 plus 89/90/91, e.g. 6 = System Restore,
+  16 = Windows Firewall, 42 = Services Configuration, 91 = Accessibility (Settings)).
+- `<MacAdminTask id="N">` → macOS System Preferences (1–16 with gaps, e.g. 1 = Security and
+  Privacy, 3 = Energy Saver, 8 = Date and Time, 10 = Time Machine). Ids outside the published
+  range fall back to `macOS admin task #N`.
+`getAdminTaskLabel(kind, id)` picks the right table by element kind and sets `target.name`.
 The UI shows a friendly element label ("Admin Task" / "macOS Admin Task") with the resolved task
 name underneath; the name is searchable.
 

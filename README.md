@@ -1,4 +1,4 @@
-# EPM Analyzer — Policy XML Viewer (Phase 1)
+# EPM Policy Viewer — Policy XML Viewer (Phase 1)
 
 A full-stack TypeScript app for uploading and inspecting CyberArk EPM policy XML files.
 

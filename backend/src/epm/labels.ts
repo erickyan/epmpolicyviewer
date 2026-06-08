@@ -163,80 +163,106 @@ export const getInternalTypeLabel = (internalType?: string): string | undefined 
   return INTERNAL_TYPE_LABELS[internalType] ?? `Type ${internalType}`
 }
 
-// Windows admin task ids (EvfAdminTaskId) — the predefined administrative tasks a
-// standard user can be allowed/elevated to run, used by <AdminTask id="…">.
-export const ADMIN_TASK_LABELS: Record<string, string> = {
-  "1": "Accessibility, Keyboard, Mouse etc",
-  "2": "Display, Colors, Fonts, Visual Effects",
-  "3": "Region and Language",
-  "4": "Date and Time",
-  "5": "Windows Backup and Restore",
+// Admin task ids — the predefined administrative tasks a standard user can be
+// allowed/elevated to run. CRITICAL: the same numeric id means DIFFERENT things on
+// Windows (<AdminTask>) vs macOS (<MacAdminTask>); they are separate enums.
+// Source: CyberArk EPM "Application patterns" → Admin task ID.
+// https://docs.cyberark.com/epm/latest/en/content/webservices/applicationpatterns.htm
+
+// Windows admin task ids (<AdminTask id="…">).
+export const WIN_ADMIN_TASK_LABELS: Record<string, string> = {
+  "1": "Accessibility (Control Panel)",
+  "2": "Display, Colors, Fonts, Visual Effects (Control Panel)",
+  "3": "Regional and Language Options (Control Panel)",
+  "4": "Date and Time (Control Panel, Settings)",
+  "5": "Backup (Control Panel)",
   "6": "System Restore",
   "7": "Create a System Repair Disk",
-  "8": "Programs and Features",
-  "9": "Automatic Updates configuration",
+  "8": "Add/Remove Programs and Windows Features",
+  "9": "Automatic Updates Configuration",
   "10": "Disk Defragmenter",
-  "11": "Search Indexing",
+  "11": "Windows Search Indexing Options",
   "12": "Disk Management",
   "13": "Power Options",
   "14": "System Properties",
   "15": "Internet Options",
   "16": "Windows Firewall",
-  "17": "Hardware",
-  "18": ".NET Configuration (mscorcfg.msc)",
-  "19": "Application Server (appsrv.msc)",
-  "20": "Authorization Manager (azman.msc)",
-  "21": "Certificate Services (certsrv.msc)",
-  "22": "Certificate Templates (certtmpl.msc)",
-  "23": "Certificates snap-in (certmgr.msc)",
-  "24": "Device Manager (devmgmt.msc)",
-  "25": "DHCP Manager (dhcpmgmt.msc)",
-  "26": "Disk Defragmenter (dfrg.msc)",
-  "27": "Disk Management (diskmgmt.msc)",
-  "28": "Distributed File System (dfsgui.msc)",
-  "29": "DNS Manager (dnsmgmt.msc)",
-  "30": "Event Viewer (eventvwr.msc)",
-  "31": "Fax Service Manager (fxsadmin.msc)",
-  "32": "File Server Management (filesvr.msc)",
-  "33": "Indexing Service (ciadv.msc)",
-  "34": "Internet Authentication Service (ias.msc)",
-  "35": "Internet Information Services (iis.msc)",
-  "36": "Performance Monitor (perfmon.msc)",
-  "37": "Remote Desktop (tsmmc.msc)",
-  "38": "Removable Storage Manager (ntmsmgr.msc)",
-  "39": "Removable Storage Operator Requests (ntmsoprq.msc)",
-  "40": "Resultant Set of Policy (rsop.msc)",
-  "41": "Routing and Remote Access (rrasmgmt.msc)",
-  "42": "Services Configuration (services.msc)",
-  "43": "Shared Folders (fsmgmt.msc)",
+  "17": "Hardware (Control Panel)",
+  "18": ".NET Configuration",
+  "19": "Application Server",
+  "20": "Authorization Manager",
+  "21": "Certificate Services",
+  "22": "Certificate Templates",
+  "23": "Certificate snap-in",
+  "24": "Device Manager",
+  "25": "DHCP Manager",
+  "26": "Disk Defragmenter",
+  "27": "Disk Management",
+  "28": "Distributed File System",
+  "29": "DNS Manager",
+  "30": "Event Viewer",
+  "31": "Fax Service Manager",
+  "32": "File Server Management",
+  "33": "Indexing Service",
+  "34": "Internet Authentication Service",
+  "35": "Internet Information Services",
+  "36": "Performance Monitor",
+  "37": "Remote Desktop",
+  "38": "Removable Storage Manager",
+  "39": "Removable Storage Operator Requests",
+  "40": "Resultant Set of Policy",
+  "41": "Routing and Remote Access",
+  "42": "Services Configuration",
+  "43": "Shared Folders",
   "44": "SQL Server Configuration Manager",
-  "45": "Telephony (tapimgmt.msc)",
-  "46": "Terminal Services (tscc.msc)",
-  "47": "Update Services (wsus.msc)",
-  "48": "Windows Firewall (wf.msc)",
-  "49": "Windows Internet Naming Service / WINS (winsmgmt.msc)",
-  "50": "Windows Management Instrumentation (wmimgmt.msc)",
-  "51": "Hyper-V Manager (virtmgmt.msc)",
+  "45": "Telephony",
+  "46": "Terminal Services",
+  "47": "Update Services",
+  "48": "Windows Firewall",
+  "49": "Windows Internet Naming Service (WINS)",
+  "50": "Windows Management Instrumentation",
+  "51": "Hyper-V Manager",
   "52": "Add/Remove Printers",
-  "53": "Network Configuration",
-  "54": "Group Policy Editor (gpedit.msc)",
-  "55": "Local Users and Groups (lusrmgr.msc)",
+  "53": "Network Properties",
+  "54": "Group Policy Editor",
+  "55": "Local Users and Groups",
   "56": "Java Update",
   "57": "Internet Information Services (IIS) Management",
-  "58": "Optional Features tab in ICP",
-  "59": "Microphone tab in ICP",
+  "58": "Optional Features (Settings)",
+  "59": "Microphone",
+  "89": "Access work or school (Settings)",
+  "90": "Create a Dev Drive (Settings)",
+  "91": "Accessibility (Settings)",
 }
 
-// Resolve a human-readable name for an <AdminTask>/<MacAdminTask> target by id.
-// EPM does not publish the numeric EvfMacAdminTaskId mapping, so mac tasks are
-// surfaced generically as a macOS System Preference task.
+// macOS admin task ids (<MacAdminTask id="…">) — macOS System Preferences.
+export const MAC_ADMIN_TASK_LABELS: Record<string, string> = {
+  "1": "Security and Privacy",
+  "2": "CDs and DVDs",
+  "3": "Energy Saver",
+  "4": "Printers and Scanning",
+  "5": "Network and WiFi",
+  "6": "Users and Groups",
+  "7": "Parental Controls",
+  "8": "Date and Time",
+  "9": "Startup Disk",
+  "10": "Time Machine",
+  "11": "App Store",
+  "12": "Sharing",
+  "15": "Copy/delete to/from Applications system folder",
+  "16": "Battery",
+}
+
+// Resolve a human-readable name for an <AdminTask>/<MacAdminTask> target by id,
+// using the platform-specific enum.
 export const getAdminTaskLabel = (
   kind: string,
   id?: string
 ): string | undefined => {
   if (id === undefined || id === "") return undefined
-  if (kind === "MacAdminTask") return `macOS System Preference Task #${id}`
-  return ADMIN_TASK_LABELS[id] ?? `Admin task #${id}`
+  if (kind === "MacAdminTask")
+    return MAC_ADMIN_TASK_LABELS[id] ?? `macOS admin task #${id}`
+  return WIN_ADMIN_TASK_LABELS[id] ?? `Windows admin task #${id}`
 }
 
 // Dialog "type" attribute -> human-readable name (from Alert triggers and dialog

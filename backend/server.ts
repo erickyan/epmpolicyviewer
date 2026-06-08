@@ -128,6 +128,6 @@ app.use((error: Error, _req: Request, res: Response, _next: express.NextFunction
 })
 
 app.listen(PORT, () => {
-  console.log(`EPM Analyzer backend listening on http://localhost:${PORT}`)
+  console.log(`EPM Policy Viewer backend listening on http://localhost:${PORT}`)
   if (publicDir) console.log(`Serving frontend from ${publicDir}`)
 })

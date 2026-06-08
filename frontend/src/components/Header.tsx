@@ -25,7 +25,7 @@ const Header = ({ response, onReset }: HeaderProps) => (
         </div>
         <div>
           <h1 className="text-lg font-semibold leading-tight text-slate-900">
-            EPM Analyzer
+            EPM Policy Viewer
           </h1>
           <p className="text-xs text-slate-500">CyberArk Policy XML Viewer</p>
         </div>
