@@ -6,7 +6,9 @@ import multer from "multer"
 import { decodeXmlBuffer } from "./src/decodeXml"
 import {
   extractConfigBaseline,
+  extractConsoleDefaults,
   parsePolicyDocument,
+  type ConsoleDefaults,
 } from "./src/epm/parsePolicyDocument"
 
 const app = express()
@@ -50,6 +52,44 @@ const getDefaultBaseline = (): Record<string, string> | undefined => {
   }
 }
 
+// EPM console "default configuration" exports (JSON) that name the default
+// application groups and policies. Used to flag baseline items so the
+// "Customized only" filter can hide them. Merge across files and cache.
+const CONSOLE_DEFAULT_FILES = [
+  "default_app_group.json",
+  "default_policy_console.json",
+]
+
+const resolveDataFile = (file: string): string | null =>
+  [
+    path.resolve(process.cwd(), "data", file),
+    path.resolve(__dirname, "data", file),
+    path.resolve(__dirname, "../data", file),
+  ].find((candidate) => existsSync(candidate)) ?? null
+
+let consoleDefaultsCache: ConsoleDefaults | undefined
+const getConsoleDefaults = (): ConsoleDefaults | undefined => {
+  if (consoleDefaultsCache) return consoleDefaultsCache
+  const appGroupNames = new Set<string>()
+  const policyNames = new Set<string>()
+  let found = false
+  for (const file of CONSOLE_DEFAULT_FILES) {
+    const filePath = resolveDataFile(file)
+    if (!filePath) continue
+    try {
+      const defaults = extractConsoleDefaults(readFileSync(filePath, "utf8"))
+      defaults.appGroupNames.forEach((name) => appGroupNames.add(name))
+      defaults.policyNames.forEach((name) => policyNames.add(name))
+      found = true
+    } catch (error) {
+      console.error(`Failed to load console defaults from ${file}:`, error)
+    }
+  }
+  if (!found) return undefined
+  consoleDefaultsCache = { appGroupNames, policyNames }
+  return consoleDefaultsCache
+}
+
 // Keep the uploaded XML in memory; we only need to parse it, not persist it.
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -78,7 +118,10 @@ app.get("/api/default-policy", (_req: Request, res: Response) => {
 
   try {
     const xml = decodeXmlBuffer(readFileSync(filePath))
-    const document = parsePolicyDocument(xml, { baseline: getDefaultBaseline() })
+    const document = parsePolicyDocument(xml, {
+      baseline: getDefaultBaseline(),
+      consoleDefaults: getConsoleDefaults(),
+    })
     res.json({ document, source: "default", fileName: "default_policy.xml" })
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error)
@@ -95,7 +138,10 @@ app.post("/api/upload-xml", upload.single("file"), (req: Request, res: Response)
 
   try {
     const xml = decodeXmlBuffer(req.file.buffer)
-    const document = parsePolicyDocument(xml, { baseline: getDefaultBaseline() })
+    const document = parsePolicyDocument(xml, {
+      baseline: getDefaultBaseline(),
+      consoleDefaults: getConsoleDefaults(),
+    })
     res.json({ document, source: "upload", fileName: req.file.originalname })
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error)

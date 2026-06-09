@@ -380,7 +380,8 @@ const buildPolicyEntry = (
   policy: XmlNode,
   category: Exclude<PolicyCategory, "configuration">,
   dialogIndex: Map<string, GuiDialog>,
-  appGroups: AppGroupIndex
+  appGroups: AppGroupIndex,
+  consoleDefaults?: ConsoleDefaults
 ): PolicyEntry => {
   const action = attr(policy, "action") ?? ""
   const internalType = attr(policy, "internalType")
@@ -390,14 +391,39 @@ const buildPolicyEntry = (
   const reportUsage = attr(policy, "reportUsage")
   const userGroups = collectUserGroups(policy)
 
-  const categoryInfo = getPolicyCategory({
-    action,
-    implicit: attr(policy, "implicit"),
-    internalDefaultPolicyModeAC: attr(policy, "internalDefaultPolicyModeAC"),
-    excludeType,
-    name,
-    internalType,
-  })
+  // A console "default configuration" scaffold policy: its name matches a default
+  // policy name AND it targets a default application group (avoids flagging a
+  // customer policy that merely shares a generic name like "Block").
+  const referencesDefaultAppGroup = targets.some(
+    (target) =>
+      target.kind === "ApplicationGroup" &&
+      !!target.name &&
+      (consoleDefaults?.appGroupNames.has(target.name.trim().toLowerCase()) ??
+        false)
+  )
+  const isConsoleDefaultPolicy =
+    (consoleDefaults?.policyNames.has(name.trim().toLowerCase()) ?? false) &&
+    referencesDefaultAppGroup
+
+  const implicit =
+    isDefaultPolicy({
+      action,
+      implicit: attr(policy, "implicit"),
+      internalDefaultPolicyModeAC: attr(policy, "internalDefaultPolicyModeAC"),
+      name,
+      internalType,
+    }) || isConsoleDefaultPolicy
+
+  const categoryInfo = isConsoleDefaultPolicy
+    ? { id: "default", label: "Default Policy" }
+    : getPolicyCategory({
+        action,
+        implicit: attr(policy, "implicit"),
+        internalDefaultPolicyModeAC: attr(policy, "internalDefaultPolicyModeAC"),
+        excludeType,
+        name,
+        internalType,
+      })
 
   return {
     id: attr(policy, "id") ?? "",
@@ -408,13 +434,7 @@ const buildPolicyEntry = (
     category,
     categoryId: categoryInfo.id,
     categoryLabel: categoryInfo.label,
-    implicit: isDefaultPolicy({
-      action,
-      implicit: attr(policy, "implicit"),
-      internalDefaultPolicyModeAC: attr(policy, "internalDefaultPolicyModeAC"),
-      name,
-      internalType,
-    }),
+    implicit,
     excludeType,
     internalType,
     internalTypeLabel: getInternalTypeLabel(internalType),
@@ -498,6 +518,39 @@ export const extractConfigBaseline = (xml: string): Record<string, string> => {
     }
   }
   return baseline
+}
+
+export interface ConsoleDefaults {
+  appGroupNames: Set<string>
+  policyNames: Set<string>
+}
+
+// Parse an EPM console JSON export ("default configuration") to collect the names
+// of default application groups and default policies. These are the authoritative
+// baseline used to flag default app groups / scaffold policies. The console export
+// uses a .xml extension but is actually JSON: { Policies:[{Name,PolicyType,…}],
+// AppGroups:[{Name,…}] }, where PolicyType 14 = application group.
+export const extractConsoleDefaults = (jsonText: string): ConsoleDefaults => {
+  const appGroupNames = new Set<string>()
+  const policyNames = new Set<string>()
+  const add = (set: Set<string>, name: unknown): void => {
+    if (typeof name === "string" && name.trim())
+      set.add(name.trim().toLowerCase())
+  }
+  try {
+    const data = JSON.parse(jsonText.replace(/^\uFEFF/, "")) as {
+      Policies?: { Name?: string; PolicyType?: number }[]
+      AppGroups?: { Name?: string }[]
+    }
+    for (const item of data.Policies ?? []) {
+      if (item.PolicyType === 14) add(appGroupNames, item.Name)
+      else add(policyNames, item.Name)
+    }
+    for (const group of data.AppGroups ?? []) add(appGroupNames, group.Name)
+  } catch {
+    // Not JSON / unexpected shape — return whatever was collected.
+  }
+  return { appGroupNames, policyNames }
 }
 
 const targetSignature = (policy: PolicyEntry): string =>
@@ -590,6 +643,7 @@ const buildDuplicateGroups = (entries: PolicyEntry[]): DuplicateGroup[] => {
 
 interface ParseOptions {
   baseline?: Record<string, string>
+  consoleDefaults?: ConsoleDefaults
 }
 
 export const parsePolicyDocument = (
@@ -655,12 +709,24 @@ export const parsePolicyDocument = (
     }
     if (EXCLUDE_ACTIONS.has(action)) {
       excludedPolicies.push(
-        buildPolicyEntry(policy, "excluded", dialogIndex, appGroupIndex)
+        buildPolicyEntry(
+          policy,
+          "excluded",
+          dialogIndex,
+          appGroupIndex,
+          options.consoleDefaults
+        )
       )
       continue
     }
     normalPolicies.push(
-      buildPolicyEntry(policy, "normal", dialogIndex, appGroupIndex)
+      buildPolicyEntry(
+        policy,
+        "normal",
+        dialogIndex,
+        appGroupIndex,
+        options.consoleDefaults
+      )
     )
   }
 
@@ -687,6 +753,10 @@ export const parsePolicyDocument = (
     }
   }
 
+  const implicitPolicyIds = new Set(
+    allEntries.filter((entry) => entry.implicit).map((entry) => entry.id)
+  )
+
   const applicationGroups: ApplicationGroupEntry[] = Array.from(
     appGroupIndex,
     ([id, def]) => {
@@ -699,13 +769,24 @@ export const parsePolicyDocument = (
         platforms.size === 1
           ? (platforms.values().next().value as ApplicationGroupEntry["platform"])
           : "Any"
+      const name = def.name ?? id
+      const usedBy = appGroupUsage.get(id) ?? []
+      // Predefined/baseline groups: named in the console default-config export, OR
+      // bracketed default names ("[…]"), OR referenced only by default policies.
+      const isDefault =
+        (options.consoleDefaults?.appGroupNames.has(name.trim().toLowerCase()) ??
+          false) ||
+        /^\[.*\]$/.test(name.trim()) ||
+        (usedBy.length > 0 &&
+          usedBy.every((policy) => implicitPolicyIds.has(policy.id)))
       return {
         id,
-        name: def.name ?? id,
+        name,
         platform,
+        isDefault,
         members: def.targets,
         memberCount: def.targets.length,
-        usedBy: appGroupUsage.get(id) ?? [],
+        usedBy,
       }
     }
   ).sort((a, b) => a.name.localeCompare(b.name))

@@ -236,6 +236,9 @@ export interface ApplicationGroupEntry {
   id: string
   name: string
   platform: "Windows" | "macOS" | "Linux" | "Any"
+  // True for predefined/baseline groups (bracketed default names, or referenced
+  // only by default/implicit policies). Hidden under the "Customized only" filter.
+  isDefault: boolean
   members: TargetEntry[]
   memberCount: number
   usedBy: ApplicationGroupUser[]

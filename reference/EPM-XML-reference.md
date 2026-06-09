@@ -162,6 +162,19 @@ reference's `name` and member applications onto `target.members[]`, shown as nes
 definitions are also surfaced as `doc.applicationGroups[]` (id, name, inferred platform, members,
 and a reverse `usedBy` list of referencing policies) and rendered in a dedicated **Application
 Groups** tab. ApplicationGroup target rows (grouped + flat views) link into that viewer.
+Each group also gets `isDefault`; the **Customized only** filter hides default groups, consistent
+with how it hides implicit policies, default software-distributor definitions and default dialogs.
+
+**Console default baseline**: `backend/data/default_app_group.json` and
+`default_policy_console.json` are EPM console "default configuration" exports (JSON, despite the
+source `.xml` extension) listing the out-of-the-box application groups (Allow / Block / Elevate /
+Developer Applications) and policies (Allow / Block / Elevate). `extractConsoleDefaults` parses
+them into name sets (`PolicyType 14` = application group), and `parsePolicyDocument` receives them
+via `options.consoleDefaults`. An application group is `isDefault` when its name is in the console
+baseline (or bracketed `[…]`, or referenced only by default/implicit policies). A policy is treated
+as a default scaffold (implicit + "Default Policy" category) when its name matches a console default
+policy name AND it targets a default application group (the name+target pair avoids flagging a
+customer policy that merely shares a generic name like "Block").
 
 **Admin tasks (`<AdminTask>` / `<MacAdminTask>`)**: predefined administrative tasks a standard
 user can be elevated to run. Both carry only a numeric `id` (no name in the XML). **The id enums

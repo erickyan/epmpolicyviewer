@@ -209,6 +209,7 @@ export interface ApplicationGroupEntry {
   id: string
   name: string
   platform: "Windows" | "macOS" | "Linux" | "Any"
+  isDefault: boolean
   members: TargetEntry[]
   memberCount: number
   usedBy: ApplicationGroupUser[]

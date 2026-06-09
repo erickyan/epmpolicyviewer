@@ -277,6 +277,7 @@ const Dashboard = ({ response }: DashboardProps) => {
           <ApplicationGroupsView
             groups={doc.applicationGroups}
             query={query}
+            hideDefaults={hideDefaults}
             selectedId={selectedAppGroup}
             onOpenPolicy={openPolicyById}
           />

@@ -8,6 +8,7 @@ import Badge from "./Badge"
 interface ApplicationGroupsViewProps {
   groups: ApplicationGroupEntry[]
   query: string
+  hideDefaults: boolean
   selectedId?: string | null
   onOpenPolicy?: (policyId: string) => void
 }
@@ -115,6 +116,7 @@ const UsedByPanel = ({
 const ApplicationGroupsView = ({
   groups,
   query,
+  hideDefaults,
   selectedId,
   onOpenPolicy,
 }: ApplicationGroupsViewProps) => {
@@ -123,8 +125,13 @@ const ApplicationGroupsView = ({
 
   const normalizedQuery = query.trim().toLowerCase()
   const filtered = useMemo(
-    () => groups.filter((group) => groupMatchesQuery(group, normalizedQuery)),
-    [groups, normalizedQuery]
+    () =>
+      groups.filter(
+        (group) =>
+          (!hideDefaults || !group.isDefault) &&
+          groupMatchesQuery(group, normalizedQuery)
+      ),
+    [groups, hideDefaults, normalizedQuery]
   )
 
   // Deep-link: auto-expand and scroll to a group selected from a policy target.
