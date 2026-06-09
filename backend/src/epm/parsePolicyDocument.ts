@@ -191,6 +191,77 @@ const countPolicyDefinitions = (targets: TargetEntry[]): number =>
     return sum + 1
   }, 0)
 
+const targetEntrySignature = (target: TargetEntry): string =>
+  [
+    target.kind,
+    target.platform,
+    target.publisher ?? "",
+    target.location ?? "",
+    target.fileName ?? "",
+    target.accessType ?? "",
+    target.name ?? "",
+    target.refId ?? "",
+  ]
+    .join("~")
+    .toLowerCase()
+
+const computeCustomizedDefinitionCount = (
+  name: string,
+  targets: TargetEntry[],
+  excludeBaseline?: Map<string, Set<string>>
+): number => {
+  const baselineSigs = excludeBaseline?.get(name.trim())
+  if (!baselineSigs) return countPolicyDefinitions(targets)
+
+  let count = 0
+  for (const target of targets) {
+    if (baselineSigs.has(targetEntrySignature(target))) continue
+    if (target.kind === "ApplicationGroup") count += target.memberCount ?? 0
+    else count += 1
+  }
+  return count
+}
+
+const buildAppGroupIndex = (root: XmlNode): AppGroupIndex => {
+  const appGroupIndex: AppGroupIndex = new Map()
+  for (const def of asArray(
+    (root.ApplicationGroups as XmlNode | undefined)?.ApplicationGroup as
+      | XmlNode
+      | XmlNode[]
+  )) {
+    const id = attr(def, "id")
+    if (!id) continue
+    appGroupIndex.set(id, {
+      name: attr(def, "name") || undefined,
+      targets: buildTargets(def),
+    })
+  }
+  return appGroupIndex
+}
+
+// Standard exclude-policy targets from the bundled default_policy.xml, keyed by
+// policy name. Used to compute customizedDefinitionCount for the "Customized only"
+// filter (e.g. hide [IGNORED LOCATIONS FOR NEW APPS POLICY] when unchanged).
+export const extractExcludeBaseline = (xml: string): Map<string, Set<string>> => {
+  const trimmed = xml.replace(/^\uFEFF/, "").trim()
+  const parsed = parser.parse(trimmed) as XmlNode
+  const root = (parsed.Policies ?? {}) as XmlNode
+  const policies = asArray(root.Policy as XmlNode | XmlNode[])
+  const appGroupIndex = buildAppGroupIndex(root)
+  const map = new Map<string, Set<string>>()
+
+  for (const policy of policies) {
+    const action = attr(policy, "action") ?? ""
+    if (!EXCLUDE_ACTIONS.has(action)) continue
+    const name = (attr(policy, "name") ?? "").trim()
+    if (!name) continue
+    const targets = buildTargets(policy.Targets, appGroupIndex)
+    map.set(name, new Set(targets.map(targetEntrySignature)))
+  }
+
+  return map
+}
+
 // The directory source ("scope") a user/group principal comes from, inferred from
 // the <UserGroupList> child element name (e.g. IdpGroup, AzGroup, User).
 const scopeForKind = (kind: string): { id: PolicyScopeId; label: string } => {
@@ -390,7 +461,8 @@ const buildPolicyEntry = (
   category: Exclude<PolicyCategory, "configuration">,
   dialogIndex: Map<string, GuiDialog>,
   appGroups: AppGroupIndex,
-  consoleDefaults?: ConsoleDefaults
+  consoleDefaults?: ConsoleDefaults,
+  excludeBaseline?: Map<string, Set<string>>
 ): PolicyEntry => {
   const action = attr(policy, "action") ?? ""
   const internalType = attr(policy, "internalType")
@@ -454,6 +526,11 @@ const buildPolicyEntry = (
     reportUsage,
     targetCount: targets.length,
     definitionCount: countPolicyDefinitions(targets),
+    customizedDefinitionCount: computeCustomizedDefinitionCount(
+      name,
+      targets,
+      excludeBaseline
+    ),
     inheritableTargets: targets.filter((t) => t.inheritable).length,
     targets,
     userGroups,
@@ -654,6 +731,7 @@ const buildDuplicateGroups = (entries: PolicyEntry[]): DuplicateGroup[] => {
 interface ParseOptions {
   baseline?: Record<string, string>
   consoleDefaults?: ConsoleDefaults
+  excludeBaseline?: Map<string, Set<string>>
 }
 
 export const parsePolicyDocument = (
@@ -675,19 +753,7 @@ export const parsePolicyDocument = (
 
   // Root <ApplicationGroups> definitions, so policies that target an application
   // group by id can resolve its name and member applications.
-  const appGroupIndex: AppGroupIndex = new Map()
-  for (const def of asArray(
-    (root.ApplicationGroups as XmlNode | undefined)?.ApplicationGroup as
-      | XmlNode
-      | XmlNode[]
-  )) {
-    const id = attr(def, "id")
-    if (!id) continue
-    appGroupIndex.set(id, {
-      name: attr(def, "name") || undefined,
-      targets: buildTargets(def),
-    })
-  }
+  const appGroupIndex = buildAppGroupIndex(root)
 
   // Reverse map: which policies reference each dialog (via Alert.id === Dialog.id).
   const usedByMap = new Map<string, DialogUser[]>()
@@ -725,7 +791,8 @@ export const parsePolicyDocument = (
           "threat-protection",
           dialogIndex,
           appGroupIndex,
-          options.consoleDefaults
+          options.consoleDefaults,
+          options.excludeBaseline
         )
       )
       continue
@@ -737,7 +804,8 @@ export const parsePolicyDocument = (
           "excluded",
           dialogIndex,
           appGroupIndex,
-          options.consoleDefaults
+          options.consoleDefaults,
+          options.excludeBaseline
         )
       )
       continue
@@ -748,7 +816,8 @@ export const parsePolicyDocument = (
         "normal",
         dialogIndex,
         appGroupIndex,
-        options.consoleDefaults
+        options.consoleDefaults,
+        options.excludeBaseline
       )
     )
   }

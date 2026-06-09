@@ -102,6 +102,7 @@ export interface PolicyEntry {
   reportUsage?: string
   targetCount: number
   definitionCount: number
+  customizedDefinitionCount: number
   inheritableTargets: number
   targets: TargetEntry[]
   userGroups: UserGroupEntry[]

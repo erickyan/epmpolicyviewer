@@ -7,6 +7,7 @@ import { decodeXmlBuffer } from "./src/decodeXml"
 import {
   extractConfigBaseline,
   extractConsoleDefaults,
+  extractExcludeBaseline,
   parsePolicyDocument,
   type ConsoleDefaults,
 } from "./src/epm/parsePolicyDocument"
@@ -51,6 +52,26 @@ const getDefaultBaseline = (): Record<string, string> | undefined => {
     return undefined
   }
 }
+
+let excludeBaselineCache: Map<string, Set<string>> | undefined
+const getExcludeBaseline = (): Map<string, Set<string>> | undefined => {
+  if (excludeBaselineCache) return excludeBaselineCache
+  const filePath = resolveDefaultPolicyPath()
+  if (!filePath) return undefined
+  try {
+    excludeBaselineCache = extractExcludeBaseline(decodeXmlBuffer(readFileSync(filePath)))
+    return excludeBaselineCache
+  } catch (error) {
+    console.error("Failed to build exclude policy baseline:", error)
+    return undefined
+  }
+}
+
+const getParseOptions = () => ({
+  baseline: getDefaultBaseline(),
+  consoleDefaults: getConsoleDefaults(),
+  excludeBaseline: getExcludeBaseline(),
+})
 
 // EPM console "default configuration" exports (JSON) that name the default
 // application groups and policies. Used to flag baseline items so the
@@ -132,10 +153,7 @@ app.get("/api/default-policy", (_req: Request, res: Response) => {
 
   try {
     const xml = decodeXmlBuffer(readFileSync(filePath))
-    const document = parsePolicyDocument(xml, {
-      baseline: getDefaultBaseline(),
-      consoleDefaults: getConsoleDefaults(),
-    })
+    const document = parsePolicyDocument(xml, getParseOptions())
     res.json({ document, source: "default", fileName: "default_policy.xml" })
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error)
@@ -171,10 +189,7 @@ app.post("/api/upload-xml", upload.single("file"), (req: Request, res: Response)
   try {
     const xml = decodeXmlBuffer(req.file.buffer).replace(/^\uFEFF/, "").trim()
     cachedUploadXml = xml
-    const document = parsePolicyDocument(xml, {
-      baseline: getDefaultBaseline(),
-      consoleDefaults: getConsoleDefaults(),
-    })
+    const document = parsePolicyDocument(xml, getParseOptions())
     res.json({ document, source: "upload", fileName: req.file.originalname })
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error)

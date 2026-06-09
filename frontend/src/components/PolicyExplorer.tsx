@@ -24,7 +24,7 @@ import type {
   TargetEntry,
   UserGroupEntry,
 } from "../types"
-import { resolveTargetMemberCount, resolveTargetMembers, formatDefinitionCount } from "../lib/appGroups"
+import { resolveTargetMemberCount, resolveTargetMembers, resolvePolicyDefinitionCount, policyHasCustomizedContent, formatDefinitionCount } from "../lib/appGroups"
 import { categoryTone, cx, platformTone, scopeTone } from "../lib/ui"
 import { getPolicyPlatforms, policyMatchesOs, type OsFilterValue } from "../lib/os"
 import { policyMatchesQuery, targetMatchesQuery } from "../lib/search"
@@ -72,6 +72,11 @@ const kindLabel = (kind: string): string => TARGET_KIND_LABELS[kind] ?? kind
 const DefinitionCountBadge = ({ count }: { count: number }) => (
   <Badge tone="neutral">{formatDefinitionCount(count)}</Badge>
 )
+
+const readableInternalTypeLabel = (label?: string): string | undefined => {
+  if (!label || /^Type \d+$/.test(label)) return undefined
+  return label
+}
 
 const inheritanceSummary = (policy: PolicyEntry): string => {
   if (policy.targetCount === 0) return "—"
@@ -541,12 +546,14 @@ const LinkedDialogsPanel = ({
 const GroupedView = ({
   policies,
   appGroups,
+  hideDefaults,
   query,
   onOpenDialog,
   onOpenAppGroup,
 }: {
   policies: PolicyEntry[]
   appGroups: ApplicationGroupEntry[]
+  hideDefaults: boolean
   query: string
   onOpenDialog: (id: string) => void
   onOpenAppGroup: (id: string) => void
@@ -567,6 +574,12 @@ const GroupedView = ({
       {policies.map((policy) => {
         const isOpen = query !== "" || expanded.has(policy.id)
         const showAction = policy.actionLabel !== policy.categoryLabel
+        const internalType = readableInternalTypeLabel(policy.internalTypeLabel)
+        const definitionCount = resolvePolicyDefinitionCount(
+          policy,
+          appGroups,
+          hideDefaults
+        )
         return (
           <div
             key={policy.id}
@@ -589,9 +602,9 @@ const GroupedView = ({
                 </p>
                 <p className="truncate text-xs text-slate-400">
                   ID {policy.id} · order {policy.order}
-                  {policy.internalTypeLabel ? ` · ${policy.internalTypeLabel}` : ""}
-                  {policy.definitionCount > 0
-                    ? ` · ${formatDefinitionCount(policy.definitionCount)}`
+                  {internalType ? ` · ${internalType}` : ""}
+                  {definitionCount > 0
+                    ? ` · ${formatDefinitionCount(definitionCount)}`
                     : ""}
                 </p>
               </div>
@@ -621,8 +634,8 @@ const GroupedView = ({
                   <KeyRound className="h-3 w-3" />
                   Sign-in
                 </Badge>
-              ) : policy.definitionCount > 0 ? (
-                <DefinitionCountBadge count={policy.definitionCount} />
+              ) : definitionCount > 0 ? (
+                <DefinitionCountBadge count={definitionCount} />
               ) : null}
             </button>
             {isOpen && (
@@ -654,12 +667,14 @@ const GroupedView = ({
 const FlatView = ({
   policies,
   appGroups,
+  hideDefaults,
   osFilter,
   query,
   onOpenAppGroup,
 }: {
   policies: PolicyEntry[]
   appGroups: ApplicationGroupEntry[]
+  hideDefaults: boolean
   osFilter: OsFilterValue
   query: string
   onOpenAppGroup: (id: string) => void
@@ -752,7 +767,14 @@ const FlatView = ({
                 </td>
                 <td className="px-4 py-2 text-xs font-medium text-slate-700">{policy.name}</td>
                 <td className="px-4 py-2 text-xs tabular-nums text-slate-500">
-                  {policy.definitionCount > 0 ? policy.definitionCount.toLocaleString() : "—"}
+                  {(() => {
+                    const count = resolvePolicyDefinitionCount(
+                      policy,
+                      appGroups,
+                      hideDefaults
+                    )
+                    return count > 0 ? count.toLocaleString() : "—"
+                  })()}
                 </td>
                 <td className="px-4 py-2 text-xs">
                   <Badge tone={categoryTone(policy.categoryId)}>
@@ -840,7 +862,7 @@ const PolicyExplorer = ({
   const normalizedQuery = query.trim().toLowerCase()
   const filtered = policies.filter(
     (policy) =>
-      (!hideDefaults || !policy.implicit) &&
+      policyHasCustomizedContent(policy, applicationGroups, hideDefaults) &&
       (categoryFilter === "all" || policy.categoryId === categoryFilter) &&
       policyMatchesOs(policy, osFilter) &&
       policyMatchesQuery(policy, normalizedQuery, applicationGroups)
@@ -918,6 +940,7 @@ const PolicyExplorer = ({
         <GroupedView
           policies={filtered}
           appGroups={applicationGroups}
+          hideDefaults={hideDefaults}
           query={normalizedQuery}
           onOpenDialog={onOpenDialog}
           onOpenAppGroup={onOpenAppGroup}
@@ -926,6 +949,7 @@ const PolicyExplorer = ({
         <FlatView
           policies={filtered}
           appGroups={applicationGroups}
+          hideDefaults={hideDefaults}
           osFilter={osFilter}
           query={normalizedQuery}
           onOpenAppGroup={onOpenAppGroup}

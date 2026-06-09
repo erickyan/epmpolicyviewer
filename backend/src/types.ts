@@ -120,6 +120,7 @@ export interface PolicyEntry {
   targetCount: number
   // Resolved application definitions (app group members expand to their member count).
   definitionCount: number
+  customizedDefinitionCount: number
   // How many of the targets are inheritable (apply to child processes).
   inheritableTargets: number
   targets: TargetEntry[]
