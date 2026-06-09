@@ -33,7 +33,8 @@ const CATEGORY_TONES: Record<string, Tone> = {
   "run-script": "slate",
   "computer-action": "slate",
   exclude: "amber",
-  eagles: "amber",
+  "threat-protection": "red",
+  eagles: "red",
   restricted: "amber",
 }
 

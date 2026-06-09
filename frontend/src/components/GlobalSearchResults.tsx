@@ -5,6 +5,7 @@ import {
   MonitorPlay,
   SearchX,
   Settings2,
+  ShieldAlert,
   ShieldCheck,
   ShieldOff,
   type LucideIcon,
@@ -127,6 +128,13 @@ const GlobalSearchResults = ({
       ),
     [doc.excludedPolicies, doc.applicationGroups, q]
   )
+  const threatMatches = useMemo(
+    () =>
+      doc.threatProtectionPolicies.filter((policy) =>
+        policyMatchesQuery(policy, q, doc.applicationGroups)
+      ),
+    [doc.threatProtectionPolicies, doc.applicationGroups, q]
+  )
   const dialogMatches = useMemo(
     () => doc.gui.filter((dialog) => dialogMatchesQuery(dialog, q)),
     [doc.gui, q]
@@ -142,6 +150,7 @@ const GlobalSearchResults = ({
   const total =
     normalMatches.length +
     excludedMatches.length +
+    threatMatches.length +
     dialogMatches.length +
     configMatches.length
 
@@ -228,6 +237,18 @@ const GlobalSearchResults = ({
           onAction={() => onNavigate("excluded")}
         >
           <PolicyRows policies={excludedMatches} onSelect={() => onNavigate("excluded")} />
+        </ResultSection>
+      )}
+
+      {threatMatches.length > 0 && (
+        <ResultSection
+          title="Threat protection policies"
+          icon={ShieldAlert}
+          count={threatMatches.length}
+          actionLabel="Open Threat Protection"
+          onAction={() => onNavigate("threat")}
+        >
+          <PolicyRows policies={threatMatches} onSelect={() => onNavigate("threat")} />
         </ResultSection>
       )}
 

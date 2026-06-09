@@ -73,8 +73,8 @@ Value types: `Number` = 0–4294967295; `Boolean` = "False"/"0" → false, "True
 | 12 | **Exclude** | Do not apply any policies to targets |
 | 13 | Software Distributors | Definitions of software distributors |
 | 14 | Restricted Run | Obsolete / not in use |
-| 15 | Eagles Policy | — |
-| 16 | Eagles Policy Global | — |
+| 15 | **Eagles / Threat Protection** | Privilege threat protection (credential theft, etc.) |
+| 16 | **Eagles Policy Global** | Global threat protection policy |
 | 17 | LCD | Password rotation for Loosely Connected Devices |
 | 18 | Multifile Creator | Definitions of multifile creators |
 | 19 | **Exclude for macOS** | Do not apply policies to targets (mac) |
@@ -84,7 +84,8 @@ Value types: `Number` = 0–4294967295; `Boolean` = "False"/"0" → false, "True
 
 ### App category mapping (coarse buckets / tabs)
 - **General Configuration** → action `10`
-- **Excluded** → actions `12, 14, 15, 16, 19`
+- **Excluded** → actions `12, 14, 19` (true exclusions — paths, macOS exclude, etc.)
+- **Threat Protection** → actions `15, 16` (Eagles privilege threat protection — *not* exclusions)
 - **Normal** → everything else (`1,2,3,4,5,6,7,8,9,11,13,18,20,23,…`)
 
 `excludeType` attr (e.g. `newFiles`) refines exclude policies (e.g. "ignored locations for new apps").

@@ -27,6 +27,7 @@ import type {
 import {
   CONFIGURATION_ACTIONS,
   EXCLUDE_ACTIONS,
+  THREAT_PROTECTION_ACTIONS,
   getActionLabel,
   getAdminTaskLabel,
   getDialogTypeLabel,
@@ -697,6 +698,7 @@ export const parsePolicyDocument = (
   let generalConfiguration: GeneralConfiguration | null = null
   const normalPolicies: PolicyEntry[] = []
   const excludedPolicies: PolicyEntry[] = []
+  const threatProtectionPolicies: PolicyEntry[] = []
 
   for (const policy of policies) {
     registerUsage(policy)
@@ -705,6 +707,18 @@ export const parsePolicyDocument = (
       // Use the first configuration policy as the General configuration.
       if (!generalConfiguration)
         generalConfiguration = buildGeneralConfiguration(policy, options.baseline)
+      continue
+    }
+    if (THREAT_PROTECTION_ACTIONS.has(action)) {
+      threatProtectionPolicies.push(
+        buildPolicyEntry(
+          policy,
+          "threat-protection",
+          dialogIndex,
+          appGroupIndex,
+          options.consoleDefaults
+        )
+      )
       continue
     }
     if (EXCLUDE_ACTIONS.has(action)) {
@@ -732,12 +746,17 @@ export const parsePolicyDocument = (
 
   normalPolicies.sort(byOrder)
   excludedPolicies.sort(byOrder)
+  threatProtectionPolicies.sort(byOrder)
 
   for (const dialog of gui) {
     dialog.usedBy = usedByMap.get(dialog.id) ?? []
   }
 
-  const allEntries = [...normalPolicies, ...excludedPolicies]
+  const allEntries = [
+    ...normalPolicies,
+    ...excludedPolicies,
+    ...threatProtectionPolicies,
+  ]
 
   // Reverse map: which policies reference each ApplicationGroup (target.refId).
   const appGroupUsage = new Map<string, ApplicationGroupUser[]>()
@@ -824,6 +843,7 @@ export const parsePolicyDocument = (
     totalPolicies: policies.length,
     normalCount: normalPolicies.length,
     excludedCount: excludedPolicies.length,
+    threatProtectionCount: threatProtectionPolicies.length,
     configCount,
     defaultPolicyCount: allEntries.filter((entry) => entry.implicit).length,
     guiCount: gui.length,
@@ -843,12 +863,14 @@ export const parsePolicyDocument = (
       policyCount: policies.length,
       normalCount: normalPolicies.length,
       excludedCount: excludedPolicies.length,
+      threatProtectionCount: threatProtectionPolicies.length,
       dialogCount: gui.length,
     },
     summary,
     generalConfiguration,
     normalPolicies,
     excludedPolicies,
+    threatProtectionPolicies,
     gui,
     applicationGroups,
   }

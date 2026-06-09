@@ -31,7 +31,10 @@ export const ACTION_LABELS: Record<string, string> = {
 export const CONFIGURATION_ACTIONS = new Set(["10"])
 
 // Actions that represent exclusion-type policies.
-export const EXCLUDE_ACTIONS = new Set(["12", "14", "15", "16", "19"])
+export const EXCLUDE_ACTIONS = new Set(["12", "14", "19"])
+
+// Privilege Threat Protection (Eagles) policies — action 15/16 in the XML spec.
+export const THREAT_PROTECTION_ACTIONS = new Set(["15", "16"])
 
 export const getActionLabel = (action: string): string =>
   ACTION_LABELS[action] ?? `Action ${action}`
@@ -106,7 +109,7 @@ export const getPolicyCategory = (p: PolicyCategoryInput): PolicyCategoryInfo =>
       return { id: "exclude", label: "Exclusion" }
     case "16":
     case "15":
-      return { id: "eagles", label: "Eagles (Ignored Locations)" }
+      return { id: "threat-protection", label: "Threat Protection" }
     case "14":
       return { id: "restricted", label: "Restricted" }
     default:

@@ -4,6 +4,7 @@ import {
   Layers,
   MonitorPlay,
   PackageCheck,
+  ShieldAlert,
   ShieldCheck,
   ShieldOff,
   SlidersHorizontal,
@@ -13,7 +14,13 @@ import type { DocumentSummary } from "../types"
 import { categoryTone, cx } from "../lib/ui"
 import Badge from "./Badge"
 
-export type SummaryTarget = "config" | "normal" | "excluded" | "gui" | "default"
+export type SummaryTarget =
+  | "config"
+  | "normal"
+  | "excluded"
+  | "threat"
+  | "gui"
+  | "default"
 
 interface SummaryViewProps {
   summary: DocumentSummary
@@ -116,6 +123,14 @@ const SummaryView = ({ summary, onNavigate, onSelectCategory }: SummaryViewProps
           icon={ShieldOff}
           onClick={() => onNavigate("excluded")}
         />
+        {summary.threatProtectionCount > 0 ? (
+          <StatCard
+            label="Threat protection"
+            value={summary.threatProtectionCount}
+            icon={ShieldAlert}
+            onClick={() => onNavigate("threat")}
+          />
+        ) : null}
         <StatCard
           label="Default policies"
           value={summary.defaultPolicyCount}

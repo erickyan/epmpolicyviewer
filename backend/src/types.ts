@@ -5,7 +5,11 @@ export interface RawPolicyAttributes {
   "@_order"?: string | number
 }
 
-export type PolicyCategory = "configuration" | "normal" | "excluded"
+export type PolicyCategory =
+  | "configuration"
+  | "normal"
+  | "excluded"
+  | "threat-protection"
 
 export interface TargetEntry {
   kind: string
@@ -187,6 +191,7 @@ export interface PolicyDocumentMeta {
   policyCount: number
   normalCount: number
   excludedCount: number
+  threatProtectionCount: number
   dialogCount: number
 }
 
@@ -212,6 +217,7 @@ export interface DocumentSummary {
   totalPolicies: number
   normalCount: number
   excludedCount: number
+  threatProtectionCount: number
   configCount: number
   defaultPolicyCount: number
   guiCount: number
@@ -249,6 +255,7 @@ export interface PolicyDocument {
   generalConfiguration: GeneralConfiguration | null
   normalPolicies: PolicyEntry[]
   excludedPolicies: PolicyEntry[]
+  threatProtectionPolicies: PolicyEntry[]
   gui: GuiDialog[]
   applicationGroups: ApplicationGroupEntry[]
 }

@@ -59,6 +59,7 @@ export const availableOsesFor = (doc: PolicyDocument): OsFilterValue[] => {
   }
   collect(doc.normalPolicies)
   collect(doc.excludedPolicies)
+  collect(doc.threatProtectionPolicies)
   for (const dialog of doc.gui) present.add(dialog.os)
 
   return OS_OPTIONS.filter((os) => present.has(os))

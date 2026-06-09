@@ -8,6 +8,7 @@ import {
   MonitorPlay,
   Settings2,
   ShieldCheck,
+  ShieldAlert,
   ShieldOff,
   type LucideIcon,
 } from "lucide-react"
@@ -35,6 +36,7 @@ type TabId =
   | "config"
   | "normal"
   | "excluded"
+  | "threat"
   | "gui"
   | "appgroups"
   | "raw"
@@ -57,6 +59,14 @@ const Dashboard = ({ response }: DashboardProps) => {
     }
     list.push({ id: "normal", label: "Normal Policies", icon: ShieldCheck, count: doc.normalPolicies.length })
     list.push({ id: "excluded", label: "Excluded Policies", icon: ShieldOff, count: doc.excludedPolicies.length })
+    if (doc.threatProtectionPolicies.length > 0) {
+      list.push({
+        id: "threat",
+        label: "Threat Protection",
+        icon: ShieldAlert,
+        count: doc.threatProtectionPolicies.length,
+      })
+    }
     list.push({ id: "gui", label: "GUI Dialogs", icon: MonitorPlay, count: doc.gui.length })
     if (doc.applicationGroups.length > 0) {
       list.push({
@@ -77,6 +87,7 @@ const Dashboard = ({ response }: DashboardProps) => {
   const [hideDefaults, setHideDefaults] = useState(false)
   const [normalCategory, setNormalCategory] = useState("all")
   const [excludedCategory, setExcludedCategory] = useState("all")
+  const [threatCategory, setThreatCategory] = useState("all")
   const [selectedDialog, setSelectedDialog] = useState<GuiDialog | null>(null)
   const [selectedAppGroup, setSelectedAppGroup] = useState<string | null>(null)
   const [rawXml, setRawXml] = useState<string | null>(null)
@@ -122,6 +133,11 @@ const Dashboard = ({ response }: DashboardProps) => {
     [doc.excludedPolicies]
   )
 
+  const threatCategoryIds = useMemo(
+    () => new Set(doc.threatProtectionPolicies.map((policy) => policy.categoryId)),
+    [doc.threatProtectionPolicies]
+  )
+
   const handleSummaryNavigate = useCallback((target: SummaryTarget) => {
     if (target === "default") {
       setNormalCategory("default")
@@ -129,11 +145,22 @@ const Dashboard = ({ response }: DashboardProps) => {
       return
     }
     if (target === "normal") setNormalCategory("all")
+    if (target === "threat") setThreatCategory("all")
     setActiveTab(target)
   }, [])
 
   const handleSelectCategory = useCallback(
     (categoryId: string) => {
+      if (categoryId === "threat-protection" || categoryId === "eagles") {
+        setThreatCategory("all")
+        setActiveTab("threat")
+        return
+      }
+      if (threatCategoryIds.has(categoryId)) {
+        setThreatCategory(categoryId)
+        setActiveTab("threat")
+        return
+      }
       if (excludedCategoryIds.has(categoryId)) {
         setExcludedCategory(categoryId)
         setActiveTab("excluded")
@@ -142,7 +169,7 @@ const Dashboard = ({ response }: DashboardProps) => {
       setNormalCategory(categoryId)
       setActiveTab("normal")
     },
-    [excludedCategoryIds]
+    [excludedCategoryIds, threatCategoryIds]
   )
 
   const openDialogById = useCallback(
@@ -160,14 +187,21 @@ const Dashboard = ({ response }: DashboardProps) => {
 
   const openPolicyById = useCallback(
     (id: string) => {
+      if (doc.threatProtectionPolicies.some((policy) => policy.id === id)) {
+        setActiveTab("threat")
+        return
+      }
       const inExcluded = doc.excludedPolicies.some((policy) => policy.id === id)
       setActiveTab(inExcluded ? "excluded" : "normal")
     },
-    [doc.excludedPolicies]
+    [doc.excludedPolicies, doc.threatProtectionPolicies]
   )
 
   const showOsFilter =
-    (activeTab === "normal" || activeTab === "excluded" || activeTab === "gui") &&
+    (activeTab === "normal" ||
+      activeTab === "excluded" ||
+      activeTab === "threat" ||
+      activeTab === "gui") &&
     availableOs.length > 0
   const showSearch = activeTab !== "raw"
 
@@ -300,6 +334,20 @@ const Dashboard = ({ response }: DashboardProps) => {
             query={deferredQuery}
             hideDefaults={hideDefaults}
             initialCategory={excludedCategory}
+            onOpenDialog={openDialogById}
+            onOpenAppGroup={openAppGroupById}
+          />
+        )}
+        {activeTab === "threat" && (
+          <PolicyExplorer
+            key={`threat-${threatCategory}`}
+            policies={doc.threatProtectionPolicies}
+            applicationGroups={doc.applicationGroups}
+            emptyMessage="No threat protection policies in this document"
+            osFilter={osFilter}
+            query={deferredQuery}
+            hideDefaults={hideDefaults}
+            initialCategory={threatCategory}
             onOpenDialog={openDialogById}
             onOpenAppGroup={openAppGroupById}
           />
