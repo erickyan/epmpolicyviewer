@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import { Boxes, ChevronDown, ChevronRight, Users } from "lucide-react"
+import { Boxes, ChevronDown, ChevronLeft, ChevronRight, Users } from "lucide-react"
 import type { ApplicationGroupEntry, TargetEntry } from "../types"
 import { cx, platformTone } from "../lib/ui"
 import { targetMatchesQuery } from "../lib/search"
 import Badge from "./Badge"
+import { MEMBERS_PAGE_SIZE } from "./PaginatedMembersTable"
 
 interface ApplicationGroupsViewProps {
   groups: ApplicationGroupEntry[]
@@ -28,6 +29,8 @@ const groupMatchesQuery = (group: ApplicationGroupEntry, query: string): boolean
 }
 
 const MembersTable = ({ members }: { members: TargetEntry[] }) => {
+  const [page, setPage] = useState(0)
+
   if (members.length === 0) {
     return (
       <p className="px-4 py-4 text-xs text-slate-400">
@@ -36,39 +39,92 @@ const MembersTable = ({ members }: { members: TargetEntry[] }) => {
     )
   }
 
+  const totalPages = Math.ceil(members.length / MEMBERS_PAGE_SIZE)
+  const safePage = Math.min(page, totalPages - 1)
+  const start = safePage * MEMBERS_PAGE_SIZE
+  const pageMembers = members.slice(start, start + MEMBERS_PAGE_SIZE)
+  const showPagination = members.length > MEMBERS_PAGE_SIZE
+
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-slate-100 text-left">
-        <thead className="bg-slate-50/70">
-          <tr>
-            <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</th>
-            <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Platform</th>
-            <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Publisher</th>
-            <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">File / Location</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-50">
-          {members.map((member, index) => (
-            <tr key={member.targetId ?? index} className="hover:bg-slate-50">
-              <td className="px-4 py-2 text-xs font-medium text-slate-700">
-                {member.kind}
-                {member.name ? (
-                  <span className="mt-0.5 block text-[11px] font-normal text-slate-500">
-                    {member.name}
-                  </span>
-                ) : null}
-              </td>
-              <td className="px-4 py-2 text-xs">
-                <Badge tone={platformTone(member.platform)}>{member.platform}</Badge>
-              </td>
-              <td className="px-4 py-2 text-xs text-slate-600">{member.publisher ?? "—"}</td>
-              <td className="px-4 py-2 font-mono text-[11px] text-slate-500">
-                {memberIdentifier(member)}
-              </td>
+    <div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-slate-100 text-left">
+          <thead className="bg-slate-50/70">
+            <tr>
+              <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</th>
+              <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Platform</th>
+              <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Publisher</th>
+              <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">File / Location</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {pageMembers.map((member, index) => (
+              <tr key={member.targetId ?? start + index} className="hover:bg-slate-50">
+                <td className="px-4 py-2 text-xs font-medium text-slate-700">
+                  {member.kind}
+                  {member.name ? (
+                    <span className="mt-0.5 block text-[11px] font-normal text-slate-500">
+                      {member.name}
+                    </span>
+                  ) : null}
+                </td>
+                <td className="px-4 py-2 text-xs">
+                  <Badge tone={platformTone(member.platform)}>{member.platform}</Badge>
+                </td>
+                <td className="px-4 py-2 text-xs text-slate-600">{member.publisher ?? "—"}</td>
+                <td className="px-4 py-2 font-mono text-[11px] text-slate-500">
+                  {memberIdentifier(member)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {showPagination ? (
+        <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/60 px-4 py-2 text-xs text-slate-500">
+          <span>
+            Showing {start + 1}–{Math.min(start + MEMBERS_PAGE_SIZE, members.length)} of{" "}
+            {members.length} definitions
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setPage((current) => Math.max(0, current - 1))}
+              disabled={safePage === 0}
+              aria-label="Previous page of definitions"
+              className={cx(
+                "inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400",
+                safePage === 0
+                  ? "cursor-not-allowed text-slate-300"
+                  : "text-slate-600 hover:bg-slate-50"
+              )}
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              Prev
+            </button>
+            <span className="px-1 tabular-nums">
+              {safePage + 1} / {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                setPage((current) => Math.min(totalPages - 1, current + 1))
+              }
+              disabled={safePage >= totalPages - 1}
+              aria-label="Next page of definitions"
+              className={cx(
+                "inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400",
+                safePage >= totalPages - 1
+                  ? "cursor-not-allowed text-slate-300"
+                  : "text-slate-600 hover:bg-slate-50"
+              )}
+            >
+              Next
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

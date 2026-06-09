@@ -1,6 +1,8 @@
 import { Fragment, useMemo, useState } from "react"
 import {
-  Boxes,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
   ChevronDown,
   ChevronRight,
   ClipboardList,
@@ -24,6 +26,7 @@ import { categoryTone, cx, platformTone, scopeTone } from "../lib/ui"
 import { getPolicyPlatforms, policyMatchesOs, type OsFilterValue } from "../lib/os"
 import { policyMatchesQuery, targetMatchesQuery } from "../lib/search"
 import Badge from "./Badge"
+import PaginatedMembersTable from "./PaginatedMembersTable"
 
 type ViewMode = "grouped" | "flat"
 
@@ -234,15 +237,20 @@ const PolicySettingsStrip = ({ policy }: { policy: PolicyEntry }) => (
 const TargetRow = ({
   target,
   nested,
+  isExpanded,
+  onToggleExpand,
   onOpenAppGroup,
 }: {
   target: TargetEntry
   nested?: boolean
+  isExpanded?: boolean
+  onToggleExpand?: () => void
   onOpenAppGroup?: (id: string) => void
 }) => {
   const flags = Object.entries(target.attributes)
   const memberCount = target.members?.length ?? 0
   const isAppGroup = target.kind === "ApplicationGroup" && !!target.refId
+  const isExpandable = isAppGroup && memberCount > 0
   const summary = `${target.name ?? ""}${
     memberCount > 0 ? ` · ${memberCount} app${memberCount === 1 ? "" : "s"}` : ""
   }`
@@ -250,16 +258,35 @@ const TargetRow = ({
     <tr className={cx("hover:bg-slate-50", nested && "bg-slate-50/40")}>
       <td className="px-4 py-2 text-xs font-medium text-slate-700">
         <span className={cx("flex items-center gap-1.5", nested && "pl-4")}>
-          {nested ? <span className="text-slate-300">↳</span> : null}
+          {nested ? (
+            <span className="text-slate-300">↳</span>
+          ) : isExpandable && onToggleExpand ? (
+            <button
+              type="button"
+              onClick={onToggleExpand}
+              aria-expanded={isExpanded}
+              aria-label={
+                isExpanded
+                  ? `Collapse ${target.name ?? "application group"} definitions`
+                  : `Expand ${target.name ?? "application group"} definitions`
+              }
+              className="inline-flex shrink-0 rounded p-0.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            >
+              {isExpanded ? (
+                <ChevronDown className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronRight className="h-3.5 w-3.5" />
+              )}
+            </button>
+          ) : null}
           {kindLabel(target.kind)}
         </span>
         {isAppGroup && onOpenAppGroup ? (
           <button
             type="button"
             onClick={() => onOpenAppGroup(target.refId as string)}
-            className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+            className="mt-0.5 block max-w-full truncate text-left text-[11px] font-medium text-blue-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
           >
-            <Boxes className="h-3 w-3" />
             {summary || "View application group"}
           </button>
         ) : target.name ? (
@@ -329,6 +356,17 @@ const TargetTable = ({
   targets: TargetEntry[]
   onOpenAppGroup: (id: string) => void
 }) => {
+  const [expandedTargets, setExpandedTargets] = useState<Set<string>>(new Set())
+
+  const handleToggleExpand = (targetKey: string) => {
+    setExpandedTargets((prev) => {
+      const next = new Set(prev)
+      if (next.has(targetKey)) next.delete(targetKey)
+      else next.add(targetKey)
+      return next
+    })
+  }
+
   if (targets.length === 0) {
     return (
       <p className="px-4 py-4 text-xs text-slate-400">
@@ -351,19 +389,34 @@ const TargetTable = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
-          {targets.map((target, index) => (
-            <Fragment key={target.targetId ?? index}>
-              <TargetRow target={target} onOpenAppGroup={onOpenAppGroup} />
-              {target.members?.map((member, memberIndex) => (
+          {targets.map((target, index) => {
+            const targetKey = target.targetId ?? String(index)
+            const members = target.members ?? []
+            const isExpanded = expandedTargets.has(targetKey)
+            return (
+              <Fragment key={targetKey}>
                 <TargetRow
-                  key={member.targetId ?? `${index}-m${memberIndex}`}
-                  target={member}
-                  nested
+                  target={target}
+                  isExpanded={isExpanded}
+                  onToggleExpand={() => handleToggleExpand(targetKey)}
                   onOpenAppGroup={onOpenAppGroup}
                 />
-              ))}
-            </Fragment>
-          ))}
+                {isExpanded && members.length > 0 ? (
+                  <PaginatedMembersTable
+                    members={members}
+                    renderRow={(member, memberIndex) => (
+                      <TargetRow
+                        key={member.targetId ?? `${targetKey}-m${memberIndex}`}
+                        target={member}
+                        nested
+                        onOpenAppGroup={onOpenAppGroup}
+                      />
+                    )}
+                  />
+                ) : null}
+              </Fragment>
+            )
+          })}
         </tbody>
       </table>
     </div>
@@ -553,21 +606,45 @@ const FlatView = ({
   query: string
   onOpenAppGroup: (id: string) => void
 }) => {
-  const rows = policies.flatMap((policy) => {
-    const policyNameMatches =
-      query === "" || policy.name.toLowerCase().includes(query.toLowerCase())
-    return policy.targets
-      .filter(
-        (target) =>
-          (osFilter === "all" || target.platform === osFilter) &&
-          (policyNameMatches || targetMatchesQuery(target, query.toLowerCase()))
-      )
-      .map((target, index) => ({
-        key: `${policy.id}-${target.targetId ?? index}`,
-        policy,
-        target,
-      }))
-  })
+  const [orderSort, setOrderSort] = useState<"asc" | "desc" | null>(null)
+
+  const handleToggleOrderSort = () =>
+    setOrderSort((current) =>
+      current === "asc" ? "desc" : current === "desc" ? null : "asc"
+    )
+
+  const rows = useMemo(() => {
+    const baseRows = policies.flatMap((policy) => {
+      const policyNameMatches =
+        query === "" || policy.name.toLowerCase().includes(query.toLowerCase())
+      return policy.targets
+        .filter(
+          (target) =>
+            (osFilter === "all" || target.platform === osFilter) &&
+            (policyNameMatches || targetMatchesQuery(target, query.toLowerCase()))
+        )
+        .map((target, index) => ({
+          key: `${policy.id}-${target.targetId ?? index}`,
+          policy,
+          target,
+        }))
+    })
+
+    if (!orderSort) return baseRows
+
+    const direction = orderSort === "asc" ? 1 : -1
+    const orderValue = (value: string): number => {
+      const parsed = Number.parseInt(value, 10)
+      return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed
+    }
+    return [...baseRows].sort(
+      (a, b) =>
+        (orderValue(a.policy.order) - orderValue(b.policy.order)) * direction
+    )
+  }, [policies, osFilter, query, orderSort])
+
+  const OrderSortIcon =
+    orderSort === "asc" ? ArrowUp : orderSort === "desc" ? ArrowDown : ArrowUpDown
 
   if (rows.length === 0) {
     return (
@@ -583,6 +660,20 @@ const FlatView = ({
         <table className="min-w-full divide-y divide-slate-100 text-left">
           <thead className="bg-slate-50">
             <tr>
+              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                <button
+                  type="button"
+                  onClick={handleToggleOrderSort}
+                  aria-label="Sort by policy order"
+                  className={cx(
+                    "inline-flex items-center gap-1 uppercase tracking-wide transition-colors hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400",
+                    orderSort ? "text-slate-700" : "text-slate-500"
+                  )}
+                >
+                  Order
+                  <OrderSortIcon className="h-3 w-3" />
+                </button>
+              </th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Policy</th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Category</th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</th>
@@ -596,6 +687,9 @@ const FlatView = ({
           <tbody className="divide-y divide-slate-50">
             {rows.map(({ key, policy, target }) => (
               <tr key={key} className="hover:bg-slate-50">
+                <td className="px-4 py-2 text-xs tabular-nums text-slate-500">
+                  {policy.order || "—"}
+                </td>
                 <td className="px-4 py-2 text-xs font-medium text-slate-700">{policy.name}</td>
                 <td className="px-4 py-2 text-xs">
                   <Badge tone={categoryTone(policy.categoryId)}>
@@ -603,15 +697,22 @@ const FlatView = ({
                   </Badge>
                 </td>
                 <td className="px-4 py-2 text-xs text-slate-600">
-                  {target.kind === "ApplicationGroup" && target.refId ? (
-                    <button
-                      type="button"
-                      onClick={() => onOpenAppGroup(target.refId as string)}
-                      className="inline-flex items-center gap-1 font-medium text-blue-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
-                    >
-                      <Boxes className="h-3 w-3" />
-                      {kindLabel(target.kind)}
-                    </button>
+                  {target.kind === "ApplicationGroup" ? (
+                    <div>
+                      <span>{kindLabel(target.kind)}</span>
+                      {target.refId ? (
+                        <button
+                          type="button"
+                          onClick={() => onOpenAppGroup(target.refId as string)}
+                          className="mt-0.5 block max-w-xs truncate text-left text-[11px] font-medium text-blue-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                        >
+                          {target.name ?? "View application group"}
+                          {target.members?.length
+                            ? ` · ${target.members.length} apps`
+                            : ""}
+                        </button>
+                      ) : null}
+                    </div>
                   ) : (
                     kindLabel(target.kind)
                   )}
@@ -621,7 +722,9 @@ const FlatView = ({
                 </td>
                 <td className="px-4 py-2 text-xs text-slate-600">{target.publisher ?? "—"}</td>
                 <td className="px-4 py-2 font-mono text-[11px] text-slate-500">
-                  {targetIdentifier(target)}
+                  {target.kind === "ApplicationGroup" && target.members?.length
+                    ? `${target.members.length} definitions`
+                    : targetIdentifier(target)}
                 </td>
                 <td className="px-4 py-2 text-[11px]">
                   {target.inheritable ? (
