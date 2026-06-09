@@ -6,6 +6,7 @@ import {
   ChevronDown,
   ChevronRight,
   ClipboardList,
+  ExternalLink,
   GitBranch,
   Globe,
   KeyRound,
@@ -234,6 +235,29 @@ const PolicySettingsStrip = ({ policy }: { policy: PolicyEntry }) => (
   </div>
 )
 
+const AppGroupOpenButton = ({
+  groupId,
+  groupName,
+  onOpenAppGroup,
+}: {
+  groupId: string
+  groupName?: string
+  onOpenAppGroup: (id: string) => void
+}) => (
+  <button
+    type="button"
+    onClick={(event) => {
+      event.stopPropagation()
+      onOpenAppGroup(groupId)
+    }}
+    title="Open in Application Groups tab"
+    aria-label={`Open ${groupName ?? "application group"} in Application Groups tab`}
+    className="inline-flex shrink-0 rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+  >
+    <ExternalLink className="h-3.5 w-3.5" />
+  </button>
+)
+
 const TargetRow = ({
   target,
   nested,
@@ -250,17 +274,25 @@ const TargetRow = ({
   const flags = Object.entries(target.attributes)
   const memberCount = target.members?.length ?? 0
   const isAppGroup = target.kind === "ApplicationGroup" && !!target.refId
-  const isExpandable = isAppGroup && memberCount > 0
+  const isExpandable = isAppGroup && memberCount > 0 && !!onToggleExpand
   const summary = `${target.name ?? ""}${
     memberCount > 0 ? ` · ${memberCount} app${memberCount === 1 ? "" : "s"}` : ""
   }`
+
+  const openButton =
+    isAppGroup && target.refId && onOpenAppGroup ? (
+      <AppGroupOpenButton
+        groupId={target.refId}
+        groupName={target.name}
+        onOpenAppGroup={onOpenAppGroup}
+      />
+    ) : null
+
   return (
     <tr className={cx("hover:bg-slate-50", nested && "bg-slate-50/40")}>
       <td className="px-4 py-2 text-xs font-medium text-slate-700">
-        <span className={cx("flex items-center gap-1.5", nested && "pl-4")}>
-          {nested ? (
-            <span className="text-slate-300">↳</span>
-          ) : isExpandable && onToggleExpand ? (
+        {isExpandable ? (
+          <div className="flex items-start justify-between gap-2">
             <button
               type="button"
               onClick={onToggleExpand}
@@ -270,30 +302,42 @@ const TargetRow = ({
                   ? `Collapse ${target.name ?? "application group"} definitions`
                   : `Expand ${target.name ?? "application group"} definitions`
               }
-              className="inline-flex shrink-0 rounded p-0.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+              className="flex min-w-0 flex-1 items-start gap-1.5 rounded-md px-1 py-0.5 text-left transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
             >
               {isExpanded ? (
-                <ChevronDown className="h-3.5 w-3.5" />
+                <ChevronDown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-500" />
               ) : (
-                <ChevronRight className="h-3.5 w-3.5" />
+                <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-500" />
               )}
+              <span className="min-w-0">
+                <span className="block">{kindLabel(target.kind)}</span>
+                <span className="mt-0.5 block truncate text-[11px] font-normal text-slate-500">
+                  {summary}
+                </span>
+              </span>
             </button>
-          ) : null}
-          {kindLabel(target.kind)}
-        </span>
-        {isAppGroup && onOpenAppGroup ? (
-          <button
-            type="button"
-            onClick={() => onOpenAppGroup(target.refId as string)}
-            className="mt-0.5 block max-w-full truncate text-left text-[11px] font-medium text-blue-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
-          >
-            {summary || "View application group"}
-          </button>
-        ) : target.name ? (
-          <span className="mt-0.5 block text-[11px] font-normal text-slate-500">
-            {summary}
-          </span>
-        ) : null}
+            {openButton}
+          </div>
+        ) : (
+          <>
+            <span className={cx("flex items-center gap-1.5", nested && "pl-4")}>
+              {nested ? <span className="text-slate-300">↳</span> : null}
+              {kindLabel(target.kind)}
+            </span>
+            {isAppGroup ? (
+              <div className="mt-0.5 flex items-start justify-between gap-2">
+                <span className="min-w-0 truncate text-[11px] font-normal text-slate-500">
+                  {summary || target.name || "Application group"}
+                </span>
+                {openButton}
+              </div>
+            ) : target.name ? (
+              <span className="mt-0.5 block text-[11px] font-normal text-slate-500">
+                {summary}
+              </span>
+            ) : null}
+          </>
+        )}
       </td>
       <td className="px-4 py-2 text-xs">
         <Badge tone={platformTone(target.platform)}>{target.platform}</Badge>
@@ -698,19 +742,22 @@ const FlatView = ({
                 </td>
                 <td className="px-4 py-2 text-xs text-slate-600">
                   {target.kind === "ApplicationGroup" ? (
-                    <div>
-                      <span>{kindLabel(target.kind)}</span>
-                      {target.refId ? (
-                        <button
-                          type="button"
-                          onClick={() => onOpenAppGroup(target.refId as string)}
-                          className="mt-0.5 block max-w-xs truncate text-left text-[11px] font-medium text-blue-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
-                        >
-                          {target.name ?? "View application group"}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <span>{kindLabel(target.kind)}</span>
+                        <span className="mt-0.5 block truncate text-[11px] font-normal text-slate-500">
+                          {target.name ?? "Application group"}
                           {target.members?.length
                             ? ` · ${target.members.length} apps`
                             : ""}
-                        </button>
+                        </span>
+                      </div>
+                      {target.refId ? (
+                        <AppGroupOpenButton
+                          groupId={target.refId}
+                          groupName={target.name}
+                          onOpenAppGroup={onOpenAppGroup}
+                        />
                       ) : null}
                     </div>
                   ) : (
