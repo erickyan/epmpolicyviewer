@@ -158,7 +158,10 @@ repeatable `<FileVerInfo name="FileDescription|ProductName|…">value</FileVerIn
 
 **ApplicationGroup references**: a policy target `<ApplicationGroup id=… name=""/>` points at a
 definition in the root `<ApplicationGroups>` block. We index those definitions and resolve each
-reference's `name` and member applications onto `target.members[]`, shown as nested rows.
+reference's `name` and member applications onto `target.members[]`, shown as nested rows. The
+definitions are also surfaced as `doc.applicationGroups[]` (id, name, inferred platform, members,
+and a reverse `usedBy` list of referencing policies) and rendered in a dedicated **Application
+Groups** tab. ApplicationGroup target rows (grouped + flat views) link into that viewer.
 
 **Admin tasks (`<AdminTask>` / `<MacAdminTask>`)**: predefined administrative tasks a standard
 user can be elevated to run. Both carry only a numeric `id` (no name in the XML). **The id enums

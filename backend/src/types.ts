@@ -224,6 +224,23 @@ export interface DocumentSummary {
   duplicatePolicyCount: number
 }
 
+// A policy that references an ApplicationGroup (reverse lookup).
+export interface ApplicationGroupUser {
+  id: string
+  name: string
+}
+
+// A root <ApplicationGroups>/<ApplicationGroup> definition: a reusable, named set
+// of application targets that policies reference by id.
+export interface ApplicationGroupEntry {
+  id: string
+  name: string
+  platform: "Windows" | "macOS" | "Linux" | "Any"
+  members: TargetEntry[]
+  memberCount: number
+  usedBy: ApplicationGroupUser[]
+}
+
 export interface PolicyDocument {
   meta: PolicyDocumentMeta
   summary: DocumentSummary
@@ -231,5 +248,6 @@ export interface PolicyDocument {
   normalPolicies: PolicyEntry[]
   excludedPolicies: PolicyEntry[]
   gui: GuiDialog[]
+  applicationGroups: ApplicationGroupEntry[]
   rawXml: string
 }

@@ -200,6 +200,20 @@ export interface DocumentSummary {
   duplicatePolicyCount: number
 }
 
+export interface ApplicationGroupUser {
+  id: string
+  name: string
+}
+
+export interface ApplicationGroupEntry {
+  id: string
+  name: string
+  platform: "Windows" | "macOS" | "Linux" | "Any"
+  members: TargetEntry[]
+  memberCount: number
+  usedBy: ApplicationGroupUser[]
+}
+
 export interface PolicyDocument {
   meta: PolicyDocumentMeta
   summary: DocumentSummary
@@ -207,6 +221,7 @@ export interface PolicyDocument {
   normalPolicies: PolicyEntry[]
   excludedPolicies: PolicyEntry[]
   gui: GuiDialog[]
+  applicationGroups: ApplicationGroupEntry[]
   rawXml: string
 }
 

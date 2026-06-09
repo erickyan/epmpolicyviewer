@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react"
 import {
+  Boxes,
   Eye,
   EyeOff,
   FileCode2,
@@ -20,6 +21,7 @@ import GlobalSearchResults from "./GlobalSearchResults"
 import GeneralConfigView from "./GeneralConfigView"
 import PolicyExplorer from "./PolicyExplorer"
 import GuiDialogs from "./GuiDialogs"
+import ApplicationGroupsView from "./ApplicationGroupsView"
 import DialogModal from "./DialogModal"
 import RawXmlView from "./RawXmlView"
 
@@ -27,7 +29,14 @@ interface DashboardProps {
   response: PolicyDocumentResponse
 }
 
-type TabId = "overview" | "config" | "normal" | "excluded" | "gui" | "raw"
+type TabId =
+  | "overview"
+  | "config"
+  | "normal"
+  | "excluded"
+  | "gui"
+  | "appgroups"
+  | "raw"
 
 interface TabDef {
   id: TabId
@@ -48,6 +57,14 @@ const Dashboard = ({ response }: DashboardProps) => {
     list.push({ id: "normal", label: "Normal Policies", icon: ShieldCheck, count: doc.normalPolicies.length })
     list.push({ id: "excluded", label: "Excluded Policies", icon: ShieldOff, count: doc.excludedPolicies.length })
     list.push({ id: "gui", label: "GUI Dialogs", icon: MonitorPlay, count: doc.gui.length })
+    if (doc.applicationGroups.length > 0) {
+      list.push({
+        id: "appgroups",
+        label: "Application Groups",
+        icon: Boxes,
+        count: doc.applicationGroups.length,
+      })
+    }
     list.push({ id: "raw", label: "Raw XML", icon: FileCode2 })
     return list
   }, [doc])
@@ -59,6 +76,7 @@ const Dashboard = ({ response }: DashboardProps) => {
   const [normalCategory, setNormalCategory] = useState("all")
   const [excludedCategory, setExcludedCategory] = useState("all")
   const [selectedDialog, setSelectedDialog] = useState<GuiDialog | null>(null)
+  const [selectedAppGroup, setSelectedAppGroup] = useState<string | null>(null)
   const availableOs = useMemo(() => availableOsesFor(doc), [doc])
 
   const excludedCategoryIds = useMemo(
@@ -97,6 +115,19 @@ const Dashboard = ({ response }: DashboardProps) => {
     [doc.gui]
   )
 
+  const openAppGroupById = useCallback((id: string) => {
+    setSelectedAppGroup(id)
+    setActiveTab("appgroups")
+  }, [])
+
+  const openPolicyById = useCallback(
+    (id: string) => {
+      const inExcluded = doc.excludedPolicies.some((policy) => policy.id === id)
+      setActiveTab(inExcluded ? "excluded" : "normal")
+    },
+    [doc.excludedPolicies]
+  )
+
   const showOsFilter =
     (activeTab === "normal" || activeTab === "excluded" || activeTab === "gui") &&
     availableOs.length > 0
@@ -109,7 +140,9 @@ const Dashboard = ({ response }: DashboardProps) => {
         ? "Search settings, alerts, messages…"
         : activeTab === "gui"
           ? "Search dialogs…"
-          : "Search policies, publishers, locations…"
+          : activeTab === "appgroups"
+            ? "Search application groups, members…"
+            : "Search policies, publishers, locations…"
 
   return (
     <div className="space-y-6">
@@ -215,6 +248,7 @@ const Dashboard = ({ response }: DashboardProps) => {
             hideDefaults={hideDefaults}
             initialCategory={normalCategory}
             onOpenDialog={openDialogById}
+            onOpenAppGroup={openAppGroupById}
           />
         )}
         {activeTab === "excluded" && (
@@ -227,6 +261,7 @@ const Dashboard = ({ response }: DashboardProps) => {
             hideDefaults={hideDefaults}
             initialCategory={excludedCategory}
             onOpenDialog={openDialogById}
+            onOpenAppGroup={openAppGroupById}
           />
         )}
         {activeTab === "gui" && (
@@ -236,6 +271,14 @@ const Dashboard = ({ response }: DashboardProps) => {
             query={query}
             hideDefaults={hideDefaults}
             onOpenDialog={setSelectedDialog}
+          />
+        )}
+        {activeTab === "appgroups" && (
+          <ApplicationGroupsView
+            groups={doc.applicationGroups}
+            query={query}
+            selectedId={selectedAppGroup}
+            onOpenPolicy={openPolicyById}
           />
         )}
         {activeTab === "raw" && <RawXmlView xml={doc.rawXml} />}

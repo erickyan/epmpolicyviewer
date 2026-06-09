@@ -1,6 +1,8 @@
 import { XMLParser } from "fast-xml-parser"
 import type {
   AlertEntry,
+  ApplicationGroupEntry,
+  ApplicationGroupUser,
   CategoryCount,
   ConfigGroup,
   ConfigItem,
@@ -671,6 +673,43 @@ export const parsePolicyDocument = (
 
   const allEntries = [...normalPolicies, ...excludedPolicies]
 
+  // Reverse map: which policies reference each ApplicationGroup (target.refId).
+  const appGroupUsage = new Map<string, ApplicationGroupUser[]>()
+  for (const entry of allEntries) {
+    const seen = new Set<string>()
+    for (const target of entry.targets) {
+      if (target.kind !== "ApplicationGroup" || !target.refId) continue
+      if (seen.has(target.refId)) continue
+      seen.add(target.refId)
+      const list = appGroupUsage.get(target.refId) ?? []
+      list.push({ id: entry.id, name: entry.name })
+      appGroupUsage.set(target.refId, list)
+    }
+  }
+
+  const applicationGroups: ApplicationGroupEntry[] = Array.from(
+    appGroupIndex,
+    ([id, def]) => {
+      const platforms = new Set(
+        def.targets
+          .map((target) => target.platform)
+          .filter((platform) => platform !== "Any")
+      )
+      const platform =
+        platforms.size === 1
+          ? (platforms.values().next().value as ApplicationGroupEntry["platform"])
+          : "Any"
+      return {
+        id,
+        name: def.name ?? id,
+        platform,
+        members: def.targets,
+        memberCount: def.targets.length,
+        usedBy: appGroupUsage.get(id) ?? [],
+      }
+    }
+  ).sort((a, b) => a.name.localeCompare(b.name))
+
   const categoryMap = new Map<string, CategoryCount>()
   for (const entry of allEntries) {
     const existing = categoryMap.get(entry.categoryId)
@@ -730,6 +769,7 @@ export const parsePolicyDocument = (
     normalPolicies,
     excludedPolicies,
     gui,
+    applicationGroups,
     rawXml: trimmed,
   }
 }

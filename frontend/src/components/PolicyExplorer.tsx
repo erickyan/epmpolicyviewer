@@ -1,5 +1,6 @@
 import { Fragment, useMemo, useState } from "react"
 import {
+  Boxes,
   ChevronDown,
   ChevronRight,
   ClipboardList,
@@ -34,6 +35,7 @@ interface PolicyExplorerProps {
   hideDefaults: boolean
   initialCategory?: string
   onOpenDialog: (id: string) => void
+  onOpenAppGroup: (id: string) => void
 }
 
 const PlatformBadges = ({ policy }: { policy: PolicyEntry }) => {
@@ -232,12 +234,18 @@ const PolicySettingsStrip = ({ policy }: { policy: PolicyEntry }) => (
 const TargetRow = ({
   target,
   nested,
+  onOpenAppGroup,
 }: {
   target: TargetEntry
   nested?: boolean
+  onOpenAppGroup?: (id: string) => void
 }) => {
   const flags = Object.entries(target.attributes)
   const memberCount = target.members?.length ?? 0
+  const isAppGroup = target.kind === "ApplicationGroup" && !!target.refId
+  const summary = `${target.name ?? ""}${
+    memberCount > 0 ? ` · ${memberCount} app${memberCount === 1 ? "" : "s"}` : ""
+  }`
   return (
     <tr className={cx("hover:bg-slate-50", nested && "bg-slate-50/40")}>
       <td className="px-4 py-2 text-xs font-medium text-slate-700">
@@ -245,10 +253,18 @@ const TargetRow = ({
           {nested ? <span className="text-slate-300">↳</span> : null}
           {kindLabel(target.kind)}
         </span>
-        {target.name ? (
+        {isAppGroup && onOpenAppGroup ? (
+          <button
+            type="button"
+            onClick={() => onOpenAppGroup(target.refId as string)}
+            className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+          >
+            <Boxes className="h-3 w-3" />
+            {summary || "View application group"}
+          </button>
+        ) : target.name ? (
           <span className="mt-0.5 block text-[11px] font-normal text-slate-500">
-            {target.name}
-            {memberCount > 0 ? ` · ${memberCount} app${memberCount === 1 ? "" : "s"}` : ""}
+            {summary}
           </span>
         ) : null}
       </td>
@@ -306,7 +322,13 @@ const TargetRow = ({
   )
 }
 
-const TargetTable = ({ targets }: { targets: TargetEntry[] }) => {
+const TargetTable = ({
+  targets,
+  onOpenAppGroup,
+}: {
+  targets: TargetEntry[]
+  onOpenAppGroup: (id: string) => void
+}) => {
   if (targets.length === 0) {
     return (
       <p className="px-4 py-4 text-xs text-slate-400">
@@ -331,12 +353,13 @@ const TargetTable = ({ targets }: { targets: TargetEntry[] }) => {
         <tbody className="divide-y divide-slate-50">
           {targets.map((target, index) => (
             <Fragment key={target.targetId ?? index}>
-              <TargetRow target={target} />
+              <TargetRow target={target} onOpenAppGroup={onOpenAppGroup} />
               {target.members?.map((member, memberIndex) => (
                 <TargetRow
                   key={member.targetId ?? `${index}-m${memberIndex}`}
                   target={member}
                   nested
+                  onOpenAppGroup={onOpenAppGroup}
                 />
               ))}
             </Fragment>
@@ -413,10 +436,12 @@ const GroupedView = ({
   policies,
   query,
   onOpenDialog,
+  onOpenAppGroup,
 }: {
   policies: PolicyEntry[]
   query: string
   onOpenDialog: (id: string) => void
+  onOpenAppGroup: (id: string) => void
 }) => {
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
 
@@ -503,7 +528,10 @@ const GroupedView = ({
                 {policy.endpointSignIn ? (
                   <EndpointSignInPanel config={policy.endpointSignIn} />
                 ) : (
-                  <TargetTable targets={policy.targets} />
+                  <TargetTable
+                    targets={policy.targets}
+                    onOpenAppGroup={onOpenAppGroup}
+                  />
                 )}
               </div>
             )}
@@ -518,10 +546,12 @@ const FlatView = ({
   policies,
   osFilter,
   query,
+  onOpenAppGroup,
 }: {
   policies: PolicyEntry[]
   osFilter: OsFilterValue
   query: string
+  onOpenAppGroup: (id: string) => void
 }) => {
   const rows = policies.flatMap((policy) => {
     const policyNameMatches =
@@ -572,7 +602,20 @@ const FlatView = ({
                     {policy.categoryLabel}
                   </Badge>
                 </td>
-                <td className="px-4 py-2 text-xs text-slate-600">{kindLabel(target.kind)}</td>
+                <td className="px-4 py-2 text-xs text-slate-600">
+                  {target.kind === "ApplicationGroup" && target.refId ? (
+                    <button
+                      type="button"
+                      onClick={() => onOpenAppGroup(target.refId as string)}
+                      className="inline-flex items-center gap-1 font-medium text-blue-600 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                    >
+                      <Boxes className="h-3 w-3" />
+                      {kindLabel(target.kind)}
+                    </button>
+                  ) : (
+                    kindLabel(target.kind)
+                  )}
+                </td>
                 <td className="px-4 py-2 text-xs">
                   <Badge tone={platformTone(target.platform)}>{target.platform}</Badge>
                 </td>
@@ -610,6 +653,7 @@ const PolicyExplorer = ({
   hideDefaults,
   initialCategory,
   onOpenDialog,
+  onOpenAppGroup,
 }: PolicyExplorerProps) => {
   const [view, setView] = useState<ViewMode>("grouped")
   const [categoryFilter, setCategoryFilter] = useState<string>(initialCategory ?? "all")
@@ -704,9 +748,15 @@ const PolicyExplorer = ({
           policies={filtered}
           query={normalizedQuery}
           onOpenDialog={onOpenDialog}
+          onOpenAppGroup={onOpenAppGroup}
         />
       ) : (
-        <FlatView policies={filtered} osFilter={osFilter} query={normalizedQuery} />
+        <FlatView
+          policies={filtered}
+          osFilter={osFilter}
+          query={normalizedQuery}
+          onOpenAppGroup={onOpenAppGroup}
+        />
       )}
     </div>
   )
