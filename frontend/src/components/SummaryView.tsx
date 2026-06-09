@@ -41,21 +41,21 @@ const StatCard = ({ label, value, icon: Icon, onClick, accent }: StatCardProps) 
     <>
       <div
         className={cx(
-          "flex h-9 w-9 items-center justify-center rounded-lg",
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
           accent ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500"
         )}
       >
         <Icon className="h-5 w-5" />
       </div>
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="text-2xl font-semibold leading-none text-slate-900">{value}</p>
-        <p className="mt-1 truncate text-xs text-slate-500">{label}</p>
+        <p className="mt-1 text-xs leading-snug text-slate-500">{label}</p>
       </div>
     </>
   )
 
   const base =
-    "flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm"
+    "flex min-w-[9.5rem] items-start gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm"
 
   if (onClick) {
     return (
@@ -104,7 +104,7 @@ const SummaryView = ({ summary, onNavigate, onSelectCategory }: SummaryViewProps
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-[repeat(auto-fit,minmax(10.75rem,1fr))]">
         <StatCard
           label="Total policies"
           value={summary.totalPolicies}
