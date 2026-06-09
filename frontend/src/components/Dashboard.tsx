@@ -87,13 +87,16 @@ const Dashboard = ({ response }: DashboardProps) => {
   useEffect(() => {
     setRawXml(null)
     setRawXmlError(null)
+    setRawXmlLoading(false)
   }, [response.fileName, response.source])
 
   useEffect(() => {
-    if (activeTab !== "raw" || rawXml || rawXmlLoading) return
+    if (activeTab !== "raw" || rawXml) return
+
     let cancelled = false
     setRawXmlLoading(true)
     setRawXmlError(null)
+
     fetchRawXml(response.source)
       .then((xml) => {
         if (!cancelled) setRawXml(xml)
@@ -108,10 +111,11 @@ const Dashboard = ({ response }: DashboardProps) => {
       .finally(() => {
         if (!cancelled) setRawXmlLoading(false)
       })
+
     return () => {
       cancelled = true
     }
-  }, [activeTab, rawXml, rawXmlLoading, response.source])
+  }, [activeTab, rawXml, response.source])
 
   const excludedCategoryIds = useMemo(
     () => new Set(doc.excludedPolicies.map((policy) => policy.categoryId)),
