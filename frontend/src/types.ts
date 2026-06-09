@@ -14,6 +14,7 @@ export interface TargetEntry {
   childProcs?: string
   serviceName?: string
   fileVerInfo?: FileVerInfoEntry[]
+  memberCount?: number
   members?: TargetEntry[]
   attributes: Record<string, string>
 }
@@ -223,7 +224,6 @@ export interface PolicyDocument {
   excludedPolicies: PolicyEntry[]
   gui: GuiDialog[]
   applicationGroups: ApplicationGroupEntry[]
-  rawXml: string
 }
 
 export interface PolicyDocumentResponse {

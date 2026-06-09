@@ -49,6 +49,18 @@ export const getDefaultCollapsedPaths = (root: XmlTreeNode): Set<string> => {
   return new Set(paths)
 }
 
+export const LARGE_TREE_NODE_THRESHOLD = 300
+
+export const getCollapsedBeyondDepth = (
+  root: XmlTreeNode,
+  maxDepth: number
+): Set<string> =>
+  new Set(
+    collectCollapsiblePaths(root, true).filter(
+      (path) => path.split("/").length - 1 >= maxDepth
+    )
+  )
+
 const walkDom = (node: Node, path: string, nextIndex: () => number): XmlTreeNode | null => {
   if (node.nodeType === Node.ELEMENT_NODE) {
     const element = node as Element

@@ -114,12 +114,18 @@ const GlobalSearchResults = ({
   const q = normalizeQuery(query)
 
   const normalMatches = useMemo(
-    () => doc.normalPolicies.filter((policy) => policyMatchesQuery(policy, q)),
-    [doc.normalPolicies, q]
+    () =>
+      doc.normalPolicies.filter((policy) =>
+        policyMatchesQuery(policy, q, doc.applicationGroups)
+      ),
+    [doc.normalPolicies, doc.applicationGroups, q]
   )
   const excludedMatches = useMemo(
-    () => doc.excludedPolicies.filter((policy) => policyMatchesQuery(policy, q)),
-    [doc.excludedPolicies, q]
+    () =>
+      doc.excludedPolicies.filter((policy) =>
+        policyMatchesQuery(policy, q, doc.applicationGroups)
+      ),
+    [doc.excludedPolicies, doc.applicationGroups, q]
   )
   const dialogMatches = useMemo(
     () => doc.gui.filter((dialog) => dialogMatchesQuery(dialog, q)),

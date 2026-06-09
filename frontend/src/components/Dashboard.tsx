@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react"
 import {
   Boxes,
   Eye,
@@ -24,6 +24,7 @@ import GuiDialogs from "./GuiDialogs"
 import ApplicationGroupsView from "./ApplicationGroupsView"
 import DialogModal from "./DialogModal"
 import RawXmlView from "./RawXmlView"
+import { fetchRawXml } from "../api"
 
 interface DashboardProps {
   response: PolicyDocumentResponse
@@ -72,12 +73,45 @@ const Dashboard = ({ response }: DashboardProps) => {
   const [activeTab, setActiveTab] = useState<TabId>(tabs[0].id)
   const [osFilter, setOsFilter] = useState<OsFilterValue>("all")
   const [query, setQuery] = useState("")
+  const deferredQuery = useDeferredValue(query)
   const [hideDefaults, setHideDefaults] = useState(false)
   const [normalCategory, setNormalCategory] = useState("all")
   const [excludedCategory, setExcludedCategory] = useState("all")
   const [selectedDialog, setSelectedDialog] = useState<GuiDialog | null>(null)
   const [selectedAppGroup, setSelectedAppGroup] = useState<string | null>(null)
+  const [rawXml, setRawXml] = useState<string | null>(null)
+  const [rawXmlLoading, setRawXmlLoading] = useState(false)
+  const [rawXmlError, setRawXmlError] = useState<string | null>(null)
   const availableOs = useMemo(() => availableOsesFor(doc), [doc])
+
+  useEffect(() => {
+    setRawXml(null)
+    setRawXmlError(null)
+  }, [response.fileName, response.source])
+
+  useEffect(() => {
+    if (activeTab !== "raw" || rawXml || rawXmlLoading) return
+    let cancelled = false
+    setRawXmlLoading(true)
+    setRawXmlError(null)
+    fetchRawXml(response.source)
+      .then((xml) => {
+        if (!cancelled) setRawXml(xml)
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setRawXmlError(
+            error instanceof Error ? error.message : "Unable to load raw XML"
+          )
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setRawXmlLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [activeTab, rawXml, rawXmlLoading, response.source])
 
   const excludedCategoryIds = useMemo(
     () => new Set(doc.excludedPolicies.map((policy) => policy.categoryId)),
@@ -217,10 +251,10 @@ const Dashboard = ({ response }: DashboardProps) => {
 
       <div>
         {activeTab === "overview" &&
-          (query.trim() ? (
+          (deferredQuery.trim() ? (
             <GlobalSearchResults
               doc={doc}
-              query={query}
+              query={deferredQuery}
               onOpenDialog={setSelectedDialog}
               onNavigate={handleSummaryNavigate}
             />
@@ -234,7 +268,7 @@ const Dashboard = ({ response }: DashboardProps) => {
         {activeTab === "config" && doc.generalConfiguration && (
           <GeneralConfigView
             config={doc.generalConfiguration}
-            query={query}
+            query={deferredQuery}
             customizedOnly={hideDefaults}
           />
         )}
@@ -242,9 +276,10 @@ const Dashboard = ({ response }: DashboardProps) => {
           <PolicyExplorer
             key={`normal-${normalCategory}`}
             policies={doc.normalPolicies}
+            applicationGroups={doc.applicationGroups}
             emptyMessage="No normal policies in this document"
             osFilter={osFilter}
-            query={query}
+            query={deferredQuery}
             hideDefaults={hideDefaults}
             initialCategory={normalCategory}
             onOpenDialog={openDialogById}
@@ -255,9 +290,10 @@ const Dashboard = ({ response }: DashboardProps) => {
           <PolicyExplorer
             key={`excluded-${excludedCategory}`}
             policies={doc.excludedPolicies}
+            applicationGroups={doc.applicationGroups}
             emptyMessage="No excluded policies in this document"
             osFilter={osFilter}
-            query={query}
+            query={deferredQuery}
             hideDefaults={hideDefaults}
             initialCategory={excludedCategory}
             onOpenDialog={openDialogById}
@@ -268,7 +304,7 @@ const Dashboard = ({ response }: DashboardProps) => {
           <GuiDialogs
             dialogs={doc.gui}
             osFilter={osFilter}
-            query={query}
+            query={deferredQuery}
             hideDefaults={hideDefaults}
             onOpenDialog={setSelectedDialog}
           />
@@ -276,13 +312,19 @@ const Dashboard = ({ response }: DashboardProps) => {
         {activeTab === "appgroups" && (
           <ApplicationGroupsView
             groups={doc.applicationGroups}
-            query={query}
+            query={deferredQuery}
             hideDefaults={hideDefaults}
             selectedId={selectedAppGroup}
             onOpenPolicy={openPolicyById}
           />
         )}
-        {activeTab === "raw" && <RawXmlView xml={doc.rawXml} />}
+        {activeTab === "raw" && (
+          <RawXmlView
+            xml={rawXml}
+            loading={rawXmlLoading}
+            error={rawXmlError}
+          />
+        )}
       </div>
 
       {selectedDialog && (

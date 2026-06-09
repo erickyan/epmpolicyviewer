@@ -1,8 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { ChevronDown, ChevronRight } from "lucide-react"
 import {
+  memo,
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
+import { ChevronDown, ChevronRight, Loader2 } from "lucide-react"
+import {
+  LARGE_TREE_NODE_THRESHOLD,
   collectCollapsiblePaths,
   formatAttributePreview,
+  getCollapsedBeyondDepth,
   getDefaultCollapsedPaths,
   hasElementChildren,
   parseXmlTree,
@@ -21,7 +30,7 @@ const countElementChildren = (node: XmlTreeNode): number =>
     ? node.children.filter((child) => child.type === "element").length
     : 0
 
-const XmlElementNode = ({
+const XmlElementNode = memo(({
   node,
   collapsedPaths,
   onToggle,
@@ -94,9 +103,11 @@ const XmlElementNode = ({
       ) : null}
     </div>
   )
-}
+})
 
-const XmlTreeNodeRow = ({
+XmlElementNode.displayName = "XmlElementNode"
+
+const XmlTreeNodeRow = memo(({
   node,
   collapsedPaths,
   onToggle,
@@ -128,29 +139,66 @@ const XmlTreeNodeRow = ({
       {node.value}
     </div>
   )
-}
+})
+
+XmlTreeNodeRow.displayName = "XmlTreeNodeRow"
 
 const XmlTreeView = ({ xml, collapseToken, expandToken }: XmlTreeViewProps) => {
-  const { root, error } = useMemo(() => parseXmlTree(xml), [xml])
+  const [parsed, setParsed] = useState<ReturnType<typeof parseXmlTree> | null>(
+    null
+  )
+  const [parsing, setParsing] = useState(true)
   const [collapsedPaths, setCollapsedPaths] = useState<Set<string>>(new Set())
+  const [expandNotice, setExpandNotice] = useState<string | null>(null)
+
+  useEffect(() => {
+    setParsing(true)
+    setParsed(null)
+    const timer = window.setTimeout(() => {
+      startTransition(() => {
+        setParsed(parseXmlTree(xml))
+        setParsing(false)
+      })
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [xml])
+
+  const root = parsed?.root ?? null
+  const error = parsed?.error ?? null
+
+  const collapsibleCount = useMemo(
+    () => (root ? collectCollapsiblePaths(root, true).length : 0),
+    [root]
+  )
 
   useEffect(() => {
     if (!root) {
       setCollapsedPaths(new Set())
+      setExpandNotice(null)
       return
     }
     setCollapsedPaths(getDefaultCollapsedPaths(root))
+    setExpandNotice(null)
   }, [root, xml])
 
   useEffect(() => {
     if (!root || collapseToken === 0) return
     setCollapsedPaths(new Set(collectCollapsiblePaths(root, true)))
+    setExpandNotice(null)
   }, [collapseToken, root])
 
   useEffect(() => {
-    if (expandToken === 0) return
+    if (!root || expandToken === 0) return
+    if (collapsibleCount > LARGE_TREE_NODE_THRESHOLD) {
+      setCollapsedPaths(getCollapsedBeyondDepth(root, 2))
+      setExpandNotice(
+        `Large document (${collapsibleCount.toLocaleString()} nodes) — expanded top levels only. Expand individual tags as needed.`
+      )
+      return
+    }
     setCollapsedPaths(new Set())
-  }, [expandToken])
+    setExpandNotice(null)
+  }, [collapsibleCount, expandToken, root])
 
   const handleToggle = useCallback((path: string) => {
     setCollapsedPaths((current) => {
@@ -160,6 +208,15 @@ const XmlTreeView = ({ xml, collapseToken, expandToken }: XmlTreeViewProps) => {
       return next
     })
   }, [])
+
+  if (parsing) {
+    return (
+      <div className="flex items-center justify-center gap-2 bg-slate-900 px-4 py-16 text-sm text-slate-400">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Building XML tree…
+      </div>
+    )
+  }
 
   if (error) {
     return (
@@ -176,17 +233,24 @@ const XmlTreeView = ({ xml, collapseToken, expandToken }: XmlTreeViewProps) => {
   }
 
   return (
-    <div
-      className={cx(
-        "max-h-[70vh] overflow-auto rounded-lg bg-slate-900 p-4",
-        "selection:bg-slate-700"
-      )}
-    >
-      <XmlTreeNodeRow
-        node={root}
-        collapsedPaths={collapsedPaths}
-        onToggle={handleToggle}
-      />
+    <div className="space-y-2">
+      {expandNotice ? (
+        <p className="border-b border-slate-200 px-4 py-2 text-xs text-amber-700">
+          {expandNotice}
+        </p>
+      ) : null}
+      <div
+        className={cx(
+          "max-h-[70vh] overflow-auto rounded-lg bg-slate-900 p-4",
+          "selection:bg-slate-700"
+        )}
+      >
+        <XmlTreeNodeRow
+          node={root}
+          collapsedPaths={collapsedPaths}
+          onToggle={handleToggle}
+        />
+      </div>
     </div>
   )
 }

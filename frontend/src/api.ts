@@ -29,3 +29,12 @@ export const loadDefaultPolicy = async (): Promise<PolicyDocumentResponse> => {
   if (!response.ok) throw new Error(await parseError(response))
   return (await response.json()) as PolicyDocumentResponse
 }
+
+export const fetchRawXml = async (
+  source: PolicyDocumentResponse["source"]
+): Promise<string> => {
+  const response = await fetch(`/api/raw-xml?source=${source}`)
+  if (!response.ok) throw new Error(await parseError(response))
+  const data = (await response.json()) as { xml: string }
+  return data.xml
+}

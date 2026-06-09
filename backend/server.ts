@@ -90,6 +90,20 @@ const getConsoleDefaults = (): ConsoleDefaults | undefined => {
   return consoleDefaultsCache
 }
 
+// Raw XML is fetched on demand (Raw XML tab) so the main parse response stays smaller.
+let cachedUploadXml: string | null = null
+
+const getDefaultPolicyXml = (): string | null => {
+  const filePath = resolveDefaultPolicyPath()
+  if (!filePath) return null
+  try {
+    return decodeXmlBuffer(readFileSync(filePath)).replace(/^\uFEFF/, "").trim()
+  } catch (error) {
+    console.error("Failed to read default policy XML:", error)
+    return null
+  }
+}
+
 // Keep the uploaded XML in memory; we only need to parse it, not persist it.
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -130,6 +144,24 @@ app.get("/api/default-policy", (_req: Request, res: Response) => {
   }
 })
 
+app.get("/api/raw-xml", (req: Request, res: Response) => {
+  const source = req.query.source === "default" ? "default" : "upload"
+  const xml =
+    source === "default" ? getDefaultPolicyXml() : cachedUploadXml
+
+  if (!xml) {
+    res.status(404).json({
+      error:
+        source === "default"
+          ? "Bundled default policy file was not found"
+          : "No uploaded XML is available",
+    })
+    return
+  }
+
+  res.json({ xml, source })
+})
+
 app.post("/api/upload-xml", upload.single("file"), (req: Request, res: Response) => {
   if (!req.file) {
     res.status(400).json({ error: "No XML file was provided" })
@@ -137,7 +169,8 @@ app.post("/api/upload-xml", upload.single("file"), (req: Request, res: Response)
   }
 
   try {
-    const xml = decodeXmlBuffer(req.file.buffer)
+    const xml = decodeXmlBuffer(req.file.buffer).replace(/^\uFEFF/, "").trim()
+    cachedUploadXml = xml
     const document = parsePolicyDocument(xml, {
       baseline: getDefaultBaseline(),
       consoleDefaults: getConsoleDefaults(),

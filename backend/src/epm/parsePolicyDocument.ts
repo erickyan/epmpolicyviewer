@@ -173,7 +173,7 @@ const buildTargets = (
         childProcs: attr(entry, "childProcs"),
         serviceName: getText(entry.SvcName),
         fileVerInfo: buildFileVerInfo(entry),
-        members: groupDef?.targets,
+        memberCount: groupDef?.targets.length,
         attributes,
       })
     }
@@ -851,6 +851,5 @@ export const parsePolicyDocument = (
     excludedPolicies,
     gui,
     applicationGroups,
-    rawXml: trimmed,
   }
 }

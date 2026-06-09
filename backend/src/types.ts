@@ -25,9 +25,8 @@ export interface TargetEntry {
   serviceName?: string
   // File version metadata (<FileVerInfo name="…">value</…>) used for matching.
   fileVerInfo?: FileVerInfoEntry[]
-  // For ApplicationGroup references: the member applications resolved from the
-  // root <ApplicationGroups> definition.
-  members?: TargetEntry[]
+  // Full members live on doc.applicationGroups[] to avoid duplicating large lists.
+  memberCount?: number
   attributes: Record<string, string>
 }
 
@@ -252,5 +251,4 @@ export interface PolicyDocument {
   excludedPolicies: PolicyEntry[]
   gui: GuiDialog[]
   applicationGroups: ApplicationGroupEntry[]
-  rawXml: string
 }

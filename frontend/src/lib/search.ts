@@ -1,4 +1,5 @@
-import type { GuiDialog, PolicyEntry, TargetEntry } from "../types"
+import type { ApplicationGroupEntry, GuiDialog, PolicyEntry, TargetEntry } from "../types"
+import { resolveTargetMembers } from "./appGroups"
 
 export const normalizeQuery = (query: string): string =>
   query.trim().toLowerCase()
@@ -8,8 +9,11 @@ const includes = (haystack: string | undefined, needle: string): boolean =>
 
 export const targetMatchesQuery = (
   target: TargetEntry,
-  query: string
-): boolean =>
+  query: string,
+  members?: TargetEntry[]
+): boolean => {
+  const nestedMembers = members ?? target.members ?? []
+  return (
   includes(target.kind, query) ||
   includes(target.platform, query) ||
   includes(target.name, query) ||
@@ -22,14 +26,17 @@ export const targetMatchesQuery = (
     (info) => includes(info.name, query) || includes(info.value, query)
   ) ??
     false) ||
-  (target.members?.some((member) => targetMatchesQuery(member, query)) ?? false) ||
+  nestedMembers.some((member) => targetMatchesQuery(member, query)) ||
   Object.entries(target.attributes).some(
     ([key, value]) => includes(key, query) || includes(value, query)
   )
+  )
+}
 
 export const policyMatchesQuery = (
   policy: PolicyEntry,
-  query: string
+  query: string,
+  appGroups: ApplicationGroupEntry[] = []
 ): boolean => {
   if (!query) return true
   const auditText = policy.auditEnabled ? "audit" : "no audit"
@@ -51,7 +58,9 @@ export const policyMatchesQuery = (
     ) ||
     policy.scopes.some((scope) => includes(scope.label, query)) ||
     policy.linkedDialogs.some((dialog) => includes(dialog.name, query)) ||
-    policy.targets.some((target) => targetMatchesQuery(target, query)) ||
+    policy.targets.some((target) =>
+      targetMatchesQuery(target, query, resolveTargetMembers(target, appGroups))
+    ) ||
     includes("endpoint sign-in", query) ||
     includes(policy.endpointSignIn?.oidc?.name, query) ||
     includes(policy.endpointSignIn?.oidc?.configurationUrl, query) ||

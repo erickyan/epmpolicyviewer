@@ -17,12 +17,14 @@ import {
   Users,
 } from "lucide-react"
 import type {
+  ApplicationGroupEntry,
   EndpointSignInConfig,
   LinkedDialog,
   PolicyEntry,
   TargetEntry,
   UserGroupEntry,
 } from "../types"
+import { resolveTargetMemberCount, resolveTargetMembers } from "../lib/appGroups"
 import { categoryTone, cx, platformTone, scopeTone } from "../lib/ui"
 import { getPolicyPlatforms, policyMatchesOs, type OsFilterValue } from "../lib/os"
 import { policyMatchesQuery, targetMatchesQuery } from "../lib/search"
@@ -33,6 +35,7 @@ type ViewMode = "grouped" | "flat"
 
 interface PolicyExplorerProps {
   policies: PolicyEntry[]
+  applicationGroups: ApplicationGroupEntry[]
   emptyMessage: string
   osFilter: OsFilterValue
   query: string
@@ -272,7 +275,7 @@ const TargetRow = ({
   onOpenAppGroup?: (id: string) => void
 }) => {
   const flags = Object.entries(target.attributes)
-  const memberCount = target.members?.length ?? 0
+  const memberCount = target.memberCount ?? target.members?.length ?? 0
   const isAppGroup = target.kind === "ApplicationGroup" && !!target.refId
   const isExpandable = isAppGroup && memberCount > 0 && !!onToggleExpand
   const summary = `${target.name ?? ""}${
@@ -395,9 +398,11 @@ const TargetRow = ({
 
 const TargetTable = ({
   targets,
+  appGroups,
   onOpenAppGroup,
 }: {
   targets: TargetEntry[]
+  appGroups: ApplicationGroupEntry[]
   onOpenAppGroup: (id: string) => void
 }) => {
   const [expandedTargets, setExpandedTargets] = useState<Set<string>>(new Set())
@@ -435,7 +440,7 @@ const TargetTable = ({
         <tbody className="divide-y divide-slate-50">
           {targets.map((target, index) => {
             const targetKey = target.targetId ?? String(index)
-            const members = target.members ?? []
+            const members = resolveTargetMembers(target, appGroups)
             const isExpanded = expandedTargets.has(targetKey)
             return (
               <Fragment key={targetKey}>
@@ -531,11 +536,13 @@ const LinkedDialogsPanel = ({
 
 const GroupedView = ({
   policies,
+  appGroups,
   query,
   onOpenDialog,
   onOpenAppGroup,
 }: {
   policies: PolicyEntry[]
+  appGroups: ApplicationGroupEntry[]
   query: string
   onOpenDialog: (id: string) => void
   onOpenAppGroup: (id: string) => void
@@ -627,6 +634,7 @@ const GroupedView = ({
                 ) : (
                   <TargetTable
                     targets={policy.targets}
+                    appGroups={appGroups}
                     onOpenAppGroup={onOpenAppGroup}
                   />
                 )}
@@ -641,11 +649,13 @@ const GroupedView = ({
 
 const FlatView = ({
   policies,
+  appGroups,
   osFilter,
   query,
   onOpenAppGroup,
 }: {
   policies: PolicyEntry[]
+  appGroups: ApplicationGroupEntry[]
   osFilter: OsFilterValue
   query: string
   onOpenAppGroup: (id: string) => void
@@ -665,7 +675,8 @@ const FlatView = ({
         .filter(
           (target) =>
             (osFilter === "all" || target.platform === osFilter) &&
-            (policyNameMatches || targetMatchesQuery(target, query.toLowerCase()))
+            (policyNameMatches ||
+          targetMatchesQuery(target, query.toLowerCase(), resolveTargetMembers(target, appGroups)))
         )
         .map((target, index) => ({
           key: `${policy.id}-${target.targetId ?? index}`,
@@ -685,7 +696,7 @@ const FlatView = ({
       (a, b) =>
         (orderValue(a.policy.order) - orderValue(b.policy.order)) * direction
     )
-  }, [policies, osFilter, query, orderSort])
+  }, [policies, appGroups, osFilter, query, orderSort])
 
   const OrderSortIcon =
     orderSort === "asc" ? ArrowUp : orderSort === "desc" ? ArrowDown : ArrowUpDown
@@ -747,8 +758,8 @@ const FlatView = ({
                         <span>{kindLabel(target.kind)}</span>
                         <span className="mt-0.5 block truncate text-[11px] font-normal text-slate-500">
                           {target.name ?? "Application group"}
-                          {target.members?.length
-                            ? ` · ${target.members.length} apps`
+                          {resolveTargetMemberCount(target, appGroups) > 0
+                            ? ` · ${resolveTargetMemberCount(target, appGroups)} apps`
                             : ""}
                         </span>
                       </div>
@@ -769,8 +780,9 @@ const FlatView = ({
                 </td>
                 <td className="px-4 py-2 text-xs text-slate-600">{target.publisher ?? "—"}</td>
                 <td className="px-4 py-2 font-mono text-[11px] text-slate-500">
-                  {target.kind === "ApplicationGroup" && target.members?.length
-                    ? `${target.members.length} definitions`
+                  {target.kind === "ApplicationGroup" &&
+                  resolveTargetMemberCount(target, appGroups) > 0
+                    ? `${resolveTargetMemberCount(target, appGroups)} definitions`
                     : targetIdentifier(target)}
                 </td>
                 <td className="px-4 py-2 text-[11px]">
@@ -797,6 +809,7 @@ const FlatView = ({
 
 const PolicyExplorer = ({
   policies,
+  applicationGroups,
   emptyMessage,
   osFilter,
   query,
@@ -822,7 +835,7 @@ const PolicyExplorer = ({
       (!hideDefaults || !policy.implicit) &&
       (categoryFilter === "all" || policy.categoryId === categoryFilter) &&
       policyMatchesOs(policy, osFilter) &&
-      policyMatchesQuery(policy, normalizedQuery)
+      policyMatchesQuery(policy, normalizedQuery, applicationGroups)
   )
 
   if (policies.length === 0) {
@@ -896,6 +909,7 @@ const PolicyExplorer = ({
       ) : view === "grouped" ? (
         <GroupedView
           policies={filtered}
+          appGroups={applicationGroups}
           query={normalizedQuery}
           onOpenDialog={onOpenDialog}
           onOpenAppGroup={onOpenAppGroup}
@@ -903,6 +917,7 @@ const PolicyExplorer = ({
       ) : (
         <FlatView
           policies={filtered}
+          appGroups={applicationGroups}
           osFilter={osFilter}
           query={normalizedQuery}
           onOpenAppGroup={onOpenAppGroup}
