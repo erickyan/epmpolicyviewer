@@ -17,3 +17,6 @@ export const resolveTargetMemberCount = (
   if (typeof target.memberCount === "number") return target.memberCount
   return resolveTargetMembers(target, appGroups).length
 }
+
+export const formatDefinitionCount = (count: number): string =>
+  `${count.toLocaleString()} ${count === 1 ? "definition" : "definitions"}`

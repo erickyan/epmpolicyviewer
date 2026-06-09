@@ -183,6 +183,14 @@ const buildTargets = (
   return targets
 }
 
+// Application definitions targeted by a policy. Each non-group target counts as 1;
+// ApplicationGroup targets contribute their member count (resolved from the root index).
+const countPolicyDefinitions = (targets: TargetEntry[]): number =>
+  targets.reduce((sum, target) => {
+    if (target.kind === "ApplicationGroup") return sum + (target.memberCount ?? 0)
+    return sum + 1
+  }, 0)
+
 // The directory source ("scope") a user/group principal comes from, inferred from
 // the <UserGroupList> child element name (e.g. IdpGroup, AzGroup, User).
 const scopeForKind = (kind: string): { id: PolicyScopeId; label: string } => {
@@ -445,6 +453,7 @@ const buildPolicyEntry = (
     auditEnabled: reportUsage !== "2",
     reportUsage,
     targetCount: targets.length,
+    definitionCount: countPolicyDefinitions(targets),
     inheritableTargets: targets.filter((t) => t.inheritable).length,
     targets,
     userGroups,

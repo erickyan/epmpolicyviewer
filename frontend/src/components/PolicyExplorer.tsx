@@ -24,7 +24,7 @@ import type {
   TargetEntry,
   UserGroupEntry,
 } from "../types"
-import { resolveTargetMemberCount, resolveTargetMembers } from "../lib/appGroups"
+import { resolveTargetMemberCount, resolveTargetMembers, formatDefinitionCount } from "../lib/appGroups"
 import { categoryTone, cx, platformTone, scopeTone } from "../lib/ui"
 import { getPolicyPlatforms, policyMatchesOs, type OsFilterValue } from "../lib/os"
 import { policyMatchesQuery, targetMatchesQuery } from "../lib/search"
@@ -68,6 +68,10 @@ const TARGET_KIND_LABELS: Record<string, string> = {
 }
 
 const kindLabel = (kind: string): string => TARGET_KIND_LABELS[kind] ?? kind
+
+const DefinitionCountBadge = ({ count }: { count: number }) => (
+  <Badge tone="neutral">{formatDefinitionCount(count)}</Badge>
+)
 
 const inheritanceSummary = (policy: PolicyEntry): string => {
   if (policy.targetCount === 0) return "—"
@@ -586,6 +590,9 @@ const GroupedView = ({
                 <p className="truncate text-xs text-slate-400">
                   ID {policy.id} · order {policy.order}
                   {policy.internalTypeLabel ? ` · ${policy.internalTypeLabel}` : ""}
+                  {policy.definitionCount > 0
+                    ? ` · ${formatDefinitionCount(policy.definitionCount)}`
+                    : ""}
                 </p>
               </div>
               <PlatformBadges policy={policy} />
@@ -614,12 +621,9 @@ const GroupedView = ({
                   <KeyRound className="h-3 w-3" />
                   Sign-in
                 </Badge>
-              ) : (
-                <Badge tone="neutral">
-                  {policy.targetCount}{" "}
-                  {policy.targetCount === 1 ? "target" : "targets"}
-                </Badge>
-              )}
+              ) : policy.definitionCount > 0 ? (
+                <DefinitionCountBadge count={policy.definitionCount} />
+              ) : null}
             </button>
             {isOpen && (
               <div className="border-t border-slate-100">
@@ -730,6 +734,7 @@ const FlatView = ({
                 </button>
               </th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Policy</th>
+              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Definitions</th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Category</th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Platform</th>
@@ -746,6 +751,9 @@ const FlatView = ({
                   {policy.order || "—"}
                 </td>
                 <td className="px-4 py-2 text-xs font-medium text-slate-700">{policy.name}</td>
+                <td className="px-4 py-2 text-xs tabular-nums text-slate-500">
+                  {policy.definitionCount > 0 ? policy.definitionCount.toLocaleString() : "—"}
+                </td>
                 <td className="px-4 py-2 text-xs">
                   <Badge tone={categoryTone(policy.categoryId)}>
                     {policy.categoryLabel}

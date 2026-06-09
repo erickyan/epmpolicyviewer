@@ -11,9 +11,10 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import type { ConfigItem, GuiDialog, PolicyDocument, PolicyEntry } from "../types"
-import { categoryTone, cx, platformTone } from "../lib/ui"
+import { formatDefinitionCount } from "../lib/appGroups"
 import { getPolicyPlatforms } from "../lib/os"
 import { dialogMatchesQuery, normalizeQuery, policyMatchesQuery } from "../lib/search"
+import { categoryTone, cx, platformTone } from "../lib/ui"
 import Badge from "./Badge"
 import type { SummaryTarget } from "./SummaryView"
 
@@ -92,7 +93,7 @@ const PolicyRows = ({
             ))}
             <Badge tone={categoryTone(policy.categoryId)}>{policy.categoryLabel}</Badge>
             <Badge tone="neutral">
-              {policy.targetCount} {policy.targetCount === 1 ? "target" : "targets"}
+              {formatDefinitionCount(policy.definitionCount)}
             </Badge>
           </button>
         </li>

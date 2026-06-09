@@ -101,6 +101,7 @@ export interface PolicyEntry {
   auditEnabled: boolean
   reportUsage?: string
   targetCount: number
+  definitionCount: number
   inheritableTargets: number
   targets: TargetEntry[]
   userGroups: UserGroupEntry[]
