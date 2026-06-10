@@ -31,6 +31,8 @@ export interface TargetEntry {
   fileVerInfo?: FileVerInfoEntry[]
   // Full members live on doc.applicationGroups[] to avoid duplicating large lists.
   memberCount?: number
+  // True when this target matches the bundled default_policy.xml exclude baseline.
+  matchesBaseline?: boolean
   attributes: Record<string, string>
 }
 
@@ -121,6 +123,8 @@ export interface PolicyEntry {
   // Resolved application definitions (app group members expand to their member count).
   definitionCount: number
   customizedDefinitionCount: number
+  // True when exclude-baseline signatures exist for this policy name.
+  hasExcludeBaseline: boolean
   // How many of the targets are inheritable (apply to child processes).
   inheritableTargets: number
   targets: TargetEntry[]

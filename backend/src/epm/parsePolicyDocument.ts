@@ -468,7 +468,13 @@ const buildPolicyEntry = (
   const internalType = attr(policy, "internalType")
   const name = attr(policy, "name") ?? ""
   const excludeType = attr(policy, "excludeType")
-  const targets = buildTargets(policy.Targets, appGroups)
+  const baselineSigs = excludeBaseline?.get(name.trim())
+  const targets = buildTargets(policy.Targets, appGroups).map((target) => ({
+    ...target,
+    matchesBaseline: baselineSigs
+      ? baselineSigs.has(targetEntrySignature(target))
+      : undefined,
+  }))
   const reportUsage = attr(policy, "reportUsage")
   const userGroups = collectUserGroups(policy)
 
@@ -531,6 +537,7 @@ const buildPolicyEntry = (
       targets,
       excludeBaseline
     ),
+    hasExcludeBaseline: !!baselineSigs,
     inheritableTargets: targets.filter((t) => t.inheritable).length,
     targets,
     userGroups,

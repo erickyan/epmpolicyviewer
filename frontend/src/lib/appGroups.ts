@@ -21,6 +21,29 @@ export const resolveTargetMemberCount = (
 export const formatDefinitionCount = (count: number): string =>
   `${count.toLocaleString()} ${count === 1 ? "definition" : "definitions"}`
 
+export const isVisibleTarget = (
+  target: TargetEntry,
+  appGroups: ApplicationGroupEntry[],
+  hideDefaults: boolean
+): boolean => {
+  if (!hideDefaults) return true
+  if (target.matchesBaseline) return false
+  if (target.kind === "ApplicationGroup") {
+    const group = appGroups.find((entry) => entry.id === target.refId)
+    if (group?.isDefault) return false
+  }
+  return true
+}
+
+export const filterVisibleTargets = (
+  targets: TargetEntry[],
+  appGroups: ApplicationGroupEntry[],
+  hideDefaults: boolean
+): TargetEntry[] =>
+  hideDefaults
+    ? targets.filter((target) => isVisibleTarget(target, appGroups, true))
+    : targets
+
 export const resolvePolicyDefinitionCount = (
   policy: PolicyEntry,
   appGroups: ApplicationGroupEntry[],
@@ -28,21 +51,15 @@ export const resolvePolicyDefinitionCount = (
 ): number => {
   if (!hideDefaults) return policy.definitionCount
 
-  let count = policy.customizedDefinitionCount
+  if (policy.hasExcludeBaseline) return policy.customizedDefinitionCount
 
-  // For policies outside the exclude baseline, still hide default app group members.
-  if (count === policy.definitionCount) {
-    count = policy.targets.reduce((sum, target) => {
-      if (target.kind === "ApplicationGroup") {
-        const group = appGroups.find((entry) => entry.id === target.refId)
-        if (group?.isDefault) return sum
-        return sum + resolveTargetMemberCount(target, appGroups)
-      }
-      return sum + 1
-    }, 0)
-  }
-
-  return count
+  return policy.targets.reduce((sum, target) => {
+    if (!isVisibleTarget(target, appGroups, true)) return sum
+    if (target.kind === "ApplicationGroup") {
+      return sum + resolveTargetMemberCount(target, appGroups)
+    }
+    return sum + 1
+  }, 0)
 }
 
 export const policyHasCustomizedContent = (

@@ -20,6 +20,7 @@ export interface TargetEntry {
   fileVerInfo?: FileVerInfoEntry[]
   memberCount?: number
   members?: TargetEntry[]
+  matchesBaseline?: boolean
   attributes: Record<string, string>
 }
 
@@ -103,6 +104,7 @@ export interface PolicyEntry {
   targetCount: number
   definitionCount: number
   customizedDefinitionCount: number
+  hasExcludeBaseline: boolean
   inheritableTargets: number
   targets: TargetEntry[]
   userGroups: UserGroupEntry[]

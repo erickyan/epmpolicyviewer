@@ -24,7 +24,7 @@ import type {
   TargetEntry,
   UserGroupEntry,
 } from "../types"
-import { resolveTargetMemberCount, resolveTargetMembers, resolvePolicyDefinitionCount, policyHasCustomizedContent, formatDefinitionCount } from "../lib/appGroups"
+import { resolveTargetMemberCount, resolveTargetMembers, resolvePolicyDefinitionCount, policyHasCustomizedContent, filterVisibleTargets, isVisibleTarget, formatDefinitionCount } from "../lib/appGroups"
 import { categoryTone, cx, platformTone, scopeTone } from "../lib/ui"
 import { getPolicyPlatforms, policyMatchesOs, type OsFilterValue } from "../lib/os"
 import { policyMatchesQuery, targetMatchesQuery } from "../lib/search"
@@ -408,10 +408,12 @@ const TargetRow = ({
 const TargetTable = ({
   targets,
   appGroups,
+  hideDefaults,
   onOpenAppGroup,
 }: {
   targets: TargetEntry[]
   appGroups: ApplicationGroupEntry[]
+  hideDefaults: boolean
   onOpenAppGroup: (id: string) => void
 }) => {
   const [expandedTargets, setExpandedTargets] = useState<Set<string>>(new Set())
@@ -425,10 +427,14 @@ const TargetTable = ({
     })
   }
 
-  if (targets.length === 0) {
+  const visibleTargets = filterVisibleTargets(targets, appGroups, hideDefaults)
+
+  if (visibleTargets.length === 0) {
     return (
       <p className="px-4 py-4 text-xs text-slate-400">
-        This policy has no application targets defined.
+        {hideDefaults
+          ? "No customized definitions in this policy."
+          : "This policy has no application targets defined."}
       </p>
     )
   }
@@ -447,9 +453,11 @@ const TargetTable = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
-          {targets.map((target, index) => {
+          {visibleTargets.map((target, index) => {
             const targetKey = target.targetId ?? String(index)
-            const members = resolveTargetMembers(target, appGroups)
+            const members = resolveTargetMembers(target, appGroups).filter((member) =>
+              isVisibleTarget(member, appGroups, hideDefaults)
+            )
             const isExpanded = expandedTargets.has(targetKey)
             return (
               <Fragment key={targetKey}>
@@ -652,6 +660,7 @@ const GroupedView = ({
                   <TargetTable
                     targets={policy.targets}
                     appGroups={appGroups}
+                    hideDefaults={hideDefaults}
                     onOpenAppGroup={onOpenAppGroup}
                   />
                 )}
@@ -690,7 +699,7 @@ const FlatView = ({
     const baseRows = policies.flatMap((policy) => {
       const policyNameMatches =
         query === "" || policy.name.toLowerCase().includes(query.toLowerCase())
-      return policy.targets
+      return filterVisibleTargets(policy.targets, appGroups, hideDefaults)
         .filter(
           (target) =>
             (osFilter === "all" || target.platform === osFilter) &&
@@ -715,7 +724,7 @@ const FlatView = ({
       (a, b) =>
         (orderValue(a.policy.order) - orderValue(b.policy.order)) * direction
     )
-  }, [policies, appGroups, osFilter, query, orderSort])
+  }, [policies, appGroups, osFilter, query, orderSort, hideDefaults])
 
   const OrderSortIcon =
     orderSort === "asc" ? ArrowUp : orderSort === "desc" ? ArrowDown : ArrowUpDown
