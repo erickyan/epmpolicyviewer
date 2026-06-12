@@ -551,6 +551,12 @@ const LinkedDialogsPanel = ({
   )
 }
 
+const actionLabelDiffersFromCategory = (
+  actionLabel: string,
+  categoryLabel: string
+): boolean =>
+  actionLabel.localeCompare(categoryLabel, undefined, { sensitivity: "accent" }) !== 0
+
 const GroupedView = ({
   policies,
   appGroups,
@@ -581,7 +587,10 @@ const GroupedView = ({
     <div className="space-y-2.5">
       {policies.map((policy) => {
         const isOpen = query !== "" || expanded.has(policy.id)
-        const showAction = policy.actionLabel !== policy.categoryLabel
+        const showAction = actionLabelDiffersFromCategory(
+          policy.actionLabel,
+          policy.categoryLabel
+        )
         const internalType = readableInternalTypeLabel(policy.internalTypeLabel)
         const definitionCount = resolvePolicyDefinitionCount(
           policy,

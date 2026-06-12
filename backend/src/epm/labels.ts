@@ -6,7 +6,7 @@ export const ACTION_LABELS: Record<string, string> = {
   "1": "Normal Run",
   "2": "Block",
   "3": "Elevate",
-  "4": "Elevate On Demand",
+  "4": "Elevate on Demand",
   "5": "Collect UAC Usage",
   "6": "Collect Policy Automation",
   "7": "Log Off",
