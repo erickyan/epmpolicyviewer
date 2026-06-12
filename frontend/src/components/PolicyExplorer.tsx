@@ -25,6 +25,7 @@ import type {
   UserGroupEntry,
 } from "../types"
 import { resolveTargetMemberCount, resolveTargetMembers, resolvePolicyDefinitionCount, policyHasCustomizedContent, filterVisibleTargets, isVisibleTarget, formatDefinitionCount } from "../lib/appGroups"
+import { shouldShowActionBadge } from "../lib/policyLabels"
 import { categoryTone, cx, platformTone, scopeTone } from "../lib/ui"
 import { getPolicyPlatforms, policyMatchesOs, type OsFilterValue } from "../lib/os"
 import { policyMatchesQuery, targetMatchesQuery } from "../lib/search"
@@ -551,12 +552,6 @@ const LinkedDialogsPanel = ({
   )
 }
 
-const actionLabelDiffersFromCategory = (
-  actionLabel: string,
-  categoryLabel: string
-): boolean =>
-  actionLabel.localeCompare(categoryLabel, undefined, { sensitivity: "accent" }) !== 0
-
 const GroupedView = ({
   policies,
   appGroups,
@@ -587,7 +582,8 @@ const GroupedView = ({
     <div className="space-y-2.5">
       {policies.map((policy) => {
         const isOpen = query !== "" || expanded.has(policy.id)
-        const showAction = actionLabelDiffersFromCategory(
+        const showAction = shouldShowActionBadge(
+          policy.action,
           policy.actionLabel,
           policy.categoryLabel
         )
