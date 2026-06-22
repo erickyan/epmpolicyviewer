@@ -5,6 +5,7 @@ import { cx, platformTone } from "../lib/ui"
 import { targetMatchesQuery } from "../lib/search"
 import Badge from "./Badge"
 import { MEMBERS_PAGE_SIZE } from "./PaginatedMembersTable"
+import { targetDefinitionText, targetKindDisplayLabel } from "../lib/targetDefinition"
 
 interface ApplicationGroupsViewProps {
   groups: ApplicationGroupEntry[]
@@ -15,7 +16,7 @@ interface ApplicationGroupsViewProps {
 }
 
 const memberIdentifier = (target: TargetEntry): string =>
-  target.location ?? target.fileName ?? target.name ?? "—"
+  targetDefinitionText(target)
 
 const groupMatchesQuery = (group: ApplicationGroupEntry, query: string): boolean => {
   if (!query) return true
@@ -53,15 +54,14 @@ const MembersTable = ({ members }: { members: TargetEntry[] }) => {
             <tr>
               <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</th>
               <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Platform</th>
-              <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Publisher</th>
-              <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">File / Location</th>
+              <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Definition</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
             {pageMembers.map((member, index) => (
               <tr key={member.targetId ?? start + index} className="hover:bg-slate-50">
                 <td className="px-4 py-2 text-xs font-medium text-slate-700">
-                  {member.kind}
+                  {targetKindDisplayLabel(member)}
                   {member.name ? (
                     <span className="mt-0.5 block text-[11px] font-normal text-slate-500">
                       {member.name}
@@ -71,10 +71,7 @@ const MembersTable = ({ members }: { members: TargetEntry[] }) => {
                 <td className="px-4 py-2 text-xs">
                   <Badge tone={platformTone(member.platform)}>{member.platform}</Badge>
                 </td>
-                <td className="px-4 py-2 text-xs text-slate-600">{member.publisher ?? "—"}</td>
-                <td className="px-4 py-2 font-mono text-[11px] text-slate-500">
-                  {memberIdentifier(member)}
-                </td>
+                <td className="px-4 py-2 text-xs text-slate-700">{memberIdentifier(member)}</td>
               </tr>
             ))}
           </tbody>

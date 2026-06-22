@@ -26,6 +26,11 @@ import type {
 } from "../types"
 import { resolveTargetMemberCount, resolveTargetMembers, resolvePolicyDefinitionCount, policyHasCustomizedContent, filterVisibleTargets, isVisibleTarget, formatDefinitionCount } from "../lib/appGroups"
 import { shouldShowActionBadge } from "../lib/policyLabels"
+import {
+  targetAccessFlags,
+  targetDefinitionText,
+  targetKindDisplayLabel,
+} from "../lib/targetDefinition"
 import { categoryTone, cx, platformTone, scopeTone } from "../lib/ui"
 import { getPolicyPlatforms, policyMatchesOs, type OsFilterValue } from "../lib/os"
 import { policyMatchesQuery, targetMatchesQuery } from "../lib/search"
@@ -60,15 +65,14 @@ const PlatformBadges = ({ policy }: { policy: PolicyEntry }) => {
   )
 }
 
-const targetIdentifier = (target: TargetEntry): string =>
-  target.location ?? target.fileName ?? target.name ?? "—"
-
 const TARGET_KIND_LABELS: Record<string, string> = {
-  AdminTask: "Admin Task",
-  MacAdminTask: "macOS Admin Task",
+  ApplicationGroup: "Application group",
 }
 
-const kindLabel = (kind: string): string => TARGET_KIND_LABELS[kind] ?? kind
+const kindLabel = (target: TargetEntry): string =>
+  target.kind === "ApplicationGroup"
+    ? TARGET_KIND_LABELS.ApplicationGroup
+    : targetKindDisplayLabel(target)
 
 const DefinitionCountBadge = ({ count }: { count: number }) => (
   <Badge tone="neutral">{formatDefinitionCount(count)}</Badge>
@@ -284,7 +288,6 @@ const TargetRow = ({
   onToggleExpand?: () => void
   onOpenAppGroup?: (id: string) => void
 }) => {
-  const flags = Object.entries(target.attributes)
   const memberCount = target.memberCount ?? target.members?.length ?? 0
   const isAppGroup = target.kind === "ApplicationGroup" && !!target.refId
   const isExpandable = isAppGroup && memberCount > 0 && !!onToggleExpand
@@ -323,7 +326,7 @@ const TargetRow = ({
                 <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-500" />
               )}
               <span className="min-w-0">
-                <span className="block">{kindLabel(target.kind)}</span>
+                <span className="block">{kindLabel(target)}</span>
                 <span className="mt-0.5 block truncate text-[11px] font-normal text-slate-500">
                   {summary}
                 </span>
@@ -335,7 +338,7 @@ const TargetRow = ({
           <>
             <span className={cx("flex items-center gap-1.5", nested && "pl-4")}>
               {nested ? <span className="text-slate-300">↳</span> : null}
-              {kindLabel(target.kind)}
+              {kindLabel(target)}
             </span>
             {isAppGroup ? (
               <div className="mt-0.5 flex items-start justify-between gap-2">
@@ -355,30 +358,7 @@ const TargetRow = ({
       <td className="px-4 py-2 text-xs">
         <Badge tone={platformTone(target.platform)}>{target.platform}</Badge>
       </td>
-      <td className="px-4 py-2 text-xs text-slate-600">{target.publisher ?? "—"}</td>
-      <td className="px-4 py-2 text-[11px]">
-        {target.location ? (
-          <span className="font-mono text-slate-500">{target.location}</span>
-        ) : null}
-        {target.location && target.fileName ? <br /> : null}
-        {target.fileName ? (
-          <span className="text-slate-600">{target.fileName}</span>
-        ) : null}
-        {target.serviceName ? (
-          <span className="block text-slate-500">svc: {target.serviceName}</span>
-        ) : null}
-        {target.fileVerInfo?.map((info) => (
-          <span key={info.name} className="block text-slate-400">
-            {info.name}: {info.value}
-          </span>
-        ))}
-        {!target.location &&
-        !target.fileName &&
-        !target.serviceName &&
-        !target.fileVerInfo?.length ? (
-          <span className="text-slate-400">—</span>
-        ) : null}
-      </td>
+      <td className="px-4 py-2 text-xs text-slate-700">{targetDefinitionText(target)}</td>
       <td className="px-4 py-2 text-[11px]">
         {target.inheritable ? (
           <Badge tone="violet">
@@ -393,14 +373,15 @@ const TargetRow = ({
         ) : null}
       </td>
       <td className="px-4 py-2 text-[11px] text-slate-400">
-        {target.accessType ? (
-          <Badge tone="violet" className="mr-1">{target.accessType}</Badge>
-        ) : null}
-        {flags.length === 0
-          ? target.accessType
-            ? ""
-            : "—"
-          : flags.map(([k, v]) => `${k}=${v}`).join("  ·  ")}
+        {(() => {
+          const flags = targetAccessFlags(target)
+          if (flags.length === 0) return "—"
+          return flags.map((flag) => (
+            <Badge key={flag} tone="violet" className="mr-1">
+              {flag}
+            </Badge>
+          ))
+        })()}
       </td>
     </tr>
   )
@@ -447,8 +428,7 @@ const TargetTable = ({
           <tr>
             <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</th>
             <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Platform</th>
-            <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Publisher</th>
-            <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">File / Location</th>
+            <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Definition</th>
             <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Inherit</th>
             <th className="px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Access / Flags</th>
           </tr>
@@ -767,8 +747,7 @@ const FlatView = ({
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Category</th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Type</th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Platform</th>
-              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Publisher</th>
-              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">File / Location</th>
+              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Definition</th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Inherit</th>
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Audit</th>
             </tr>
@@ -799,7 +778,7 @@ const FlatView = ({
                   {target.kind === "ApplicationGroup" ? (
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <span>{kindLabel(target.kind)}</span>
+                        <span>{kindLabel(target)}</span>
                         <span className="mt-0.5 block truncate text-[11px] font-normal text-slate-500">
                           {target.name ?? "Application group"}
                           {resolveTargetMemberCount(target, appGroups) > 0
@@ -816,18 +795,17 @@ const FlatView = ({
                       ) : null}
                     </div>
                   ) : (
-                    kindLabel(target.kind)
+                    kindLabel(target)
                   )}
                 </td>
                 <td className="px-4 py-2 text-xs">
                   <Badge tone={platformTone(target.platform)}>{target.platform}</Badge>
                 </td>
-                <td className="px-4 py-2 text-xs text-slate-600">{target.publisher ?? "—"}</td>
-                <td className="px-4 py-2 font-mono text-[11px] text-slate-500">
+                <td className="px-4 py-2 text-xs text-slate-700">
                   {target.kind === "ApplicationGroup" &&
                   resolveTargetMemberCount(target, appGroups) > 0
-                    ? `${resolveTargetMemberCount(target, appGroups)} definitions`
-                    : targetIdentifier(target)}
+                    ? `${resolveTargetMemberCount(target, appGroups)} definitions in ${target.name ?? "group"}`
+                    : targetDefinitionText(target)}
                 </td>
                 <td className="px-4 py-2 text-[11px]">
                   {target.inheritable ? (

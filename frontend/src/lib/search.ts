@@ -18,6 +18,8 @@ export const targetMatchesQuery = (
   includes(target.platform, query) ||
   includes(target.name, query) ||
   includes(target.publisher, query) ||
+  includes(target.bundleId, query) ||
+  includes(target.definitionSummary, query) ||
   includes(target.location, query) ||
   includes(target.fileName, query) ||
   includes(target.accessType, query) ||

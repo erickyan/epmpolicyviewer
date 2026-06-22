@@ -36,6 +36,7 @@ import {
   isDefaultPolicy,
 } from "./labels"
 import { CONFIG_GROUP_SPECS } from "./configGroups"
+import { enrichTargetDefinition } from "./targetDefinition"
 
 // Per EPM domain rules + the format spec, attributes hold the metadata and must
 // be preserved. Entity limits are raised because real exports contain thousands
@@ -156,27 +157,30 @@ const buildTargets = (
           ? getAdminTaskLabel(kind, refId)
           : undefined
 
-      targets.push({
-        kind,
-        platform: platformForKind(kind),
-        name:
-          adminTaskName ??
-          attr(entry, "softwareDistributorName") ??
-          (attr(entry, "name") || undefined) ??
-          groupDef?.name,
-        publisher: getText(entry.Publisher) ?? nestedPublisher,
-        location: getText(entry.Location),
-        fileName: getText(entry.FileName),
-        accessType: getText(entry.Type),
-        targetId: attr(entry, "targetId"),
-        refId,
-        inheritable: (attr(entry, "inheritable") ?? "").toLowerCase() === "true",
-        childProcs: attr(entry, "childProcs"),
-        serviceName: getText(entry.SvcName),
-        fileVerInfo: buildFileVerInfo(entry),
-        memberCount: groupDef?.targets.length,
-        attributes,
-      })
+      targets.push(
+        enrichTargetDefinition(entry, kind, {
+          kind,
+          platform: platformForKind(kind),
+          name:
+            adminTaskName ??
+            attr(entry, "softwareDistributorName") ??
+            (attr(entry, "name") || undefined) ??
+            groupDef?.name,
+          publisher: getText(entry.Publisher) ?? nestedPublisher,
+          location: getText(entry.Location) ?? getText((entry.DmgFile as XmlNode | undefined)?.Location),
+          fileName:
+            getText(entry.FileName) ?? getText((entry.DmgFile as XmlNode | undefined)?.FileName),
+          accessType: getText(entry.Type),
+          targetId: attr(entry, "targetId"),
+          refId,
+          inheritable: (attr(entry, "inheritable") ?? "").toLowerCase() === "true",
+          childProcs: attr(entry, "childProcs"),
+          serviceName: getText(entry.SvcName),
+          fileVerInfo: buildFileVerInfo(entry),
+          memberCount: groupDef?.targets.length,
+          attributes,
+        })
+      )
     }
   }
 
@@ -196,6 +200,7 @@ const targetEntrySignature = (target: TargetEntry): string =>
     target.kind,
     target.platform,
     target.publisher ?? "",
+    target.bundleId ?? "",
     target.location ?? "",
     target.fileName ?? "",
     target.accessType ?? "",

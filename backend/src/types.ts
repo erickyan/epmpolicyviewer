@@ -11,11 +11,19 @@ export type PolicyCategory =
   | "excluded"
   | "threat-protection"
 
+export interface PatternMatch {
+  value: string
+  compareAs?: string
+  caseSensitive?: boolean
+  subfolders?: boolean
+}
+
 export interface TargetEntry {
   kind: string
   platform: "Windows" | "macOS" | "Linux" | "Any"
   name?: string
   publisher?: string
+  bundleId?: string
   location?: string
   fileName?: string
   accessType?: string
@@ -33,6 +41,11 @@ export interface TargetEntry {
   memberCount?: number
   // True when this target matches the bundled default_policy.xml exclude baseline.
   matchesBaseline?: boolean
+  publisherPattern?: PatternMatch
+  bundleIdPattern?: PatternMatch
+  fileNamePattern?: PatternMatch
+  locationPattern?: PatternMatch
+  definitionSummary?: string
   attributes: Record<string, string>
 }
 
