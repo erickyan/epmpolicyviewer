@@ -5,6 +5,15 @@ import cors from "cors"
 import multer from "multer"
 import { decodeXmlBuffer } from "./src/decodeXml"
 import {
+  createSession,
+  isValidSession,
+  readBearerToken,
+  requireAuth,
+  revokeSession,
+  AUTH_PASSPHRASE,
+} from "./src/auth"
+import { getAppBuildInfo } from "./src/buildInfo"
+import {
   extractConfigBaseline,
   extractConsoleDefaults,
   extractExcludeBaseline,
@@ -16,6 +25,9 @@ const app = express()
 const PORT = process.env.PORT ?? 4000
 
 app.use(cors())
+app.use(express.json({ limit: "16kb" }))
+
+const appBuildInfo = getAppBuildInfo()
 
 // Resolve the bundled default ("standard") policy across dev (tsx) and built
 // (dist) layouts by checking a few candidate locations.
@@ -141,10 +153,44 @@ const upload = multer({
 })
 
 app.get("/api/health", (_req: Request, res: Response) => {
+  res.json({ status: "ok", ...appBuildInfo })
+})
+
+app.get("/api/meta", (_req: Request, res: Response) => {
+  res.json(appBuildInfo)
+})
+
+app.post("/api/auth/login", (req: Request, res: Response) => {
+  const passphrase = typeof req.body?.passphrase === "string" ? req.body.passphrase : ""
+  if (passphrase !== AUTH_PASSPHRASE) {
+    res.status(401).json({ error: "Invalid passphrase" })
+    return
+  }
+
+  const session = createSession()
+  res.json({
+    token: session.token,
+    expiresAt: session.expiresAt,
+    authenticatedAt: new Date().toISOString(),
+    ...appBuildInfo,
+  })
+})
+
+app.post("/api/auth/logout", (req: Request, res: Response) => {
+  revokeSession(readBearerToken(req))
   res.json({ status: "ok" })
 })
 
-app.get("/api/default-policy", (_req: Request, res: Response) => {
+app.get("/api/auth/session", (req: Request, res: Response) => {
+  const token = readBearerToken(req)
+  if (!isValidSession(token)) {
+    res.status(401).json({ error: "Unauthorized" })
+    return
+  }
+  res.json({ status: "ok", ...appBuildInfo })
+})
+
+app.get("/api/default-policy", requireAuth, (_req: Request, res: Response) => {
   const filePath = resolveDefaultPolicyPath()
   if (!filePath) {
     res.status(404).json({ error: "Bundled default policy file was not found" })
@@ -162,7 +208,7 @@ app.get("/api/default-policy", (_req: Request, res: Response) => {
   }
 })
 
-app.get("/api/raw-xml", (req: Request, res: Response) => {
+app.get("/api/raw-xml", requireAuth, (req: Request, res: Response) => {
   const source = req.query.source === "default" ? "default" : "upload"
   const xml =
     source === "default" ? getDefaultPolicyXml() : cachedUploadXml
@@ -180,7 +226,7 @@ app.get("/api/raw-xml", (req: Request, res: Response) => {
   res.json({ xml, source })
 })
 
-app.post("/api/upload-xml", upload.single("file"), (req: Request, res: Response) => {
+app.post("/api/upload-xml", requireAuth, upload.single("file"), (req: Request, res: Response) => {
   if (!req.file) {
     res.status(400).json({ error: "No XML file was provided" })
     return
@@ -223,5 +269,7 @@ app.use((error: Error, _req: Request, res: Response, _next: express.NextFunction
 
 app.listen(PORT, () => {
   console.log(`EPM Policy Viewer backend listening on http://localhost:${PORT}`)
+  console.log(`App version ${appBuildInfo.version} · last updated ${appBuildInfo.lastUpdated}`)
+  console.log("Any issue/improvement please reach out to ryyan@paloaltonetworks.com")
   if (publicDir) console.log(`Serving frontend from ${publicDir}`)
 })
