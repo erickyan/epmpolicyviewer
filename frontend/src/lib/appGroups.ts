@@ -75,7 +75,7 @@ export const policyHasCustomizedContent = (
   // Default scaffold policies normally apply to all users; narrowing scope is a modification.
   if (hasSpecificTargeting(policy)) return true
 
-  if (policy.customizedDefinitionCount > 0) return true
+  if (policy.hasExcludeBaseline && policy.customizedDefinitionCount > 0) return true
 
   // Unmodified implicit/default scaffold policies stay hidden.
   if (policy.implicit) return false

@@ -216,7 +216,7 @@ const computeCustomizedDefinitionCount = (
   excludeBaseline?: Map<string, Set<string>>
 ): number => {
   const baselineSigs = excludeBaseline?.get(name.trim())
-  if (!baselineSigs) return countPolicyDefinitions(targets)
+  if (!baselineSigs) return 0
 
   let count = 0
   for (const target of targets) {
