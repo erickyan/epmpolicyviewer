@@ -19,7 +19,7 @@ export const ACTION_LABELS: Record<string, string> = {
   "14": "Restricted Run",
   "15": "Eagles Policy",
   "16": "Eagles Policy Global",
-  "17": "LCD",
+  "17": "LCD Policy",
   "18": "Multifile Creator",
   "19": "Exclude for macOS",
   "20": "Add To Local Group",
@@ -97,7 +97,7 @@ export const getPolicyCategory = (p: PolicyCategoryInput): PolicyCategoryInfo =>
     case "13":
       return { id: "software-distributor", label: "Software Distributor" }
     case "17":
-      return { id: "lcd", label: "LCD" }
+      return { id: "lcd", label: "LCD Policy" }
     case "20":
       return { id: "add-to-group", label: "Add to Local Group" }
     case "23":
@@ -309,4 +309,29 @@ export const DIALOG_TYPE_LABELS: Record<string, string> = {
 export const getDialogTypeLabel = (type?: string): string | undefined => {
   if (!type) return undefined
   return DIALOG_TYPE_LABELS[type] ?? `Dialog type ${type}`
+}
+
+// LCD Policy (action 17) — certificate attributes from the XML spec.
+export const LCD_CERTIFICATE_TYPE_LABELS: Record<string, string> = {
+  "1": "EPM default",
+  "2": "By FQDN",
+  "3": "By subject and issuer",
+}
+
+export const LCD_CERTIFICATE_STORE_LABELS: Record<string, string> = {
+  "1": "Trusted Root Certification Authorities",
+  "2": "Trusted Publishers",
+  "3": "Enterprise Trust",
+  "4": "Intermediate Certification Authorities",
+  "5": "Personal",
+}
+
+export const getLcdCertificateTypeLabel = (type?: string): string | undefined => {
+  if (!type) return undefined
+  return LCD_CERTIFICATE_TYPE_LABELS[type] ?? `Type ${type}`
+}
+
+export const getLcdCertificateStoreLabel = (storeName?: string): string | undefined => {
+  if (!storeName) return undefined
+  return LCD_CERTIFICATE_STORE_LABELS[storeName] ?? `Store ${storeName}`
 }

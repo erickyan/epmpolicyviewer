@@ -75,7 +75,7 @@ Value types: `Number` = 0–4294967295; `Boolean` = "False"/"0" → false, "True
 | 14 | Restricted Run | Obsolete / not in use |
 | 15 | **Eagles / Threat Protection** | Privilege threat protection (credential theft, etc.) |
 | 16 | **Eagles Policy Global** | Global threat protection policy |
-| 17 | LCD | Password rotation for Loosely Connected Devices |
+| 17 | LCD Policy | Password rotation for Loosely Connected Devices (PAS agent) |
 | 18 | Multifile Creator | Definitions of multifile creators |
 | 19 | **Exclude for macOS** | Do not apply policies to targets (mac) |
 | 20 | Add To Local Group | Add users to local groups |
@@ -95,7 +95,7 @@ Computed in `getPolicyCategory` (`labels.ts`). A policy is a **Default Policy** 
 `implicit="true"`, or it has `internalDefaultPolicyModeAC`, or its name matches
 `Main Default Policy` / `Default MAC Policy`. Otherwise it's labeled by action:
 Block (2), Allow / Monitor (1), Elevate (3), Elevate on Demand (4), Detect / Automation (5/6),
-Software Distributor (13), Multifile Creator (18), LCD (17), Remove Admin Rights (23),
+Software Distributor (13), Multifile Creator (18), LCD Policy (17), Remove Admin Rights (23),
 Endpoint Sign-in (24), etc.
 
 **Action 24 — Endpoint Sign-in** ([CyberArk docs](https://docs.cyberark.com/epm/latest/en/content/policies/endpointsigninpolicy.htm)).
@@ -108,6 +108,17 @@ The legacy PDF label was "IDP Policy for linux or user control for windows"; the
 - **Linux Identity Bridge**: `<IDP AllowIdentityBridging …>` with `<AllowedDomainPatterns>`/
   `<Certificate>`, plus `<UserGroupList>` (IdpUser/IdpGroup). Variant detected; full Linux
   parsing TBD when a sample file is available.
+
+**Action 17 — LCD Policy** (Loosely Connected Devices). Configures the PAS agent for
+password rotation on disconnected endpoints. These policies have **no `<Targets>`** — settings
+live on the `<Policy>` element and child nodes:
+- Attributes: `SecretKey`, `LCDIntervalSeconds`, `LCDRetryIntervalSeconds`
+- `<PVWAAddresses>` / `<PVWAAddress>` — PVWA URLs
+- `<LocalGroups>` / `<LocalGroup SID="…">` — groups whose accounts the agent retrieves
+- `<Certificate Type StoreName>` — client certificate (type 1–3; store 5 = Personal)
+- `<Scheduler weekdays startTime endTime>` — optional schedule window
+Parsed into `PolicyEntry.lcdPolicy` and shown in the policy drilldown (not the targets table).
+Tenant LCD policies count as **customized** even when they have zero application definitions.
 
 Other real-world policy attrs seen: `implicit`, `internalDefaultPolicyModeAC`, `reportUsage`,
 `sendPolicyAutomation`, `replaceUAC`/`replaceAdminUAC`, `suppressUAC`/`suppressAdminUAC`,

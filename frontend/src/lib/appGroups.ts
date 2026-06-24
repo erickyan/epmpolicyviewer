@@ -77,6 +77,9 @@ export const policyHasCustomizedContent = (
 
   if (policy.hasExcludeBaseline && policy.customizedDefinitionCount > 0) return true
 
+  // Tenant LCD / endpoint sign-in policies have no application targets but are still customized.
+  if (!policy.implicit && (policy.lcdPolicy || policy.endpointSignIn)) return true
+
   // Unmodified implicit/default scaffold policies stay hidden.
   if (policy.implicit) return false
 

@@ -113,6 +113,36 @@ export interface EndpointSignInConfig {
   fallback?: EndpointSignInFallbackOptions
 }
 
+// Action 17 — Loosely Connected Devices (LCD / PAS agent) policy.
+export interface LcdLocalGroup {
+  name?: string
+  sid?: string
+}
+
+export interface LcdCertificate {
+  type?: string
+  typeLabel?: string
+  storeName?: string
+  storeNameLabel?: string
+  value?: string
+}
+
+export interface LcdScheduler {
+  weekdays?: string
+  startTime?: string
+  endTime?: string
+}
+
+export interface LcdPolicyConfig {
+  secretKeyConfigured: boolean
+  lcdIntervalSeconds?: string
+  lcdRetryIntervalSeconds?: string
+  pvwaAddresses: string[]
+  localGroups: LcdLocalGroup[]
+  certificate?: LcdCertificate
+  scheduler?: LcdScheduler
+}
+
 export interface PolicyEntry {
   id: string
   name: string
@@ -147,6 +177,8 @@ export interface PolicyEntry {
   linkedDialogs: LinkedDialog[]
   // Present for action 24 (Endpoint sign-in) policies.
   endpointSignIn?: EndpointSignInConfig
+  // Present for action 17 (LCD / Loosely Connected Devices) policies.
+  lcdPolicy?: LcdPolicyConfig
 }
 
 export interface ConfigItem {

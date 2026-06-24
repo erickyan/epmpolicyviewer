@@ -69,7 +69,13 @@ export const policyMatchesQuery = (
     includes(policy.endpointSignIn?.oidc?.clientId, query) ||
     includes(policy.endpointSignIn?.oidc?.userDomain, query) ||
     includes(policy.endpointSignIn?.oidc?.scopes, query) ||
-    includes(policy.endpointSignIn?.mappings?.userName, query)
+    includes(policy.endpointSignIn?.mappings?.userName, query) ||
+    includes("lcd policy", query) ||
+    includes("loosely connected", query) ||
+    (policy.lcdPolicy?.pvwaAddresses.some((address) => includes(address, query)) ?? false) ||
+    (policy.lcdPolicy?.localGroups.some(
+      (group) => includes(group.name, query) || includes(group.sid, query)
+    ) ?? false)
   )
 }
 

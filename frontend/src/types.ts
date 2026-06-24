@@ -96,6 +96,35 @@ export interface EndpointSignInConfig {
   fallback?: EndpointSignInFallbackOptions
 }
 
+export interface LcdLocalGroup {
+  name?: string
+  sid?: string
+}
+
+export interface LcdCertificate {
+  type?: string
+  typeLabel?: string
+  storeName?: string
+  storeNameLabel?: string
+  value?: string
+}
+
+export interface LcdScheduler {
+  weekdays?: string
+  startTime?: string
+  endTime?: string
+}
+
+export interface LcdPolicyConfig {
+  secretKeyConfigured: boolean
+  lcdIntervalSeconds?: string
+  lcdRetryIntervalSeconds?: string
+  pvwaAddresses: string[]
+  localGroups: LcdLocalGroup[]
+  certificate?: LcdCertificate
+  scheduler?: LcdScheduler
+}
+
 export interface PolicyEntry {
   id: string
   name: string
@@ -124,6 +153,7 @@ export interface PolicyEntry {
   scopes: PolicyScope[]
   linkedDialogs: LinkedDialog[]
   endpointSignIn?: EndpointSignInConfig
+  lcdPolicy?: LcdPolicyConfig
 }
 
 export interface ConfigItem {

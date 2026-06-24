@@ -15,6 +15,7 @@ import type {
   GeneralConfiguration,
   GuiDialog,
   LinkedDialog,
+  LcdPolicyConfig,
   MessageEntry,
   PolicyCategory,
   PolicyDocument,
@@ -32,6 +33,8 @@ import {
   getAdminTaskLabel,
   getDialogTypeLabel,
   getInternalTypeLabel,
+  getLcdCertificateStoreLabel,
+  getLcdCertificateTypeLabel,
   getPolicyCategory,
   isDefaultPolicy,
 } from "./labels"
@@ -461,6 +464,66 @@ const buildEndpointSignIn = (policy: XmlNode): EndpointSignInConfig | undefined 
   }
 }
 
+// Action 17 — Loosely Connected Devices (LCD). These policies configure the PAS
+// agent (PVWA addresses, local groups, certificate, intervals) and do not use
+// <Targets> application definitions.
+const buildLcdPolicy = (policy: XmlNode): LcdPolicyConfig | undefined => {
+  if (attr(policy, "action") !== "17") return undefined
+
+  const pvwaNode = policy.PVWAAddresses as XmlNode | undefined
+  const pvwaAddresses = asArray(pvwaNode?.PVWAAddress as XmlNode | XmlNode[])
+    .map((node) => getText(node)?.trim())
+    .filter((value): value is string => !!value)
+
+  const localGroupsNode = policy.LocalGroups as XmlNode | undefined
+  const localGroups = asArray(localGroupsNode?.LocalGroup as XmlNode | XmlNode[]).map(
+    (node) => ({
+      name: getText(node)?.trim(),
+      sid: attr(node, "SID"),
+    })
+  )
+
+  const certNode = policy.Certificate as XmlNode | undefined
+  const certType = certNode ? attr(certNode, "Type") : undefined
+  const certStore = certNode ? attr(certNode, "StoreName") : undefined
+  const certValue = certNode ? getText(certNode)?.trim() : undefined
+  const certificate =
+    certNode && (certType !== undefined || certStore !== undefined || certValue)
+      ? {
+          type: certType,
+          typeLabel: getLcdCertificateTypeLabel(certType),
+          storeName: certStore,
+          storeNameLabel: getLcdCertificateStoreLabel(certStore),
+          value: certValue,
+        }
+      : undefined
+
+  const schedulerNode = policy.Scheduler as XmlNode | undefined
+  const scheduler =
+    schedulerNode &&
+    (attr(schedulerNode, "weekdays") ||
+      attr(schedulerNode, "startTime") ||
+      attr(schedulerNode, "endTime"))
+      ? {
+          weekdays: attr(schedulerNode, "weekdays"),
+          startTime: attr(schedulerNode, "startTime"),
+          endTime: attr(schedulerNode, "endTime"),
+        }
+      : undefined
+
+  const secretKey = attr(policy, "SecretKey")?.trim()
+
+  return {
+    secretKeyConfigured: !!secretKey,
+    lcdIntervalSeconds: attr(policy, "LCDIntervalSeconds"),
+    lcdRetryIntervalSeconds: attr(policy, "LCDRetryIntervalSeconds"),
+    pvwaAddresses,
+    localGroups,
+    certificate,
+    scheduler,
+  }
+}
+
 const buildPolicyEntry = (
   policy: XmlNode,
   category: Exclude<PolicyCategory, "configuration">,
@@ -550,6 +613,7 @@ const buildPolicyEntry = (
     linkedDialogs: resolveLinkedDialogs(policy, dialogIndex),
     endpointSignIn:
       action === "24" ? buildEndpointSignIn(policy) : undefined,
+    lcdPolicy: action === "17" ? buildLcdPolicy(policy) : undefined,
   }
 }
 
