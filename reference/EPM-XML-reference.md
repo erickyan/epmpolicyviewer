@@ -120,7 +120,9 @@ hidden by the "Customized only" toggle) when `implicit="true"`, `internalDefault
 present, the name matches `Main Default Policy|Default MAC Policy|Default Policy`, **or** it is a
 predefined trusted-distributor/updater *definition* (`action="13"` with `internalType` 800 / 805 /
 820 — e.g. Jamf, Kandji, VMWare Workspace ONE, Intune). Custom definitions (810 / 830) stay
-non-default.
+non-default. **Exception**: a default/implicit policy with a `<UserGroupList>` (specific targeting)
+is still shown under **Customized only**, because narrowing scope is a deliberate modification from
+the default "all users" baseline.
 
 **Audit setting (`reportUsage`)**: controls policy audit / usage reporting. `reportUsage="2"`
 = audit **off** (these policies are typically named "… No Audit" / "… Without Audit"); the
@@ -185,9 +187,10 @@ from two separate tables (`WIN_ADMIN_TASK_LABELS` / `MAC_ADMIN_TASK_LABELS` in
 [CyberArk EPM "Application patterns" → Admin task ID](https://docs.cyberark.com/epm/latest/en/content/webservices/applicationpatterns.htm).
 - `<AdminTask id="N">` → Windows admin tasks (1–59 plus 89/90/91, e.g. 6 = System Restore,
   16 = Windows Firewall, 42 = Services Configuration, 91 = Accessibility (Settings)).
-- `<MacAdminTask id="N">` → macOS System Preferences (1–16 with gaps, e.g. 1 = Security and
-  Privacy, 3 = Energy Saver, 8 = Date and Time, 10 = Time Machine). Ids outside the published
-  range fall back to `macOS admin task #N`.
+- `<MacAdminTask id="N">` → macOS System Preferences (1–17, e.g. 1 = Security and
+  Privacy, 3 = Energy Saver, 8 = Date and Time, 10 = Time Machine, 13 = Finder,
+  14 = Install Software, 17 = Lock Screen). Ids outside the published range fall
+  back to `macOS admin task #N`.
 `getAdminTaskLabel(kind, id)` picks the right table by element kind and sets `target.name`.
 The UI shows a friendly element label ("Admin Task" / "macOS Admin Task") with the resolved task
 name underneath; the name is searchable.

@@ -173,6 +173,9 @@ export const getInternalTypeLabel = (internalType?: string): string | undefined 
 // https://docs.cyberark.com/epm/latest/en/content/webservices/applicationpatterns.htm
 
 // Windows admin task ids (<AdminTask id="…">).
+// EvfAdminTaskId enum 1–59 (sequential) — validated against the PDF spec, installed
+// EPM agent VFAT_* enum order, and CyberArk application patterns web doc.
+// Settings app tasks 89–91 are documented separately (not in the legacy PDF enum).
 export const WIN_ADMIN_TASK_LABELS: Record<string, string> = {
   "1": "Accessibility (Control Panel)",
   "2": "Display, Colors, Fonts, Visual Effects (Control Panel)",
@@ -239,6 +242,8 @@ export const WIN_ADMIN_TASK_LABELS: Record<string, string> = {
 }
 
 // macOS admin task ids (<MacAdminTask id="…">) — macOS System Preferences.
+// Source: CyberArk EPM application patterns + EvfMacAdminTaskId enum order
+// (VfAgentDeclarations.cs / installed EPM agent).
 export const MAC_ADMIN_TASK_LABELS: Record<string, string> = {
   "1": "Security and Privacy",
   "2": "CDs and DVDs",
@@ -252,8 +257,11 @@ export const MAC_ADMIN_TASK_LABELS: Record<string, string> = {
   "10": "Time Machine",
   "11": "App Store",
   "12": "Sharing",
+  "13": "Finder",
+  "14": "Install Software",
   "15": "Copy/delete to/from Applications system folder",
   "16": "Battery",
+  "17": "Lock Screen",
 }
 
 // Resolve a human-readable name for an <AdminTask>/<MacAdminTask> target by id,

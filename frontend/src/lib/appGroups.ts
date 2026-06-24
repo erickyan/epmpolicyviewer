@@ -62,12 +62,23 @@ export const resolvePolicyDefinitionCount = (
   }, 0)
 }
 
+export const hasSpecificTargeting = (policy: PolicyEntry): boolean =>
+  policy.userGroups.length > 0
+
 export const policyHasCustomizedContent = (
   policy: PolicyEntry,
   appGroups: ApplicationGroupEntry[],
   hideDefaults: boolean
 ): boolean => {
   if (!hideDefaults) return true
+
+  // Default scaffold policies normally apply to all users; narrowing scope is a modification.
+  if (hasSpecificTargeting(policy)) return true
+
+  if (policy.customizedDefinitionCount > 0) return true
+
+  // Unmodified implicit/default scaffold policies stay hidden.
   if (policy.implicit) return false
+
   return resolvePolicyDefinitionCount(policy, appGroups, true) > 0
 }
