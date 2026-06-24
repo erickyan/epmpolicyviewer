@@ -772,17 +772,7 @@ const GroupedView = ({
                   {policy.linkedDialogs.length}
                 </Badge>
               ) : null}
-              {policy.endpointSignIn ? (
-                <Badge tone="blue">
-                  <KeyRound className="h-3 w-3" />
-                  Sign-in
-                </Badge>
-              ) : policy.lcdPolicy ? (
-                <Badge tone="blue">
-                  <Cloud className="h-3 w-3" />
-                  LCD
-                </Badge>
-              ) : definitionCount > 0 ? (
+              {definitionCount > 0 ? (
                 <DefinitionCountBadge count={definitionCount} />
               ) : null}
             </button>

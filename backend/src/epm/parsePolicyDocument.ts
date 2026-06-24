@@ -524,6 +524,17 @@ const buildLcdPolicy = (policy: XmlNode): LcdPolicyConfig | undefined => {
   }
 }
 
+const normalizePolicyPlatform = (
+  value?: string
+): PolicyEntry["platform"] => {
+  if (!value) return undefined
+  const normalized = value.trim().toLowerCase()
+  if (normalized === "linux") return "Linux"
+  if (normalized === "windows" || normalized === "win") return "Windows"
+  if (normalized === "macos" || normalized === "mac") return "macOS"
+  return undefined
+}
+
 const buildPolicyEntry = (
   policy: XmlNode,
   category: Exclude<PolicyCategory, "configuration">,
@@ -594,6 +605,7 @@ const buildPolicyEntry = (
     internalType,
     internalTypeLabel: getInternalTypeLabel(internalType),
     serverPolicyId: attr(policy, "serverPolicyId"),
+    platform: normalizePolicyPlatform(attr(policy, "platform")),
     winMav: attr(policy, "winMav"),
     macMav: attr(policy, "macMav"),
     auditEnabled: reportUsage !== "2",

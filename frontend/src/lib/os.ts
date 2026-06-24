@@ -8,26 +8,48 @@ export const OS_OPTIONS: Exclude<OsFilterValue, "all">[] = [
   "Linux",
 ]
 
-// Some targets (e.g. <ApplicationGroup>) reference an app group defined
-// elsewhere and carry no concrete OS, so they are tagged "Any". These must NOT
-// be treated as "every OS" for filtering, otherwise an OS-specific policy that
-// references an app group would leak into all OS filters. When a policy has no
-// concrete-OS target we fall back to OS hints in its name.
 const inferPlatformsFromName = (name: string): string[] => {
   const platforms: string[] = []
   if (/\bmac(?:os)?\b/i.test(name)) platforms.push("macOS")
   if (/\bwindows\b|\bwin\b/i.test(name)) platforms.push("Windows")
-  if (/\blinux\b/i.test(name)) platforms.push("Linux")
+  if (/\blinux\b|\bunix\b|\bnix\b/i.test(name)) platforms.push("Linux")
   return platforms
 }
 
-export const getPolicyPlatforms = (policy: PolicyEntry): string[] => {
+const inferPlatformsFromEndpointSignIn = (policy: PolicyEntry): string[] => {
+  if (!policy.endpointSignIn) return []
+
+  if (policy.endpointSignIn.variant === "linux") return ["Linux"]
+
+  const platforms: string[] = []
+  if (policy.winMav) platforms.push("Windows")
+  if (policy.macMav) platforms.push("macOS")
+  return platforms
+}
+
+const inferPlatformsFromTargets = (policy: PolicyEntry): string[] => {
   const concrete = new Set<string>()
   for (const target of policy.targets) {
     if (target.platform === "Any") continue
     concrete.add(target.platform)
   }
-  if (concrete.size > 0) return [...concrete]
+  return [...concrete]
+}
+
+export const getPolicyPlatforms = (policy: PolicyEntry): string[] => {
+  if (policy.platform) return [policy.platform]
+
+  const fromTargets = inferPlatformsFromTargets(policy)
+  if (fromTargets.length > 0) return fromTargets
+
+  const fromEndpointSignIn = inferPlatformsFromEndpointSignIn(policy)
+  if (fromEndpointSignIn.length > 0) return fromEndpointSignIn
+
+  if (policy.lcdPolicy) {
+    const fromName = inferPlatformsFromName(policy.name)
+    return fromName.length > 0 ? fromName : ["Linux"]
+  }
+
   return inferPlatformsFromName(policy.name)
 }
 

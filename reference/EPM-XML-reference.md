@@ -109,6 +109,10 @@ The legacy PDF label was "IDP Policy for linux or user control for windows"; the
   `<Certificate>`, plus `<UserGroupList>` (IdpUser/IdpGroup). Variant detected; full Linux
   parsing TBD when a sample file is available.
 
+Linux endpoint sign-in policies often carry `platform="Linux"` on the `<Policy>` element and have
+**no `<Targets>`**. The viewer uses `@platform`, endpoint-sign-in variant, and name hints
+(`unix` / `nix`) for OS filtering when targets are absent.
+
 **Action 17 — LCD Policy** (Loosely Connected Devices). Configures the PAS agent for
 password rotation on disconnected endpoints. These policies have **no `<Targets>`** — settings
 live on the `<Policy>` element and child nodes:

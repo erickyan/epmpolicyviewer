@@ -157,6 +157,8 @@ export interface PolicyEntry {
   internalType?: string
   internalTypeLabel?: string
   serverPolicyId?: string
+  // Policy-level platform (endpoint sign-in, LCD, etc.) when no target definitions exist.
+  platform?: "Windows" | "macOS" | "Linux"
   winMav?: string
   macMav?: string
   // Audit / usage reporting (EPM `reportUsage`; "2" = off, absent = on).

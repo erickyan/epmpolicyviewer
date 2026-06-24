@@ -139,6 +139,7 @@ export interface PolicyEntry {
   internalType?: string
   internalTypeLabel?: string
   serverPolicyId?: string
+  platform?: "Windows" | "macOS" | "Linux"
   winMav?: string
   macMav?: string
   auditEnabled: boolean
