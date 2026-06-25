@@ -143,3 +143,73 @@ export const formatAttributePreview = (
     entries.length > maxAttrs ? ` +${entries.length - maxAttrs} more` : ""
   return `${preview.join(" ")}${suffix}`
 }
+
+export const normalizeXmlSearchQuery = (query: string): string =>
+  query.trim().toLowerCase()
+
+export const nodeMatchesXmlSearch = (
+  node: XmlTreeNode,
+  query: string
+): boolean => {
+  const normalized = normalizeXmlSearchQuery(query)
+  if (!normalized) return false
+
+  if (node.type === "element") {
+    if (node.name.toLowerCase().includes(normalized)) return true
+    return Object.entries(node.attributes).some(
+      ([name, value]) =>
+        name.toLowerCase().includes(normalized) ||
+        value.toLowerCase().includes(normalized)
+    )
+  }
+
+  return node.value.toLowerCase().includes(normalized)
+}
+
+export interface XmlSearchTreeState {
+  relevantPaths: Set<string> | null
+  collapsedPaths: Set<string>
+  matchCount: number
+}
+
+export const buildXmlSearchTreeState = (
+  root: XmlTreeNode,
+  query: string
+): XmlSearchTreeState => {
+  const normalized = normalizeXmlSearchQuery(query)
+  if (!normalized) {
+    return {
+      relevantPaths: null,
+      collapsedPaths: getDefaultCollapsedPaths(root),
+      matchCount: 0,
+    }
+  }
+
+  const relevantPaths = new Set<string>()
+  let matchCount = 0
+
+  const walk = (node: XmlTreeNode): boolean => {
+    const selfMatch = nodeMatchesXmlSearch(node, query)
+    if (selfMatch) matchCount += 1
+
+    let childRelevant = false
+    if (node.type === "element") {
+      for (const child of node.children) {
+        if (walk(child)) childRelevant = true
+      }
+    }
+
+    const keep = selfMatch || childRelevant
+    if (keep) relevantPaths.add(node.path)
+    return keep
+  }
+
+  walk(root)
+
+  const allCollapsible = collectCollapsiblePaths(root, true)
+  const collapsedPaths = new Set(
+    allCollapsible.filter((path) => !relevantPaths.has(path))
+  )
+
+  return { relevantPaths, collapsedPaths, matchCount }
+}

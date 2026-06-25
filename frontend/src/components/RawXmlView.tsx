@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react"
-import { Check, ChevronsDownUp, ChevronsUpDown, Copy, Loader2 } from "lucide-react"
+import { ChevronsDownUp, ChevronsUpDown, Loader2, Search } from "lucide-react"
 import XmlTreeView from "./XmlTreeView"
 import { cx } from "../lib/ui"
+import { normalizeXmlSearchQuery } from "../lib/xmlTree"
 
 interface RawXmlViewProps {
   xml: string | null
@@ -12,23 +13,34 @@ interface RawXmlViewProps {
 type ViewMode = "tree" | "source"
 
 const RawXmlView = ({ xml, loading = false, error = null }: RawXmlViewProps) => {
-  const [copied, setCopied] = useState(false)
   const [viewMode, setViewMode] = useState<ViewMode>("tree")
+  const [searchQuery, setSearchQuery] = useState("")
   const [collapseToken, setCollapseToken] = useState(0)
   const [expandToken, setExpandToken] = useState(0)
 
-  const handleCopy = async () => {
-    if (!xml) return
-    try {
-      await navigator.clipboard.writeText(xml)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch {
-      setCopied(false)
-    }
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    setCollapseToken(0)
+    setExpandToken(0)
   }
 
   const lineCount = useMemo(() => (xml ? xml.split("\n").length : 0), [xml])
+
+  const filteredSource = useMemo(() => {
+    if (!xml) return ""
+    const normalized = normalizeXmlSearchQuery(searchQuery)
+    if (!normalized) return xml
+    return xml
+      .split("\n")
+      .filter((line) => line.toLowerCase().includes(normalized))
+      .join("\n")
+  }, [xml, searchQuery])
+
+  const sourceMatchCount = useMemo(() => {
+    if (!searchQuery.trim() || !xml) return 0
+    const normalized = normalizeXmlSearchQuery(searchQuery)
+    return xml.split("\n").filter((line) => line.toLowerCase().includes(normalized)).length
+  }, [xml, searchQuery])
 
   if (loading) {
     return (
@@ -55,6 +67,8 @@ const RawXmlView = ({ xml, loading = false, error = null }: RawXmlViewProps) => 
     )
   }
 
+  const hasSearch = searchQuery.trim().length > 0
+
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="space-y-3 border-b border-slate-200 px-4 py-3">
@@ -62,9 +76,12 @@ const RawXmlView = ({ xml, loading = false, error = null }: RawXmlViewProps) => 
           <p className="text-xs text-slate-500">
             {lineCount.toLocaleString()} lines ·{" "}
             {xml.length.toLocaleString()} characters
+            {hasSearch && viewMode === "source"
+              ? ` · ${sourceMatchCount.toLocaleString()} matching lines`
+              : null}
           </p>
           <div className="flex flex-wrap items-center gap-2">
-            {viewMode === "tree" ? (
+            {viewMode === "tree" && !hasSearch ? (
               <>
                 <button
                   type="button"
@@ -86,26 +103,26 @@ const RawXmlView = ({ xml, loading = false, error = null }: RawXmlViewProps) => 
                 </button>
               </>
             ) : null}
-            <button
-              type="button"
-              onClick={handleCopy}
-              aria-label="Copy raw XML to clipboard"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
-            >
-              {copied ? (
-                <Check className="h-3.5 w-3.5 text-emerald-600" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
-              {copied ? "Copied" : "Copy"}
-            </button>
           </div>
+        </div>
+
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => handleSearchChange(event.target.value)}
+            placeholder="Search tags, attributes, and values…"
+            aria-label="Search raw XML"
+            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+          />
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-slate-500">
-            Loaded on demand. Decoded upload content (UTF-16 converted to UTF-8 when
-            needed, BOM stripped). Semantically the same as your file.
+            {hasSearch && viewMode === "tree"
+              ? "Tree view opens only matching tags and their parent paths."
+              : "Loaded on demand. Decoded upload content (UTF-16 converted to UTF-8 when needed, BOM stripped). Semantically the same as your file."}
           </p>
           <div
             className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5"
@@ -136,12 +153,17 @@ const RawXmlView = ({ xml, loading = false, error = null }: RawXmlViewProps) => 
       {viewMode === "tree" ? (
         <XmlTreeView
           xml={xml}
+          searchQuery={searchQuery}
           collapseToken={collapseToken}
           expandToken={expandToken}
         />
+      ) : hasSearch && filteredSource.length === 0 ? (
+        <p className="px-4 py-8 text-center text-xs text-slate-500">
+          No source lines match “{searchQuery.trim()}”.
+        </p>
       ) : (
         <pre className="max-h-[70vh] overflow-auto bg-slate-900 p-4 text-xs leading-relaxed text-slate-100">
-          <code>{xml}</code>
+          <code>{filteredSource}</code>
         </pre>
       )}
     </div>

@@ -9,11 +9,14 @@ import {
 import { ChevronDown, ChevronRight, Loader2 } from "lucide-react"
 import {
   LARGE_TREE_NODE_THRESHOLD,
+  buildXmlSearchTreeState,
   collectCollapsiblePaths,
   formatAttributePreview,
   getCollapsedBeyondDepth,
   getDefaultCollapsedPaths,
   hasElementChildren,
+  nodeMatchesXmlSearch,
+  normalizeXmlSearchQuery,
   parseXmlTree,
   type XmlTreeNode,
 } from "../lib/xmlTree"
@@ -21,6 +24,7 @@ import { cx } from "../lib/ui"
 
 interface XmlTreeViewProps {
   xml: string
+  searchQuery: string
   collapseToken: number
   expandToken: number
 }
@@ -33,20 +37,36 @@ const countElementChildren = (node: XmlTreeNode): number =>
 const XmlElementNode = memo(({
   node,
   collapsedPaths,
+  relevantPaths,
+  searchQuery,
   onToggle,
 }: {
   node: Extract<XmlTreeNode, { type: "element" }>
   collapsedPaths: Set<string>
+  relevantPaths: Set<string> | null
+  searchQuery: string
   onToggle: (path: string) => void
 }) => {
+  if (relevantPaths && !relevantPaths.has(node.path)) return null
+
   const collapsible = hasElementChildren(node)
   const isCollapsed = collapsible && collapsedPaths.has(node.path)
   const childElements = countElementChildren(node)
   const attributePreview = formatAttributePreview(node.attributes)
+  const isMatch = nodeMatchesXmlSearch(node, searchQuery)
+
+  const visibleChildren = relevantPaths
+    ? node.children.filter((child) => relevantPaths.has(child.path))
+    : node.children
 
   return (
     <div className="font-mono text-[11px] leading-5">
-      <div className="group flex items-start gap-1 rounded px-1 hover:bg-slate-800/60">
+      <div
+        className={cx(
+          "group flex items-start gap-1 rounded px-1 hover:bg-slate-800/60",
+          isMatch && "bg-amber-500/15 ring-1 ring-inset ring-amber-400/30"
+        )}
+      >
         {collapsible ? (
           <button
             type="button"
@@ -88,11 +108,13 @@ const XmlElementNode = memo(({
 
       {!isCollapsed ? (
         <div className="ml-5 border-l border-slate-700/80 pl-2">
-          {node.children.map((child) => (
+          {visibleChildren.map((child) => (
             <XmlTreeNodeRow
               key={child.path}
               node={child}
               collapsedPaths={collapsedPaths}
+              relevantPaths={relevantPaths}
+              searchQuery={searchQuery}
               onToggle={onToggle}
             />
           ))}
@@ -110,32 +132,52 @@ XmlElementNode.displayName = "XmlElementNode"
 const XmlTreeNodeRow = memo(({
   node,
   collapsedPaths,
+  relevantPaths,
+  searchQuery,
   onToggle,
 }: {
   node: XmlTreeNode
   collapsedPaths: Set<string>
+  relevantPaths: Set<string> | null
+  searchQuery: string
   onToggle: (path: string) => void
 }) => {
+  if (relevantPaths && !relevantPaths.has(node.path)) return null
+
   if (node.type === "element") {
     return (
       <XmlElementNode
         node={node}
         collapsedPaths={collapsedPaths}
+        relevantPaths={relevantPaths}
+        searchQuery={searchQuery}
         onToggle={onToggle}
       />
     )
   }
 
+  const isMatch = nodeMatchesXmlSearch(node, searchQuery)
+
   if (node.type === "comment") {
     return (
-      <div className="px-1 text-slate-500">
+      <div
+        className={cx(
+          "rounded px-1 text-slate-500",
+          isMatch && "bg-amber-500/15 ring-1 ring-inset ring-amber-400/30"
+        )}
+      >
         {`<!-- ${node.value} -->`}
       </div>
     )
   }
 
   return (
-    <div className="px-1 text-emerald-200/90">
+    <div
+      className={cx(
+        "rounded px-1 text-emerald-200/90",
+        isMatch && "bg-amber-500/15 ring-1 ring-inset ring-amber-400/30"
+      )}
+    >
       {node.value}
     </div>
   )
@@ -143,7 +185,12 @@ const XmlTreeNodeRow = memo(({
 
 XmlTreeNodeRow.displayName = "XmlTreeNodeRow"
 
-const XmlTreeView = ({ xml, collapseToken, expandToken }: XmlTreeViewProps) => {
+const XmlTreeView = ({
+  xml,
+  searchQuery,
+  collapseToken,
+  expandToken,
+}: XmlTreeViewProps) => {
   const [parsed, setParsed] = useState<ReturnType<typeof parseXmlTree> | null>(
     null
   )
@@ -165,6 +212,12 @@ const XmlTreeView = ({ xml, collapseToken, expandToken }: XmlTreeViewProps) => {
 
   const root = parsed?.root ?? null
   const error = parsed?.error ?? null
+  const hasSearch = normalizeXmlSearchQuery(searchQuery).length > 0
+
+  const searchState = useMemo(
+    () => (root ? buildXmlSearchTreeState(root, searchQuery) : null),
+    [root, searchQuery]
+  )
 
   const collapsibleCount = useMemo(
     () => (root ? collectCollapsiblePaths(root, true).length : 0),
@@ -177,18 +230,25 @@ const XmlTreeView = ({ xml, collapseToken, expandToken }: XmlTreeViewProps) => {
       setExpandNotice(null)
       return
     }
+
+    if (hasSearch && searchState) {
+      setCollapsedPaths(searchState.collapsedPaths)
+      setExpandNotice(null)
+      return
+    }
+
     setCollapsedPaths(getDefaultCollapsedPaths(root))
     setExpandNotice(null)
-  }, [root, xml])
+  }, [hasSearch, root, searchQuery, searchState, xml])
 
   useEffect(() => {
-    if (!root || collapseToken === 0) return
+    if (!root || collapseToken === 0 || hasSearch) return
     setCollapsedPaths(new Set(collectCollapsiblePaths(root, true)))
     setExpandNotice(null)
-  }, [collapseToken, root])
+  }, [collapseToken, hasSearch, root])
 
   useEffect(() => {
-    if (!root || expandToken === 0) return
+    if (!root || expandToken === 0 || hasSearch) return
     if (collapsibleCount > LARGE_TREE_NODE_THRESHOLD) {
       setCollapsedPaths(getCollapsedBeyondDepth(root, 2))
       setExpandNotice(
@@ -198,7 +258,7 @@ const XmlTreeView = ({ xml, collapseToken, expandToken }: XmlTreeViewProps) => {
     }
     setCollapsedPaths(new Set())
     setExpandNotice(null)
-  }, [collapsibleCount, expandToken, root])
+  }, [collapsibleCount, expandToken, hasSearch, root])
 
   const handleToggle = useCallback((path: string) => {
     setCollapsedPaths((current) => {
@@ -232,11 +292,26 @@ const XmlTreeView = ({ xml, collapseToken, expandToken }: XmlTreeViewProps) => {
     )
   }
 
+  if (hasSearch && searchState && searchState.matchCount === 0) {
+    return (
+      <p className="px-4 py-8 text-center text-xs text-slate-500">
+        No XML tags match “{searchQuery.trim()}”.
+      </p>
+    )
+  }
+
   return (
     <div className="space-y-2">
       {expandNotice ? (
         <p className="border-b border-slate-200 px-4 py-2 text-xs text-amber-700">
           {expandNotice}
+        </p>
+      ) : null}
+      {hasSearch && searchState ? (
+        <p className="border-b border-slate-200 px-4 py-2 text-xs text-slate-500">
+          {searchState.matchCount.toLocaleString()}{" "}
+          {searchState.matchCount === 1 ? "match" : "matches"} · showing matching
+          branches only
         </p>
       ) : null}
       <div
@@ -248,6 +323,8 @@ const XmlTreeView = ({ xml, collapseToken, expandToken }: XmlTreeViewProps) => {
         <XmlTreeNodeRow
           node={root}
           collapsedPaths={collapsedPaths}
+          relevantPaths={searchState?.relevantPaths ?? null}
+          searchQuery={searchQuery}
           onToggle={handleToggle}
         />
       </div>
