@@ -215,8 +215,8 @@ const XmlTreeView = ({
   const hasSearch = normalizeXmlSearchQuery(searchQuery).length > 0
 
   const searchState = useMemo(
-    () => (root ? buildXmlSearchTreeState(root, searchQuery) : null),
-    [root, searchQuery]
+    () => (root ? buildXmlSearchTreeState(root, searchQuery, xml) : null),
+    [root, searchQuery, xml]
   )
 
   const collapsibleCount = useMemo(
@@ -293,9 +293,18 @@ const XmlTreeView = ({
   }
 
   if (hasSearch && searchState && searchState.matchCount === 0) {
+    if (searchState.rawXmlMatchOutsideTree) {
+      return (
+        <p className="px-4 py-8 text-center text-xs text-slate-500">
+          “{searchQuery.trim()}” appears in the XML file but outside the document
+          tree (for example the XML declaration). Switch to Source view to see it.
+        </p>
+      )
+    }
+
     return (
       <p className="px-4 py-8 text-center text-xs text-slate-500">
-        No XML tags match “{searchQuery.trim()}”.
+        No XML content matches “{searchQuery.trim()}”.
       </p>
     )
   }
@@ -310,8 +319,8 @@ const XmlTreeView = ({
       {hasSearch && searchState ? (
         <p className="border-b border-slate-200 px-4 py-2 text-xs text-slate-500">
           {searchState.matchCount.toLocaleString()}{" "}
-          {searchState.matchCount === 1 ? "match" : "matches"} · showing matching
-          branches only
+          {searchState.matchCount === 1 ? "match" : "matches"} · showing branches
+          with matching text or attributes
         </p>
       ) : null}
       <div

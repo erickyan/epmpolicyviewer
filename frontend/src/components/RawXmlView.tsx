@@ -2,7 +2,7 @@ import { useMemo, useState } from "react"
 import { ChevronsDownUp, ChevronsUpDown, Loader2, Search } from "lucide-react"
 import XmlTreeView from "./XmlTreeView"
 import { cx } from "../lib/ui"
-import { normalizeXmlSearchQuery } from "../lib/xmlTree"
+import { filterRawXmlLines, countRawXmlLineMatches } from "../lib/xmlTree"
 
 interface RawXmlViewProps {
   xml: string | null
@@ -28,18 +28,12 @@ const RawXmlView = ({ xml, loading = false, error = null }: RawXmlViewProps) => 
 
   const filteredSource = useMemo(() => {
     if (!xml) return ""
-    const normalized = normalizeXmlSearchQuery(searchQuery)
-    if (!normalized) return xml
-    return xml
-      .split("\n")
-      .filter((line) => line.toLowerCase().includes(normalized))
-      .join("\n")
+    return filterRawXmlLines(xml, searchQuery)
   }, [xml, searchQuery])
 
   const sourceMatchCount = useMemo(() => {
-    if (!searchQuery.trim() || !xml) return 0
-    const normalized = normalizeXmlSearchQuery(searchQuery)
-    return xml.split("\n").filter((line) => line.toLowerCase().includes(normalized)).length
+    if (!xml) return 0
+    return countRawXmlLineMatches(xml, searchQuery)
   }, [xml, searchQuery])
 
   if (loading) {
@@ -112,7 +106,7 @@ const RawXmlView = ({ xml, loading = false, error = null }: RawXmlViewProps) => 
             type="search"
             value={searchQuery}
             onChange={(event) => handleSearchChange(event.target.value)}
-            placeholder="Search tags, attributes, and values…"
+            placeholder="Search all XML text, tags, and attributes…"
             aria-label="Search raw XML"
             className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
           />
@@ -121,7 +115,7 @@ const RawXmlView = ({ xml, loading = false, error = null }: RawXmlViewProps) => 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-slate-500">
             {hasSearch && viewMode === "tree"
-              ? "Tree view opens only matching tags and their parent paths."
+              ? "Tree view opens branches that contain matching text, attributes, or tag names."
               : "Loaded on demand. Decoded upload content (UTF-16 converted to UTF-8 when needed, BOM stripped). Semantically the same as your file."}
           </p>
           <div

@@ -5,6 +5,10 @@ export type XmlTreeNode =
       name: string
       attributes: Record<string, string>
       children: XmlTreeNode[]
+      // All descendant text from the DOM (includes CDATA and nested text nodes).
+      textContent?: string
+      // Serialized element subtree for full-string search fallback.
+      serialized?: string
     }
   | {
       type: "text"
@@ -61,6 +65,9 @@ export const getCollapsedBeyondDepth = (
     )
   )
 
+const xmlSerializer =
+  typeof XMLSerializer !== "undefined" ? new XMLSerializer() : null
+
 const walkDom = (node: Node, path: string, nextIndex: () => number): XmlTreeNode | null => {
   if (node.nodeType === Node.ELEMENT_NODE) {
     const element = node as Element
@@ -76,18 +83,26 @@ const walkDom = (node: Node, path: string, nextIndex: () => number): XmlTreeNode
       if (walked) children.push(walked)
     }
 
+    const textContent = element.textContent ?? undefined
+    const serialized = xmlSerializer?.serializeToString(element)
+
     return {
       type: "element",
       path,
       name: element.tagName,
       attributes,
       children,
+      textContent: textContent || undefined,
+      serialized,
     }
   }
 
-  if (node.nodeType === Node.TEXT_NODE) {
-    const value = node.textContent?.replace(/\s+/g, " ").trim() ?? ""
-    if (!value) return null
+  if (
+    node.nodeType === Node.TEXT_NODE ||
+    node.nodeType === Node.CDATA_SECTION_NODE
+  ) {
+    const value = node.textContent ?? ""
+    if (!value.trim()) return null
     return { type: "text", path, value }
   }
 
@@ -147,34 +162,50 @@ export const formatAttributePreview = (
 export const normalizeXmlSearchQuery = (query: string): string =>
   query.trim().toLowerCase()
 
+export const normalizeForXmlSearch = (value: string): string =>
+  value.toLowerCase().replace(/\s+/g, " ").trim()
+
+export const matchesXmlSearchQuery = (haystack: string, query: string): boolean => {
+  const normalizedQuery = normalizeForXmlSearch(query)
+  if (!normalizedQuery) return false
+  return normalizeForXmlSearch(haystack).includes(normalizedQuery)
+}
+
+const elementTagOrAttributeMatches = (
+  node: Extract<XmlTreeNode, { type: "element" }>,
+  query: string
+): boolean => {
+  if (matchesXmlSearchQuery(node.name, query)) return true
+  return Object.entries(node.attributes).some(
+    ([name, value]) =>
+      matchesXmlSearchQuery(name, query) || matchesXmlSearchQuery(value, query)
+  )
+}
+
 export const nodeMatchesXmlSearch = (
   node: XmlTreeNode,
   query: string
 ): boolean => {
-  const normalized = normalizeXmlSearchQuery(query)
-  if (!normalized) return false
+  if (!normalizeXmlSearchQuery(query)) return false
 
-  if (node.type === "element") {
-    if (node.name.toLowerCase().includes(normalized)) return true
-    return Object.entries(node.attributes).some(
-      ([name, value]) =>
-        name.toLowerCase().includes(normalized) ||
-        value.toLowerCase().includes(normalized)
-    )
+  if (node.type === "text" || node.type === "comment") {
+    return matchesXmlSearchQuery(node.value, query)
   }
 
-  return node.value.toLowerCase().includes(normalized)
+  return elementTagOrAttributeMatches(node, query)
 }
 
 export interface XmlSearchTreeState {
   relevantPaths: Set<string> | null
   collapsedPaths: Set<string>
   matchCount: number
+  rawXmlMatchOutsideTree: boolean
 }
 
 export const buildXmlSearchTreeState = (
   root: XmlTreeNode,
-  query: string
+  query: string,
+  rawXml?: string
 ): XmlSearchTreeState => {
   const normalized = normalizeXmlSearchQuery(query)
   if (!normalized) {
@@ -182,6 +213,7 @@ export const buildXmlSearchTreeState = (
       relevantPaths: null,
       collapsedPaths: getDefaultCollapsedPaths(root),
       matchCount: 0,
+      rawXmlMatchOutsideTree: false,
     }
   }
 
@@ -189,19 +221,46 @@ export const buildXmlSearchTreeState = (
   let matchCount = 0
 
   const walk = (node: XmlTreeNode): boolean => {
-    const selfMatch = nodeMatchesXmlSearch(node, query)
-    if (selfMatch) matchCount += 1
-
-    let childRelevant = false
-    if (node.type === "element") {
-      for (const child of node.children) {
-        if (walk(child)) childRelevant = true
-      }
+    if (node.type === "text" || node.type === "comment") {
+      if (!matchesXmlSearchQuery(node.value, query)) return false
+      matchCount += 1
+      relevantPaths.add(node.path)
+      return true
     }
 
-    const keep = selfMatch || childRelevant
-    if (keep) relevantPaths.add(node.path)
-    return keep
+    const tagOrAttrMatch = elementTagOrAttributeMatches(node, query)
+    let childRelevant = false
+    for (const child of node.children) {
+      if (walk(child)) childRelevant = true
+    }
+
+    const textContentMatch =
+      !childRelevant &&
+      !!node.textContent &&
+      matchesXmlSearchQuery(node.textContent, query)
+
+    const serializedMatch =
+      !childRelevant &&
+      !textContentMatch &&
+      !!node.serialized &&
+      matchesXmlSearchQuery(node.serialized, query)
+
+    if (serializedMatch) {
+      for (const child of node.children) {
+        walk(child)
+      }
+      childRelevant = node.children.some((child) => relevantPaths.has(child.path))
+    }
+
+    const keep = tagOrAttrMatch || childRelevant || textContentMatch || serializedMatch
+    if (!keep) return false
+
+    if (tagOrAttrMatch || textContentMatch || (serializedMatch && !childRelevant)) {
+      matchCount += 1
+    }
+
+    relevantPaths.add(node.path)
+    return true
   }
 
   walk(root)
@@ -211,5 +270,27 @@ export const buildXmlSearchTreeState = (
     allCollapsible.filter((path) => !relevantPaths.has(path))
   )
 
-  return { relevantPaths, collapsedPaths, matchCount }
+  return {
+    relevantPaths,
+    collapsedPaths,
+    matchCount,
+    rawXmlMatchOutsideTree:
+      matchCount === 0 && !!rawXml && matchesXmlSearchQuery(rawXml, query),
+  }
 }
+
+export const filterRawXmlLines = (xml: string, query: string): string => {
+  if (!normalizeXmlSearchQuery(query)) return xml
+  return xml
+    .split("\n")
+    .filter((line) => matchesXmlSearchQuery(line, query))
+    .join("\n")
+}
+
+export const countRawXmlLineMatches = (xml: string, query: string): number => {
+  if (!normalizeXmlSearchQuery(query)) return 0
+  return xml.split("\n").filter((line) => matchesXmlSearchQuery(line, query)).length
+}
+
+export const rawXmlContainsSearchQuery = (xml: string, query: string): boolean =>
+  matchesXmlSearchQuery(xml, query)
