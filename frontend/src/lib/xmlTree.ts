@@ -200,6 +200,16 @@ export interface XmlSearchTreeState {
   collapsedPaths: Set<string>
   matchCount: number
   rawXmlMatchOutsideTree: boolean
+  // Elements that matched on tag name or attributes — show their full subtree.
+  directMatchPaths: Set<string>
+}
+
+const addDescendantPaths = (node: XmlTreeNode, paths: Set<string>) => {
+  if (node.type !== "element") return
+  for (const child of node.children) {
+    paths.add(child.path)
+    addDescendantPaths(child, paths)
+  }
 }
 
 export const buildXmlSearchTreeState = (
@@ -214,10 +224,12 @@ export const buildXmlSearchTreeState = (
       collapsedPaths: getDefaultCollapsedPaths(root),
       matchCount: 0,
       rawXmlMatchOutsideTree: false,
+      directMatchPaths: new Set(),
     }
   }
 
   const relevantPaths = new Set<string>()
+  const directMatchPaths = new Set<string>()
   let matchCount = 0
 
   const walk = (node: XmlTreeNode): boolean => {
@@ -260,6 +272,12 @@ export const buildXmlSearchTreeState = (
     }
 
     relevantPaths.add(node.path)
+
+    if (tagOrAttrMatch) {
+      directMatchPaths.add(node.path)
+      addDescendantPaths(node, relevantPaths)
+    }
+
     return true
   }
 
@@ -267,13 +285,24 @@ export const buildXmlSearchTreeState = (
 
   const allCollapsible = collectCollapsiblePaths(root, true)
   const collapsedPaths = new Set(
-    allCollapsible.filter((path) => !relevantPaths.has(path))
+    allCollapsible.filter((path) => {
+      if (!relevantPaths.has(path)) return true
+      // Keep direct-match subtrees expanded at first level; collapse deeper by default.
+      for (const directPath of directMatchPaths) {
+        if (path.startsWith(`${directPath}/`)) {
+          const depth = path.split("/").length - directPath.split("/").length
+          return depth > 1
+        }
+      }
+      return false
+    })
   )
 
   return {
     relevantPaths,
     collapsedPaths,
     matchCount,
+    directMatchPaths,
     rawXmlMatchOutsideTree:
       matchCount === 0 && !!rawXml && matchesXmlSearchQuery(rawXml, query),
   }

@@ -38,12 +38,14 @@ const XmlElementNode = memo(({
   node,
   collapsedPaths,
   relevantPaths,
+  directMatchPaths,
   searchQuery,
   onToggle,
 }: {
   node: Extract<XmlTreeNode, { type: "element" }>
   collapsedPaths: Set<string>
   relevantPaths: Set<string> | null
+  directMatchPaths: Set<string> | null
   searchQuery: string
   onToggle: (path: string) => void
 }) => {
@@ -54,10 +56,14 @@ const XmlElementNode = memo(({
   const childElements = countElementChildren(node)
   const attributePreview = formatAttributePreview(node.attributes)
   const isMatch = nodeMatchesXmlSearch(node, searchQuery)
+  const showFullSubtree =
+    !relevantPaths || (directMatchPaths?.has(node.path) ?? false)
 
-  const visibleChildren = relevantPaths
-    ? node.children.filter((child) => relevantPaths.has(child.path))
-    : node.children
+  const visibleChildren = showFullSubtree
+    ? node.children
+    : relevantPaths
+      ? node.children.filter((child) => relevantPaths.has(child.path))
+      : node.children
 
   return (
     <div className="font-mono text-[11px] leading-5">
@@ -114,6 +120,7 @@ const XmlElementNode = memo(({
               node={child}
               collapsedPaths={collapsedPaths}
               relevantPaths={relevantPaths}
+              directMatchPaths={directMatchPaths}
               searchQuery={searchQuery}
               onToggle={onToggle}
             />
@@ -133,12 +140,14 @@ const XmlTreeNodeRow = memo(({
   node,
   collapsedPaths,
   relevantPaths,
+  directMatchPaths,
   searchQuery,
   onToggle,
 }: {
   node: XmlTreeNode
   collapsedPaths: Set<string>
   relevantPaths: Set<string> | null
+  directMatchPaths: Set<string> | null
   searchQuery: string
   onToggle: (path: string) => void
 }) => {
@@ -150,6 +159,7 @@ const XmlTreeNodeRow = memo(({
         node={node}
         collapsedPaths={collapsedPaths}
         relevantPaths={relevantPaths}
+        directMatchPaths={directMatchPaths}
         searchQuery={searchQuery}
         onToggle={onToggle}
       />
@@ -333,6 +343,7 @@ const XmlTreeView = ({
           node={root}
           collapsedPaths={collapsedPaths}
           relevantPaths={searchState?.relevantPaths ?? null}
+          directMatchPaths={searchState?.directMatchPaths ?? null}
           searchQuery={searchQuery}
           onToggle={handleToggle}
         />
