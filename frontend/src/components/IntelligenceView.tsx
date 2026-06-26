@@ -44,6 +44,12 @@ interface DuplicateGroup {
 const DUPLICATE_RULE_ID = "duplicate-policies"
 const DEFINITION_LIMIT_RULE_ID = "definition-limit"
 
+const SUGGESTION_ONLY_RULE_IDS = new Set([
+  "missing-policy-description",
+  "missing-target-description",
+  "non-standard-policy-naming",
+])
+
 const readDefinitionLimitEvidence = (finding: PolicyFinding) => {
   const definitionCount = Number(finding.evidence?.definitionCount ?? 0)
   const limit = Number(finding.evidence?.limit ?? 1000)
@@ -171,34 +177,6 @@ const DefinitionLimitRow = ({
   )
 }
 
-const FindingRow = ({
-  finding,
-  onSelect,
-}: {
-  finding: PolicyFinding
-  onSelect: (finding: PolicyFinding) => void
-}) => (
-  <li>
-    <button
-      type="button"
-      onClick={() => onSelect(finding)}
-      className="group flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400"
-    >
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="truncate text-sm font-medium text-slate-900">{finding.policyName}</span>
-          <Badge tone={categoryTone(finding.policyCategory)}>{finding.categoryLabel}</Badge>
-          <span className="font-mono text-[11px] text-slate-400">#{finding.policyId}</span>
-        </div>
-        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600">{finding.message}</p>
-      </div>
-      <span className="shrink-0 text-xs font-medium text-blue-600 group-hover:text-blue-800">
-        View details
-      </span>
-    </button>
-  </li>
-)
-
 const DuplicateGroupCard = ({
   group,
   policiesById,
@@ -271,6 +249,175 @@ const DuplicateGroupCard = ({
         </div>
       </button>
     </li>
+  )
+}
+
+const FindingRow = ({
+  finding,
+  onSelect,
+}: {
+  finding: PolicyFinding
+  onSelect: (finding: PolicyFinding) => void
+}) => (
+  <li>
+    <button
+      type="button"
+      onClick={() => onSelect(finding)}
+      className="group flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400"
+    >
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="truncate text-sm font-medium text-slate-900">{finding.policyName}</span>
+          <Badge tone={categoryTone(finding.policyCategory)}>{finding.categoryLabel}</Badge>
+          <span className="font-mono text-[11px] text-slate-400">#{finding.policyId}</span>
+        </div>
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600">{finding.message}</p>
+      </div>
+      <span className="shrink-0 text-xs font-medium text-blue-600 group-hover:text-blue-800">
+        View details
+      </span>
+    </button>
+  </li>
+)
+
+const SuggestionGroupCard = ({
+  group,
+  ruleInfo,
+}: {
+  group: {
+    ruleId: string
+    title: string
+    docUrl?: string
+    findings: PolicyFinding[]
+  }
+  ruleInfo?: IntelligenceRuleInfo
+}) => {
+  const count = group.findings.length
+  const remediation = group.findings[0]?.remediation
+
+  return (
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50/60 shadow-sm">
+      <div className="px-4 py-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="slate">Suggestion</Badge>
+              <h3 className="text-sm font-semibold text-slate-900">{group.title}</h3>
+            </div>
+            <p className="mt-1 text-xs text-slate-500">
+              Applies to {count.toLocaleString()} {count === 1 ? "policy" : "policies"}
+            </p>
+            {ruleInfo?.description ? (
+              <p className="mt-2 text-xs leading-relaxed text-slate-600">{ruleInfo.description}</p>
+            ) : null}
+            {remediation ? (
+              <p className="mt-2 text-xs leading-relaxed text-slate-700">
+                <span className="font-medium">Tip:</span> {remediation}
+              </p>
+            ) : null}
+          </div>
+          {group.docUrl ? (
+            <a
+              href={group.docUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800"
+            >
+              CyberArk docs
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const renderFindingGroup = (
+  group: {
+    ruleId: string
+    title: string
+    docUrl?: string
+    severity: PolicyFinding["severity"]
+    findings: PolicyFinding[]
+    duplicateGroups?: DuplicateGroup[]
+  },
+  normalizedQuery: string,
+  policiesById: Map<string, PolicyEntry>,
+  onCompare: (group: DuplicateGroup) => void,
+  onSelectFinding: (finding: PolicyFinding) => void
+) => {
+  const duplicateGroups = group.duplicateGroups?.filter((item) =>
+    duplicateGroupMatchesQuery(item, normalizedQuery)
+  )
+  const duplicatePolicyCount = duplicateGroups?.reduce(
+    (total, item) => total + item.policyIds.length,
+    0
+  )
+
+  return (
+    <section
+      key={group.ruleId}
+      className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-4 py-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge tone={severityTone(group.severity)}>{group.severity}</Badge>
+            <h3 className="text-sm font-semibold text-slate-900">{group.title}</h3>
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            {group.ruleId === DUPLICATE_RULE_ID && duplicateGroups
+              ? `${duplicateGroups.length} duplicate group${duplicateGroups.length === 1 ? "" : "s"} · ${duplicatePolicyCount} policies`
+              : `${group.findings.length} ${group.findings.length === 1 ? "policy" : "policies"} affected`}
+          </p>
+        </div>
+        {group.docUrl ? (
+          <a
+            href={group.docUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800"
+          >
+            CyberArk docs
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        ) : null}
+      </div>
+
+      {group.ruleId === DUPLICATE_RULE_ID && duplicateGroups ? (
+        <ul className="divide-y divide-slate-50">
+          {duplicateGroups.map((duplicateGroup) => (
+            <DuplicateGroupCard
+              key={duplicateGroup.groupKey}
+              group={duplicateGroup}
+              policiesById={policiesById}
+              onCompare={onCompare}
+            />
+          ))}
+        </ul>
+      ) : group.ruleId === DEFINITION_LIMIT_RULE_ID ? (
+        <ul className="divide-y divide-slate-50">
+          {group.findings.map((finding) => (
+            <DefinitionLimitRow
+              key={`${finding.ruleId}-${finding.policyId}`}
+              finding={finding}
+              onSelect={onSelectFinding}
+            />
+          ))}
+        </ul>
+      ) : (
+        <ul className="divide-y divide-slate-50">
+          {group.findings.map((finding) => (
+            <FindingRow
+              key={`${finding.ruleId}-${finding.policyId}-${finding.title}`}
+              finding={finding}
+              onSelect={onSelectFinding}
+            />
+          ))}
+        </ul>
+      )}
+    </section>
   )
 }
 
@@ -351,6 +498,18 @@ const IntelligenceView = ({
         ruleId === DUPLICATE_RULE_ID ? buildDuplicateGroups(findings) : undefined,
     }))
   }, [filtered])
+
+  const rulesById = useMemo(() => new Map(rules.map((rule) => [rule.id, rule])), [rules])
+
+  const { actionableGroups, suggestionGroups } = useMemo(() => {
+    const actionable: typeof grouped = []
+    const suggestions: typeof grouped = []
+    for (const group of grouped) {
+      if (SUGGESTION_ONLY_RULE_IDS.has(group.ruleId)) suggestions.push(group)
+      else actionable.push(group)
+    }
+    return { actionableGroups: actionable, suggestionGroups: suggestions }
+  }, [grouped])
 
   const scopedActionable = useMemo(() => {
     let critical = 0
@@ -435,85 +594,48 @@ const IntelligenceView = ({
           No findings match this filter.
         </p>
       ) : (
-        <div className="space-y-4">
-          {grouped.map((group) => {
-            const duplicateGroups = group.duplicateGroups?.filter((item) =>
-              duplicateGroupMatchesQuery(item, normalizedQuery)
-            )
-            const duplicatePolicyCount = duplicateGroups?.reduce(
-              (total, item) => total + item.policyIds.length,
-              0
-            )
+        <div className="space-y-6">
+          {actionableGroups.length > 0 ? (
+            <div className="space-y-4">
+              {actionableGroups.map((group) =>
+                renderFindingGroup(
+                  group,
+                  normalizedQuery,
+                  policiesById,
+                  setActiveDuplicateGroup,
+                  setActiveFinding
+                )
+              )}
+            </div>
+          ) : null}
 
-            return (
-              <section
-                key={group.ruleId}
-                className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-4 py-3">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge tone={severityTone(group.severity)}>{group.severity}</Badge>
-                      <h3 className="text-sm font-semibold text-slate-900">{group.title}</h3>
-                    </div>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {group.ruleId === DUPLICATE_RULE_ID && duplicateGroups
-                        ? `${duplicateGroups.length} duplicate group${duplicateGroups.length === 1 ? "" : "s"} · ${duplicatePolicyCount} policies`
-                        : `${group.findings.length} ${group.findings.length === 1 ? "policy" : "policies"} affected`}
-                    </p>
-                  </div>
-                  {group.docUrl ? (
-                    <a
-                      href={group.docUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800"
-                    >
-                      CyberArk docs
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  ) : null}
-                </div>
-
-                {group.ruleId === DUPLICATE_RULE_ID && duplicateGroups ? (
-                  <ul className="divide-y divide-slate-50">
-                    {duplicateGroups.map((duplicateGroup) => (
-                      <DuplicateGroupCard
-                        key={duplicateGroup.groupKey}
-                        group={duplicateGroup}
-                        policiesById={policiesById}
-                        onCompare={setActiveDuplicateGroup}
-                      />
-                    ))}
-                  </ul>
-                ) : group.ruleId === DEFINITION_LIMIT_RULE_ID ? (
-                  <ul className="divide-y divide-slate-50">
-                    {group.findings.map((finding) => (
-                      <DefinitionLimitRow
-                        key={`${finding.ruleId}-${finding.policyId}`}
-                        finding={finding}
-                        onSelect={setActiveFinding}
-                      />
-                    ))}
-                  </ul>
-                ) : (
-                  <ul className="divide-y divide-slate-50">
-                    {group.findings.map((finding) => (
-                      <FindingRow
-                        key={`${finding.ruleId}-${finding.policyId}-${finding.title}`}
-                        finding={finding}
-                        onSelect={setActiveFinding}
-                      />
-                    ))}
-                  </ul>
-                )}
-              </section>
-            )
-          })}
+          {suggestionGroups.length > 0 ? (
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">Suggestions</h3>
+                <p className="mt-0.5 text-xs text-slate-500">
+                  Cosmetic improvements — counts only, individual policies are not listed.
+                </p>
+              </div>
+              <div className="space-y-3">
+                {suggestionGroups.map((group) => (
+                  <SuggestionGroupCard
+                    key={group.ruleId}
+                    group={group}
+                    ruleInfo={rulesById.get(group.ruleId)}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
 
-      {scopedActionable === 0 ? (
+      {scopedActionable === 0 && actionableGroups.length === 0 && suggestionGroups.length > 0 ? (
+        <p className="text-xs text-slate-500">
+          No critical or warning findings. Review suggestions above for optional housekeeping.
+        </p>
+      ) : scopedActionable === 0 && actionableGroups.length > 0 ? (
         <p className="text-xs text-slate-500">
           Only informational findings remain. Review duplicates and other notes above.
         </p>
@@ -591,13 +713,16 @@ const IntelligenceRulesGuide = ({
         <ul className="divide-y divide-slate-100 border-t border-slate-100">
           {rules.map((rule) => {
             const isSelected = selectedRuleId === rule.id
+            const isSuggestion = SUGGESTION_ONLY_RULE_IDS.has(rule.id)
 
             return (
               <li key={rule.id} className="px-4 py-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <Badge tone={severityTone(rule.severity)}>{rule.severity}</Badge>
+                      <Badge tone={isSuggestion ? "slate" : severityTone(rule.severity)}>
+                        {isSuggestion ? "Suggestion" : rule.severity}
+                      </Badge>
                       <h4 className="text-sm font-medium text-slate-900">{rule.title}</h4>
                     </div>
                     <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
