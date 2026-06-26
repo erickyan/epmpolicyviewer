@@ -66,6 +66,14 @@ const findingBadgeTone = (findings?: PolicyFinding[]) => {
 
 const FindingsPanel = ({ findings }: { findings: PolicyFinding[] }) => {
   if (findings.length === 0) return null
+
+  const sortedFindings = [...findings].sort((a, b) => {
+    const rank = { critical: 0, warning: 1, info: 2 } as const
+    const severityDiff = rank[a.severity] - rank[b.severity]
+    if (severityDiff !== 0) return severityDiff
+    return a.title.localeCompare(b.title)
+  })
+
   return (
     <div className="border-t border-amber-100 bg-amber-50/40 px-4 py-3">
       <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
@@ -73,7 +81,7 @@ const FindingsPanel = ({ findings }: { findings: PolicyFinding[] }) => {
         Policy intelligence ({findings.length})
       </p>
       <ul className="space-y-2">
-        {findings.map((finding) => (
+        {sortedFindings.map((finding) => (
           <li
             key={`${finding.ruleId}-${finding.title}`}
             className="rounded-lg border border-amber-200/80 bg-white px-3 py-2"

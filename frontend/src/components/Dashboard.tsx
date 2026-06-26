@@ -11,12 +11,12 @@ import {
   ShieldAlert,
   ShieldOff,
   Sparkles,
-  type LucideIcon,
 } from "lucide-react"
 import type { GuiDialog, PolicyDocumentResponse } from "../types"
 import { cx } from "../lib/ui"
 import { availableOsesFor, type OsFilterValue } from "../lib/os"
 import { tabCountsForDocument, overviewCountsForDocument } from "../lib/customizedCounts"
+import { buildIntelligenceDocumentKey } from "../lib/intelligenceAcknowledgements"
 import OsFilter from "./OsFilter"
 import SearchBar from "./SearchBar"
 import SummaryView, { type SummaryTarget } from "./SummaryView"
@@ -28,29 +28,16 @@ import ApplicationGroupsView from "./ApplicationGroupsView"
 import DialogModal from "./DialogModal"
 import RawXmlView from "./RawXmlView"
 import IntelligenceView from "./IntelligenceView"
+import DashboardNav, { type DashboardTab, type DashboardTabId } from "./DashboardNav"
 import { fetchRawXml } from "../api"
 
 interface DashboardProps {
   response: PolicyDocumentResponse
 }
 
-type TabId =
-  | "overview"
-  | "intelligence"
-  | "config"
-  | "normal"
-  | "excluded"
-  | "threat"
-  | "gui"
-  | "appgroups"
-  | "raw"
+type TabId = DashboardTabId
 
-interface TabDef {
-  id: TabId
-  label: string
-  icon: LucideIcon
-  count?: number
-}
+interface TabDef extends DashboardTab {}
 
 const Dashboard = ({ response }: DashboardProps) => {
   const { document: doc } = response
@@ -61,54 +48,90 @@ const Dashboard = ({ response }: DashboardProps) => {
     [doc, hideDefaults]
   )
 
+  const intelligenceDocumentKey = useMemo(
+    () => buildIntelligenceDocumentKey(doc.meta, response.source, response.fileName),
+    [doc.meta, response.fileName, response.source]
+  )
+
   const tabs = useMemo<TabDef[]>(() => {
     const counts = tabCountsForDocument(doc, hideDefaults)
     const list: TabDef[] = []
-    list.push({ id: "overview", label: "Overview", icon: LayoutDashboard })
+    list.push({
+      id: "overview",
+      label: "Overview",
+      shortLabel: "Overview",
+      icon: LayoutDashboard,
+      group: "explore",
+    })
     list.push({
       id: "intelligence",
       label: "Intelligence",
+      shortLabel: "Intelligence",
       icon: Sparkles,
       count: counts.intelligence,
+      group: "explore",
     })
     if (doc.generalConfiguration) {
       list.push({
         id: "config",
         label: "General Configuration",
+        shortLabel: "Configuration",
         icon: Settings2,
         count: counts.config,
+        group: "reference",
       })
     }
     list.push({
       id: "normal",
       label: "Normal Policies",
+      shortLabel: "Normal",
       icon: ShieldCheck,
       count: counts.normal,
+      group: "policies",
     })
     list.push({
       id: "excluded",
       label: "Excluded Policies",
+      shortLabel: "Excluded",
       icon: ShieldOff,
       count: counts.excluded,
+      group: "policies",
     })
     if (doc.threatProtectionPolicies.length > 0) {
       list.push({
         id: "threat",
         label: "Threat Protection",
+        shortLabel: "Threat",
         icon: ShieldAlert,
         count: counts.threat,
+        group: "policies",
       })
     }
-    list.push({ id: "gui", label: "GUI Dialogs", icon: MonitorPlay, count: counts.gui })
+    list.push({
+      id: "gui",
+      label: "GUI Dialogs",
+      shortLabel: "Dialogs",
+      icon: MonitorPlay,
+      count: counts.gui,
+      group: "reference",
+    })
     if (doc.applicationGroups.length > 0) {
       list.push({
         id: "appgroups",
         label: "Application Groups",
+        shortLabel: "App Groups",
         icon: Boxes,
         count: counts.appGroups,
+        group: "reference",
       })
     }
-    list.push({ id: "raw", label: "Raw XML", icon: FileCode2 })
+    list.push({
+      id: "raw",
+      label: "Raw XML",
+      shortLabel: "Raw XML",
+      icon: FileCode2,
+      group: "reference",
+    })
     return list
   }, [doc, hideDefaults])
 
@@ -228,45 +251,12 @@ const Dashboard = ({ response }: DashboardProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-slate-200">
-        <nav className="flex flex-wrap gap-1">
-          {tabs.map((tab) => {
-            const Icon = tab.icon
-            const isActive = tab.id === activeTab
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                aria-current={isActive ? "page" : undefined}
-                className={cx(
-                  "inline-flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-sm font-medium transition-colors",
-                  isActive
-                    ? "border-slate-900 text-slate-900"
-                    : "border-transparent text-slate-500 hover:text-slate-700"
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                {tab.label}
-                {tab.count !== undefined ? (
-                  <span
-                    className={cx(
-                      "rounded-full px-1.5 py-0.5 text-[11px] font-semibold",
-                      isActive
-                        ? "bg-slate-900 text-white"
-                        : hideDefaults
-                          ? "bg-amber-100 text-amber-800"
-                          : "bg-slate-100 text-slate-500"
-                    )}
-                  >
-                    {tab.count}
-                  </span>
-                ) : null}
-              </button>
-            )
-          })}
-        </nav>
-      </div>
+      <DashboardNav
+        tabs={tabs}
+        activeTab={activeTab}
+        hideDefaults={hideDefaults}
+        onSelectTab={setActiveTab}
+      />
 
       {activeTab !== "raw" && (
         <div className="flex flex-wrap items-center gap-3">
@@ -335,6 +325,7 @@ const Dashboard = ({ response }: DashboardProps) => {
             applicationGroups={doc.applicationGroups}
             hideDefaults={hideDefaults}
             query={deferredQuery}
+            documentKey={intelligenceDocumentKey}
             onOpenPolicy={openPolicyById}
           />
         )}

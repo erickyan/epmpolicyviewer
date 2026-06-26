@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react"
 import {
+  CheckCircle2,
   ChevronDown,
   ChevronRight,
   Copy,
   ExternalLink,
   GitCompare,
   Layers,
+  RotateCcw,
   Sparkles,
 } from "lucide-react"
 import type {
@@ -19,6 +21,7 @@ import Badge from "./Badge"
 import DuplicateComparisonModal from "./DuplicateComparisonModal"
 import FindingDetailModal from "./FindingDetailModal"
 import { policyHasCustomizedContent } from "../lib/appGroups"
+import { useIntelligenceAcknowledgements } from "../lib/intelligenceAcknowledgements"
 import { shouldShowActionBadge } from "../lib/policyLabels"
 import { categoryTone } from "../lib/ui"
 
@@ -28,10 +31,20 @@ interface IntelligenceViewProps {
   applicationGroups: ApplicationGroupEntry[]
   hideDefaults: boolean
   query: string
+  documentKey: string
   onOpenPolicy: (policyId: string) => void
 }
 
 type SeverityFilter = "all" | "critical" | "warning" | "info"
+
+interface FindingGroup {
+  ruleId: string
+  title: string
+  docUrl?: string
+  severity: PolicyFinding["severity"]
+  findings: PolicyFinding[]
+  duplicateGroups?: DuplicateGroup[]
+}
 
 interface DuplicateGroup {
   groupKey: string
@@ -49,6 +62,45 @@ const SUGGESTION_ONLY_RULE_IDS = new Set([
   "missing-target-description",
   "non-standard-policy-naming",
 ])
+
+const SEVERITY_RANK: Record<PolicyFinding["severity"], number> = {
+  critical: 0,
+  warning: 1,
+  info: 2,
+}
+
+interface SeveritySortable {
+  severity: PolicyFinding["severity"]
+  title?: string
+  findings?: PolicyFinding[]
+}
+
+const compareByCriticality = (a: SeveritySortable, b: SeveritySortable): number => {
+  const severityDiff = SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]
+  if (severityDiff !== 0) return severityDiff
+
+  const countDiff = (b.findings?.length ?? 0) - (a.findings?.length ?? 0)
+  if (countDiff !== 0) return countDiff
+
+  return (a.title ?? "").localeCompare(b.title ?? "")
+}
+
+const compareRulesByCriticality = (
+  a: IntelligenceRuleInfo,
+  b: IntelligenceRuleInfo
+): number => {
+  const aIsSuggestion = SUGGESTION_ONLY_RULE_IDS.has(a.id)
+  const bIsSuggestion = SUGGESTION_ONLY_RULE_IDS.has(b.id)
+  if (aIsSuggestion !== bIsSuggestion) return aIsSuggestion ? 1 : -1
+
+  const severityDiff = SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]
+  if (severityDiff !== 0) return severityDiff
+
+  const countDiff = b.findingCount - a.findingCount
+  if (countDiff !== 0) return countDiff
+
+  return a.title.localeCompare(b.title)
+}
 
 const readDefinitionLimitEvidence = (finding: PolicyFinding) => {
   const definitionCount = Number(finding.evidence?.definitionCount ?? 0)
@@ -105,6 +157,57 @@ const buildDuplicateGroups = (findings: PolicyFinding[]): DuplicateGroup[] => {
 const duplicateGroupMatchesQuery = (group: DuplicateGroup, query: string): boolean => {
   if (!query) return true
   return group.findings.some((finding) => matchesQuery(finding, query))
+}
+
+const AcknowledgeButton = ({
+  label,
+  onClick,
+}: {
+  label: string
+  onClick: () => void
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-label={`Acknowledge ${label}`}
+    className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+  >
+    <CheckCircle2 className="h-3.5 w-3.5" />
+    Acknowledge
+  </button>
+)
+
+const RestoreButton = ({
+  label,
+  onClick,
+}: {
+  label: string
+  onClick: () => void
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-label={`Restore ${label}`}
+    className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+  >
+    <RotateCcw className="h-3.5 w-3.5" />
+    Restore
+  </button>
+)
+
+const groupSummaryLine = (group: FindingGroup, normalizedQuery: string): string => {
+  if (group.ruleId === DUPLICATE_RULE_ID && group.duplicateGroups) {
+    const duplicateGroups = group.duplicateGroups.filter((item) =>
+      duplicateGroupMatchesQuery(item, normalizedQuery)
+    )
+    const duplicatePolicyCount = duplicateGroups.reduce(
+      (total, item) => total + item.policyIds.length,
+      0
+    )
+    return `${duplicateGroups.length} duplicate group${duplicateGroups.length === 1 ? "" : "s"} · ${duplicatePolicyCount} policies`
+  }
+
+  return `${group.findings.length} ${group.findings.length === 1 ? "policy" : "policies"} affected`
 }
 
 const DefinitionLimitRow = ({
@@ -283,14 +386,11 @@ const FindingRow = ({
 const SuggestionGroupCard = ({
   group,
   ruleInfo,
+  onAcknowledge,
 }: {
-  group: {
-    ruleId: string
-    title: string
-    docUrl?: string
-    findings: PolicyFinding[]
-  }
+  group: FindingGroup
   ruleInfo?: IntelligenceRuleInfo
+  onAcknowledge?: () => void
 }) => {
   const count = group.findings.length
   const remediation = group.findings[0]?.remediation
@@ -316,17 +416,60 @@ const SuggestionGroupCard = ({
               </p>
             ) : null}
           </div>
-          {group.docUrl ? (
-            <a
-              href={group.docUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800"
-            >
-              CyberArk docs
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-2">
+            {onAcknowledge ? (
+              <AcknowledgeButton label={group.title} onClick={onAcknowledge} />
+            ) : null}
+            {group.docUrl ? (
+              <a
+                href={group.docUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800"
+              >
+                CyberArk docs
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const AcknowledgedGroupCard = ({
+  group,
+  ruleInfo,
+  normalizedQuery,
+  onRestore,
+}: {
+  group: FindingGroup
+  ruleInfo?: IntelligenceRuleInfo
+  normalizedQuery: string
+  onRestore: () => void
+}) => {
+  const isSuggestion = SUGGESTION_ONLY_RULE_IDS.has(group.ruleId)
+
+  return (
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50/80 shadow-sm">
+      <div className="px-4 py-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="emerald">Acknowledged</Badge>
+              {isSuggestion ? <Badge tone="slate">Suggestion</Badge> : null}
+              {!isSuggestion ? (
+                <Badge tone={severityTone(group.severity)}>{group.severity}</Badge>
+              ) : null}
+              <h3 className="text-sm font-semibold text-slate-700">{group.title}</h3>
+            </div>
+            <p className="mt-1 text-xs text-slate-500">{groupSummaryLine(group, normalizedQuery)}</p>
+            {ruleInfo?.description ? (
+              <p className="mt-2 text-xs leading-relaxed text-slate-500">{ruleInfo.description}</p>
+            ) : null}
+          </div>
+          <RestoreButton label={group.title} onClick={onRestore} />
         </div>
       </div>
     </section>
@@ -334,25 +477,15 @@ const SuggestionGroupCard = ({
 }
 
 const renderFindingGroup = (
-  group: {
-    ruleId: string
-    title: string
-    docUrl?: string
-    severity: PolicyFinding["severity"]
-    findings: PolicyFinding[]
-    duplicateGroups?: DuplicateGroup[]
-  },
+  group: FindingGroup,
   normalizedQuery: string,
   policiesById: Map<string, PolicyEntry>,
   onCompare: (group: DuplicateGroup) => void,
-  onSelectFinding: (finding: PolicyFinding) => void
+  onSelectFinding: (finding: PolicyFinding) => void,
+  onAcknowledge?: () => void
 ) => {
   const duplicateGroups = group.duplicateGroups?.filter((item) =>
     duplicateGroupMatchesQuery(item, normalizedQuery)
-  )
-  const duplicatePolicyCount = duplicateGroups?.reduce(
-    (total, item) => total + item.policyIds.length,
-    0
   )
 
   return (
@@ -367,22 +500,25 @@ const renderFindingGroup = (
             <h3 className="text-sm font-semibold text-slate-900">{group.title}</h3>
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            {group.ruleId === DUPLICATE_RULE_ID && duplicateGroups
-              ? `${duplicateGroups.length} duplicate group${duplicateGroups.length === 1 ? "" : "s"} · ${duplicatePolicyCount} policies`
-              : `${group.findings.length} ${group.findings.length === 1 ? "policy" : "policies"} affected`}
+            {groupSummaryLine(group, normalizedQuery)}
           </p>
         </div>
-        {group.docUrl ? (
-          <a
-            href={group.docUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800"
-          >
-            CyberArk docs
-            <ExternalLink className="h-3 w-3" />
-          </a>
-        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {onAcknowledge ? (
+            <AcknowledgeButton label={group.title} onClick={onAcknowledge} />
+          ) : null}
+          {group.docUrl ? (
+            <a
+              href={group.docUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800"
+            >
+              CyberArk docs
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          ) : null}
+        </div>
       </div>
 
       {group.ruleId === DUPLICATE_RULE_ID && duplicateGroups ? (
@@ -427,12 +563,16 @@ const IntelligenceView = ({
   applicationGroups,
   hideDefaults,
   query,
+  documentKey,
   onOpenPolicy,
 }: IntelligenceViewProps) => {
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("all")
   const [ruleFilter, setRuleFilter] = useState("all")
+  const [acknowledgedExpanded, setAcknowledgedExpanded] = useState(true)
   const [activeDuplicateGroup, setActiveDuplicateGroup] = useState<DuplicateGroup | null>(null)
   const [activeFinding, setActiveFinding] = useState<PolicyFinding | null>(null)
+  const { acknowledgedRuleIds, acknowledge, unacknowledge } =
+    useIntelligenceAcknowledgements(documentKey)
 
   const normalizedQuery = query.trim().toLowerCase()
   const policiesById = useMemo(
@@ -451,18 +591,23 @@ const IntelligenceView = ({
 
   const rules = useMemo(() => {
     const base = intelligence.rules ?? []
-    if (!hideDefaults) return base
-    const findingCountByRule = new Map<string, number>()
-    for (const finding of scopedFindings) {
-      findingCountByRule.set(
-        finding.ruleId,
-        (findingCountByRule.get(finding.ruleId) ?? 0) + 1
-      )
-    }
-    return base.map((rule) => ({
-      ...rule,
-      findingCount: findingCountByRule.get(rule.id) ?? 0,
-    }))
+    const adjusted = !hideDefaults
+      ? base
+      : (() => {
+          const findingCountByRule = new Map<string, number>()
+          for (const finding of scopedFindings) {
+            findingCountByRule.set(
+              finding.ruleId,
+              (findingCountByRule.get(finding.ruleId) ?? 0) + 1
+            )
+          }
+          return base.map((rule) => ({
+            ...rule,
+            findingCount: findingCountByRule.get(rule.id) ?? 0,
+          }))
+        })()
+
+    return [...adjusted].sort(compareRulesByCriticality)
   }, [hideDefaults, intelligence.rules, scopedFindings])
 
   const ruleFilterOptions = useMemo(
@@ -488,38 +633,59 @@ const IntelligenceView = ({
       list.push(finding)
       map.set(finding.ruleId, list)
     }
-    return [...map.entries()].map(([ruleId, findings]) => ({
-      ruleId,
-      title: findings[0]?.title ?? ruleId,
-      docUrl: findings[0]?.docUrl,
-      severity: findings[0]?.severity ?? "info",
-      findings,
-      duplicateGroups:
-        ruleId === DUPLICATE_RULE_ID ? buildDuplicateGroups(findings) : undefined,
-    }))
+    return [...map.entries()]
+      .map(([ruleId, findings]) => ({
+        ruleId,
+        title: findings[0]?.title ?? ruleId,
+        docUrl: findings[0]?.docUrl,
+        severity: findings[0]?.severity ?? "info",
+        findings,
+        duplicateGroups:
+          ruleId === DUPLICATE_RULE_ID ? buildDuplicateGroups(findings) : undefined,
+      }))
+      .sort(compareByCriticality)
   }, [filtered])
 
   const rulesById = useMemo(() => new Map(rules.map((rule) => [rule.id, rule])), [rules])
 
-  const { actionableGroups, suggestionGroups } = useMemo(() => {
-    const actionable: typeof grouped = []
-    const suggestions: typeof grouped = []
+  const { actionableGroups, suggestionGroups, acknowledgedGroups } = useMemo(() => {
+    const actionable: FindingGroup[] = []
+    const suggestions: FindingGroup[] = []
+    const acknowledged: FindingGroup[] = []
+
     for (const group of grouped) {
+      if (acknowledgedRuleIds.has(group.ruleId)) {
+        acknowledged.push(group)
+        continue
+      }
+
       if (SUGGESTION_ONLY_RULE_IDS.has(group.ruleId)) suggestions.push(group)
       else actionable.push(group)
     }
-    return { actionableGroups: actionable, suggestionGroups: suggestions }
-  }, [grouped])
+
+    actionable.sort(compareByCriticality)
+    suggestions.sort(compareByCriticality)
+    acknowledged.sort(compareByCriticality)
+
+    return {
+      actionableGroups: actionable,
+      suggestionGroups: suggestions,
+      acknowledgedGroups: acknowledged,
+    }
+  }, [acknowledgedRuleIds, grouped])
 
   const scopedActionable = useMemo(() => {
     let critical = 0
     let warning = 0
     for (const finding of scopedFindings) {
+      if (acknowledgedRuleIds.has(finding.ruleId)) continue
       if (finding.severity === "critical") critical += 1
       if (finding.severity === "warning") warning += 1
     }
     return critical + warning
-  }, [scopedFindings])
+  }, [acknowledgedRuleIds, scopedFindings])
+
+  const pendingGroupCount = actionableGroups.length + suggestionGroups.length
 
   const modalPolicies = useMemo(() => {
     if (!activeDuplicateGroup) return []
@@ -593,6 +759,10 @@ const IntelligenceView = ({
         <p className="rounded-xl border border-slate-200 bg-white px-4 py-8 text-center text-xs text-slate-500 shadow-sm">
           No findings match this filter.
         </p>
+      ) : pendingGroupCount === 0 && acknowledgedGroups.length > 0 ? (
+        <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-8 text-center text-xs text-emerald-900 shadow-sm">
+          All matching findings have been acknowledged. Review them in the Acknowledged section below.
+        </p>
       ) : (
         <div className="space-y-6">
           {actionableGroups.length > 0 ? (
@@ -603,7 +773,8 @@ const IntelligenceView = ({
                   normalizedQuery,
                   policiesById,
                   setActiveDuplicateGroup,
-                  setActiveFinding
+                  setActiveFinding,
+                  () => acknowledge(group.ruleId)
                 )
               )}
             </div>
@@ -623,6 +794,7 @@ const IntelligenceView = ({
                     key={group.ruleId}
                     group={group}
                     ruleInfo={rulesById.get(group.ruleId)}
+                    onAcknowledge={() => acknowledge(group.ruleId)}
                   />
                 ))}
               </div>
@@ -630,6 +802,44 @@ const IntelligenceView = ({
           ) : null}
         </div>
       )}
+
+      {acknowledgedGroups.length > 0 ? (
+        <section className="space-y-3">
+          <button
+            type="button"
+            onClick={() => setAcknowledgedExpanded((value) => !value)}
+            aria-expanded={acknowledgedExpanded}
+            className="flex w-full items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-left shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+          >
+            <div>
+              <h3 className="text-sm font-semibold text-slate-900">Acknowledged</h3>
+              <p className="mt-0.5 text-xs text-slate-500">
+                {acknowledgedGroups.length}{" "}
+                {acknowledgedGroups.length === 1 ? "entry" : "entries"} hidden from the active list
+              </p>
+            </div>
+            {acknowledgedExpanded ? (
+              <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+            ) : (
+              <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+            )}
+          </button>
+
+          {acknowledgedExpanded ? (
+            <div className="space-y-3">
+              {acknowledgedGroups.map((group) => (
+                <AcknowledgedGroupCard
+                  key={group.ruleId}
+                  group={group}
+                  ruleInfo={rulesById.get(group.ruleId)}
+                  normalizedQuery={normalizedQuery}
+                  onRestore={() => unacknowledge(group.ruleId)}
+                />
+              ))}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {scopedActionable === 0 && actionableGroups.length === 0 && suggestionGroups.length > 0 ? (
         <p className="text-xs text-slate-500">

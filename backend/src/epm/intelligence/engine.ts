@@ -3,8 +3,10 @@ import { POLICY_RULES } from "./rules"
 import type {
   IntelligenceCounts,
   IntelligenceReport,
+  IntelligenceRuleInfo,
   RuleContext,
 } from "./types"
+import type { IntelligenceSeverity, PolicyFinding } from "./types"
 
 export type { PolicyFinding, IntelligenceReport, PolicyRule } from "./types"
 
@@ -13,6 +15,38 @@ const emptyCounts = (): IntelligenceCounts => ({
   warning: 0,
   info: 0,
 })
+
+const SEVERITY_RANK: Record<IntelligenceSeverity, number> = {
+  critical: 0,
+  warning: 1,
+  info: 2,
+}
+
+const sortFindingsByCriticality = (
+  findings: PolicyFinding[]
+): PolicyFinding[] =>
+  [...findings].sort((a, b) => {
+    const severityDiff = SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]
+    if (severityDiff !== 0) return severityDiff
+
+    const titleDiff = a.title.localeCompare(b.title)
+    if (titleDiff !== 0) return titleDiff
+
+    return a.policyName.localeCompare(b.policyName)
+  })
+
+const sortRulesByCriticality = (
+  rules: IntelligenceRuleInfo[]
+): IntelligenceRuleInfo[] =>
+  [...rules].sort((a, b) => {
+    const severityDiff = SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]
+    if (severityDiff !== 0) return severityDiff
+
+    const countDiff = b.findingCount - a.findingCount
+    if (countDiff !== 0) return countDiff
+
+    return a.title.localeCompare(b.title)
+  })
 
 const countBySeverity = (findings: ReturnType<(typeof POLICY_RULES)[0]["evaluate"]>): IntelligenceCounts => {
   const counts = emptyCounts()
@@ -43,7 +77,9 @@ export const runPolicyIntelligence = (input: {
   applicationGroups: ApplicationGroupEntry[]
 }): IntelligenceReport => {
   const ctx = buildRuleContext(input)
-  const findings = POLICY_RULES.flatMap((rule) => rule.evaluate(ctx))
+  const findings = sortFindingsByCriticality(
+    POLICY_RULES.flatMap((rule) => rule.evaluate(ctx))
+  )
 
   const findingCountByRule = new Map<string, number>()
   for (const finding of findings) {
@@ -57,14 +93,16 @@ export const runPolicyIntelligence = (input: {
     findings,
     counts: countBySeverity(findings),
     rulesRun: POLICY_RULES.length,
-    rules: POLICY_RULES.map((rule) => ({
-      id: rule.id,
-      title: rule.title,
-      description: rule.description,
-      severity: rule.severity,
-      docUrl: rule.docUrl,
-      findingCount: findingCountByRule.get(rule.id) ?? 0,
-    })),
+    rules: sortRulesByCriticality(
+      POLICY_RULES.map((rule) => ({
+        id: rule.id,
+        title: rule.title,
+        description: rule.description,
+        severity: rule.severity,
+        docUrl: rule.docUrl,
+        findingCount: findingCountByRule.get(rule.id) ?? 0,
+      }))
+    ),
   }
 }
 
@@ -82,7 +120,7 @@ export const attachFindingsToPolicies = (
   for (const policy of policies) {
     const policyFindings = byPolicy.get(policy.id)
     if (policyFindings?.length) {
-      policy.findings = policyFindings
+      policy.findings = sortFindingsByCriticality(policyFindings)
     }
   }
 }
