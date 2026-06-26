@@ -63,14 +63,6 @@ const Dashboard = ({ response }: DashboardProps) => {
       icon: LayoutDashboard,
       group: "explore",
     })
-    list.push({
-      id: "intelligence",
-      label: "Intelligence",
-      shortLabel: "Intelligence",
-      icon: Sparkles,
-      count: counts.intelligence,
-      group: "explore",
-    })
     if (doc.generalConfiguration) {
       list.push({
         id: "config",
@@ -131,6 +123,14 @@ const Dashboard = ({ response }: DashboardProps) => {
       shortLabel: "Raw XML",
       icon: FileCode2,
       group: "reference",
+    })
+    list.push({
+      id: "intelligence",
+      label: "Intelligence",
+      shortLabel: "Intelligence",
+      icon: Sparkles,
+      count: counts.intelligence,
+      group: "explore",
     })
     return list
   }, [doc, hideDefaults])
