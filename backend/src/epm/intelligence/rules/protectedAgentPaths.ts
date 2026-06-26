@@ -27,7 +27,7 @@ export const protectedAgentPathRule: PolicyRule = {
   id: "protected-agent-path",
   title: "Set Security grants access to protected agent path",
   description:
-    "Set Security policies that allow user access to EPM-protected folders or registry keys can break agent functionality.",
+    "Checks Set Security policies (action 11) that grant allowAccess on filesystem or registry paths matching curated CyberArk agent install/data locations.",
   severity: "critical",
   docUrl:
     "https://docs.cyberark.com/epm/latest/en/content/policies/accessfilesystemregistry-newui.htm",

@@ -1,6 +1,19 @@
 import { useMemo, useState } from "react"
-import { Copy, ExternalLink, GitCompare, Layers, Sparkles } from "lucide-react"
-import type { IntelligenceReport, PolicyEntry, PolicyFinding } from "../types"
+import {
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  ExternalLink,
+  GitCompare,
+  Layers,
+  Sparkles,
+} from "lucide-react"
+import type {
+  IntelligenceReport,
+  IntelligenceRuleInfo,
+  PolicyEntry,
+  PolicyFinding,
+} from "../types"
 import Badge from "./Badge"
 import DuplicateComparisonModal from "./DuplicateComparisonModal"
 import FindingDetailModal from "./FindingDetailModal"
@@ -274,13 +287,12 @@ const IntelligenceView = ({
     [policies]
   )
 
-  const rules = useMemo(() => {
-    const map = new Map<string, string>()
-    for (const finding of intelligence.findings) {
-      if (!map.has(finding.ruleId)) map.set(finding.ruleId, finding.title)
-    }
-    return [...map.entries()].map(([id, title]) => ({ id, title }))
-  }, [intelligence.findings])
+  const rules = intelligence.rules ?? []
+
+  const ruleFilterOptions = useMemo(
+    () => rules.map((rule) => ({ id: rule.id, title: rule.title })),
+    [rules]
+  )
 
   const filtered = useMemo(
     () =>
@@ -326,6 +338,11 @@ const IntelligenceView = ({
     return (
       <div className="space-y-4">
         <DisclaimerBanner />
+        <IntelligenceRulesGuide
+          rules={rules}
+          selectedRuleId={ruleFilter}
+          onSelectRule={setRuleFilter}
+        />
         <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
           <Sparkles className="mb-3 h-8 w-8 text-emerald-500" />
           <p className="text-sm font-medium text-slate-900">No policy issues detected</p>
@@ -340,6 +357,11 @@ const IntelligenceView = ({
   return (
     <div className="space-y-4">
       <DisclaimerBanner />
+      <IntelligenceRulesGuide
+        rules={rules}
+        selectedRuleId={ruleFilter}
+        onSelectRule={setRuleFilter}
+      />
 
       <div className="flex flex-wrap items-center gap-2">
         <Badge tone={intelligence.counts.critical > 0 ? "red" : "slate"}>
@@ -374,7 +396,7 @@ const IntelligenceView = ({
           className="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
         >
           <option value="all">All rules</option>
-          {rules.map((rule) => (
+          {ruleFilterOptions.map((rule) => (
             <option key={rule.id} value={rule.id}>
               {rule.title}
             </option>
@@ -504,5 +526,101 @@ const DisclaimerBanner = () => (
     EPM environment before making changes.
   </div>
 )
+
+const IntelligenceRulesGuide = ({
+  rules,
+  selectedRuleId,
+  onSelectRule,
+}: {
+  rules: IntelligenceRuleInfo[]
+  selectedRuleId: string
+  onSelectRule: (ruleId: string) => void
+}) => {
+  const [expanded, setExpanded] = useState(true)
+
+  if (rules.length === 0) return null
+
+  return (
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <button
+        type="button"
+        onClick={() => setExpanded((value) => !value)}
+        aria-expanded={expanded}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400"
+      >
+        <div>
+          <h3 className="text-sm font-semibold text-slate-900">What we check</h3>
+          <p className="mt-0.5 text-xs text-slate-500">
+            {rules.length} intelligence rules evaluated on every uploaded policy document
+          </p>
+        </div>
+        {expanded ? (
+          <ChevronDown className="h-4 w-4 shrink-0 text-slate-400" />
+        ) : (
+          <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+        )}
+      </button>
+
+      {expanded ? (
+        <ul className="divide-y divide-slate-100 border-t border-slate-100">
+          {rules.map((rule) => {
+            const isSelected = selectedRuleId === rule.id
+
+            return (
+              <li key={rule.id} className="px-4 py-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge tone={severityTone(rule.severity)}>{rule.severity}</Badge>
+                      <h4 className="text-sm font-medium text-slate-900">{rule.title}</h4>
+                    </div>
+                    <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+                      {rule.description}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px]">
+                      <span
+                        className={
+                          rule.findingCount > 0
+                            ? "font-medium text-slate-700"
+                            : "text-slate-400"
+                        }
+                      >
+                        {rule.findingCount}{" "}
+                        {rule.findingCount === 1 ? "finding" : "findings"} in this document
+                      </span>
+                      {rule.docUrl ? (
+                        <a
+                          href={rule.docUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(event) => event.stopPropagation()}
+                          className="inline-flex items-center gap-1 font-medium text-blue-600 hover:text-blue-800"
+                        >
+                          Reference
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : null}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onSelectRule(isSelected ? "all" : rule.id)}
+                    className={
+                      isSelected
+                        ? "shrink-0 rounded-lg border border-slate-900 bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white"
+                        : "shrink-0 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                    }
+                  >
+                    {isSelected ? "Showing findings" : "Show findings"}
+                  </button>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      ) : null}
+    </section>
+  )
+}
 
 export default IntelligenceView

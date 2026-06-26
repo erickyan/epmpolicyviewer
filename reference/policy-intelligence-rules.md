@@ -74,6 +74,7 @@ Protected paths are maintained in `backend/src/epm/intelligence/data/protectedPa
 | `definition-limit` | warning | [Definition properties](https://docs.cyberark.com/epm/latest/en/content/epm/server%20user%20guide/definitionproperties.htm) | Policy `definitionCount` exceeds 1,000 (app-group members included in count). |
 | `broad-publisher-audit` | warning | [Definition properties](https://docs.cyberark.com/epm/latest/en/content/epm/server%20user%20guide/definitionproperties.htm) | Audit enabled; every publisher-bearing target is publisher-only and uses macOS **Software Signing** or Windows **Microsoft Windows**. Skips implicit policies. |
 | `protected-agent-path` | critical | [Access FS/registry](https://docs.cyberark.com/epm/latest/en/content/policies/accessfilesystemregistry-newui.htm) | Set Security (`action` 11) with `allowAccess` on an `FSEntry` or `RegKey` matching curated CyberArk agent paths. |
+| `explorer-inheritable-child-procs` | critical | [Explorer.exe with child processes](https://community.cyberark.com/s/article/EPM-Policies-for-Explorer-exe-with-child-processes) | Windows target matching `explorer.exe` with `inheritable="True"` (directly, via application group member, or with inheritance on the group reference). |
 | `duplicate-policies` | info | — | Identical action + target signature + user targeting (user groups, or scope when untargeted), or duplicate policy names. Excludes implicit and “Installed by:” companion policies. |
 
 ## Duplicate groups vs intelligence

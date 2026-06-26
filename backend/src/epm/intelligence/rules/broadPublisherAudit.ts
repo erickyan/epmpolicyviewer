@@ -13,7 +13,7 @@ export const broadPublisherAuditRule: PolicyRule = {
   id: "broad-publisher-audit",
   title: "Broad OS publisher with audit enabled",
   description:
-    "Policies that match all apps signed by the OS publisher (Software Signing on macOS, Microsoft Windows on Windows) with audit enabled can flood the event queue.",
+    "Checks for policies with audit enabled where every publisher-bearing target is publisher-only and uses the broad OS signature (Software Signing on macOS, Microsoft Windows on Windows). Implicit policies are skipped.",
   severity: "warning",
   docUrl:
     "https://docs.cyberark.com/epm/latest/en/content/epm/server%20user%20guide/definitionproperties.htm",

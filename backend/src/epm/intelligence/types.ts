@@ -26,10 +26,20 @@ export interface IntelligenceCounts {
   info: number
 }
 
+export interface IntelligenceRuleInfo {
+  id: string
+  title: string
+  description: string
+  severity: IntelligenceSeverity
+  docUrl?: string
+  findingCount: number
+}
+
 export interface IntelligenceReport {
   findings: PolicyFinding[]
   counts: IntelligenceCounts
   rulesRun: number
+  rules: IntelligenceRuleInfo[]
 }
 
 export interface RuleContext {

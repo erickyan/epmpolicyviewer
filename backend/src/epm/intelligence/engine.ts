@@ -45,10 +45,26 @@ export const runPolicyIntelligence = (input: {
   const ctx = buildRuleContext(input)
   const findings = POLICY_RULES.flatMap((rule) => rule.evaluate(ctx))
 
+  const findingCountByRule = new Map<string, number>()
+  for (const finding of findings) {
+    findingCountByRule.set(
+      finding.ruleId,
+      (findingCountByRule.get(finding.ruleId) ?? 0) + 1
+    )
+  }
+
   return {
     findings,
     counts: countBySeverity(findings),
     rulesRun: POLICY_RULES.length,
+    rules: POLICY_RULES.map((rule) => ({
+      id: rule.id,
+      title: rule.title,
+      description: rule.description,
+      severity: rule.severity,
+      docUrl: rule.docUrl,
+      findingCount: findingCountByRule.get(rule.id) ?? 0,
+    })),
   }
 }
 

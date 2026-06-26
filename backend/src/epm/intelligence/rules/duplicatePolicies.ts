@@ -63,7 +63,7 @@ export const duplicatePoliciesRule: PolicyRule = {
   id: "duplicate-policies",
   title: "Potential duplicate policy",
   description:
-    "Multiple non-default policies share identical action, targets, and user targeting, or the same policy name.",
+    "Checks for non-default policies sharing the same action, targets, and user targeting, or duplicate policy names. Implicit and “Installed by:” companion policies are excluded.",
   severity: "info",
   evaluate: (ctx) => {
     const findings = []

@@ -7,7 +7,7 @@ export const definitionLimitRule: PolicyRule = {
   id: "definition-limit",
   title: "Definition count exceeds EPM limit",
   description:
-    "Each policy is limited to 1,000 application definitions. Split oversized policies into multiple policies.",
+    "Checks whether a policy exceeds 1,000 application definitions (application group members are counted). EPM limits each policy to 1,000 definitions.",
   severity: "warning",
   docUrl:
     "https://docs.cyberark.com/epm/latest/en/content/epm/server%20user%20guide/definitionproperties.htm",
