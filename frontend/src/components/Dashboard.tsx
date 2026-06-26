@@ -118,19 +118,19 @@ const Dashboard = ({ response }: DashboardProps) => {
       })
     }
     list.push({
-      id: "raw",
-      label: "Raw XML",
-      shortLabel: "Raw XML",
-      icon: FileCode2,
-      group: "reference",
-    })
-    list.push({
       id: "intelligence",
       label: "Intelligence",
       shortLabel: "Intelligence",
       icon: Sparkles,
       count: counts.intelligence,
       group: "explore",
+    })
+    list.push({
+      id: "raw",
+      label: "Raw XML",
+      shortLabel: "Raw XML",
+      icon: FileCode2,
+      group: "reference",
     })
     return list
   }, [doc, hideDefaults])

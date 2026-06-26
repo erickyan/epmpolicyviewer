@@ -1,4 +1,4 @@
-import { Fragment } from "react"
+import { Fragment, useMemo } from "react"
 import type { LucideIcon } from "lucide-react"
 import { cx } from "../lib/ui"
 
@@ -77,13 +77,13 @@ const TabButton = ({
   )
 }
 
-const PrimaryTabs = ({
+const TabRow = ({
   tabs,
   activeTab,
   hideDefaults,
   onSelectTab,
 }: DashboardNavProps) => (
-  <div className="flex min-w-0 flex-1 flex-wrap items-stretch gap-x-0.5 gap-y-0">
+  <>
     {tabs.map((tab, index) => {
       const previousGroup = index > 0 ? tabs[index - 1]?.group : null
       const showDivider = previousGroup !== null && previousGroup !== tab.group
@@ -105,8 +105,13 @@ const PrimaryTabs = ({
         </Fragment>
       )
     })}
-  </div>
+  </>
 )
+
+const splitBalancedRows = (tabs: DashboardTab[]): [DashboardTab[], DashboardTab[]] => {
+  const midpoint = Math.ceil(tabs.length / 2)
+  return [tabs.slice(0, midpoint), tabs.slice(midpoint)]
+}
 
 const DashboardNav = ({
   tabs,
@@ -114,30 +119,45 @@ const DashboardNav = ({
   hideDefaults,
   onSelectTab,
 }: DashboardNavProps) => {
-  const intelligenceTab = tabs.find((tab) => tab.id === "intelligence")
-  const primaryTabs = tabs.filter((tab) => tab.id !== "intelligence")
+  const rawTab = tabs.find((tab) => tab.id === "raw")
+  const mainTabs = tabs.filter((tab) => tab.id !== "raw")
+
+  const [rowOne, rowTwo] = useMemo(() => splitBalancedRows(mainTabs), [mainTabs])
 
   return (
     <div className="border-b border-slate-200 bg-white/80 px-2 backdrop-blur-sm sm:px-3">
-      <div className="-mb-px flex flex-wrap items-stretch justify-between gap-x-2">
-        <PrimaryTabs
-          tabs={primaryTabs}
-          activeTab={activeTab}
-          hideDefaults={hideDefaults}
-          onSelectTab={onSelectTab}
-        />
+      <nav aria-label="Dashboard sections" className="-mb-px flex flex-col">
+        <div className="flex flex-wrap items-stretch gap-x-0.5">
+          <TabRow
+            tabs={rowOne}
+            activeTab={activeTab}
+            hideDefaults={hideDefaults}
+            onSelectTab={onSelectTab}
+          />
+        </div>
 
-        {intelligenceTab ? (
-          <div className="ml-auto flex shrink-0 items-stretch border-slate-200 sm:border-l sm:pl-2">
-            <TabButton
-              tab={intelligenceTab}
-              isActive={activeTab === "intelligence"}
+        <div className="flex flex-wrap items-stretch justify-between gap-x-2 border-t border-slate-100">
+          <div className="flex min-w-0 flex-1 flex-wrap items-stretch gap-x-0.5">
+            <TabRow
+              tabs={rowTwo}
+              activeTab={activeTab}
               hideDefaults={hideDefaults}
-              onSelect={() => onSelectTab("intelligence")}
+              onSelectTab={onSelectTab}
             />
           </div>
-        ) : null}
-      </div>
+
+          {rawTab ? (
+            <div className="ml-auto flex shrink-0 items-stretch border-slate-200 sm:border-l sm:pl-2">
+              <TabButton
+                tab={rawTab}
+                isActive={activeTab === "raw"}
+                hideDefaults={hideDefaults}
+                onSelect={() => onSelectTab("raw")}
+              />
+            </div>
+          ) : null}
+        </div>
+      </nav>
     </div>
   )
 }
