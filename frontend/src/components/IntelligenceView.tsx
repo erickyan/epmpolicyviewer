@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react"
-import { Copy, ExternalLink, GitCompare, Sparkles } from "lucide-react"
+import { Copy, ExternalLink, GitCompare, Layers, Sparkles } from "lucide-react"
 import type { IntelligenceReport, PolicyEntry, PolicyFinding } from "../types"
 import Badge from "./Badge"
 import DuplicateComparisonModal from "./DuplicateComparisonModal"
+import FindingDetailModal from "./FindingDetailModal"
 import { shouldShowActionBadge } from "../lib/policyLabels"
 import { categoryTone } from "../lib/ui"
 
@@ -24,6 +25,19 @@ interface DuplicateGroup {
 }
 
 const DUPLICATE_RULE_ID = "duplicate-policies"
+const DEFINITION_LIMIT_RULE_ID = "definition-limit"
+
+const readDefinitionLimitEvidence = (finding: PolicyFinding) => {
+  const definitionCount = Number(finding.evidence?.definitionCount ?? 0)
+  const limit = Number(finding.evidence?.limit ?? 1000)
+  const overBy = Math.max(definitionCount - limit, 0)
+  const percentOfLimit =
+    limit > 0 ? Math.round((definitionCount / limit) * 100) : 0
+  const suggestedPolicyCount =
+    limit > 0 ? Math.ceil(definitionCount / limit) : 0
+
+  return { definitionCount, limit, overBy, percentOfLimit, suggestedPolicyCount }
+}
 
 const severityTone = (severity: PolicyFinding["severity"]) => {
   if (severity === "critical") return "red"
@@ -70,42 +84,100 @@ const duplicateGroupMatchesQuery = (group: DuplicateGroup, query: string): boole
   return group.findings.some((finding) => matchesQuery(finding, query))
 }
 
-const FindingRow = ({
+const DefinitionLimitRow = ({
   finding,
-  onOpenPolicy,
+  onSelect,
 }: {
   finding: PolicyFinding
-  onOpenPolicy: (policyId: string) => void
+  onSelect: (finding: PolicyFinding) => void
+}) => {
+  const { definitionCount, limit, overBy, percentOfLimit } =
+    readDefinitionLimitEvidence(finding)
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => onSelect(finding)}
+        className="group flex w-full flex-col gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400"
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700 group-hover:bg-amber-200">
+              <Layers className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="truncate text-sm font-medium text-slate-900">
+                  {finding.policyName}
+                </span>
+                <Badge tone={categoryTone(finding.policyCategory)}>
+                  {finding.categoryLabel}
+                </Badge>
+                <span className="font-mono text-[11px] text-slate-400">#{finding.policyId}</span>
+              </div>
+              <p className="mt-1 text-xs text-slate-600">
+                {definitionCount.toLocaleString()} definitions · {percentOfLimit}% of{" "}
+                {limit.toLocaleString()} limit
+              </p>
+            </div>
+          </div>
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            <Badge tone="amber">{overBy.toLocaleString()} over</Badge>
+            <span className="text-xs font-medium text-blue-600 group-hover:text-blue-800">
+              View details
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+            <div
+              className="h-full rounded-full bg-amber-500"
+              style={{ width: `${Math.min(percentOfLimit, 100)}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[10px] text-slate-400">
+            <span>0</span>
+            <span>{limit.toLocaleString()} limit</span>
+            {percentOfLimit > 100 ? (
+              <span className="font-medium text-amber-700">
+                {definitionCount.toLocaleString()} actual
+              </span>
+            ) : (
+              <span>{definitionCount.toLocaleString()}</span>
+            )}
+          </div>
+        </div>
+      </button>
+    </li>
+  )
+}
+
+const FindingRow = ({
+  finding,
+  onSelect,
+}: {
+  finding: PolicyFinding
+  onSelect: (finding: PolicyFinding) => void
 }) => (
   <li>
     <button
       type="button"
-      onClick={() => onOpenPolicy(finding.policyId)}
-      className="flex w-full flex-col gap-2 px-4 py-3 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400"
+      onClick={() => onSelect(finding)}
+      className="group flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-slate-400"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="truncate text-sm font-medium text-slate-900">{finding.policyName}</span>
-        <span className="flex shrink-0 items-center gap-2">
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="truncate text-sm font-medium text-slate-900">{finding.policyName}</span>
           <Badge tone={categoryTone(finding.policyCategory)}>{finding.categoryLabel}</Badge>
           <span className="font-mono text-[11px] text-slate-400">#{finding.policyId}</span>
-        </span>
+        </div>
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600">{finding.message}</p>
       </div>
-      <p className="text-xs leading-relaxed text-slate-600">{finding.message}</p>
-      {finding.evidence && Object.keys(finding.evidence).length > 0 ? (
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[11px]">
-          {Object.entries(finding.evidence)
-            .filter(([key]) => key !== "duplicateGroupKey")
-            .map(([key, value]) => (
-              <div key={key} className="contents">
-                <dt className="text-slate-400">{key}</dt>
-                <dd className="text-slate-600">{String(value)}</dd>
-              </div>
-            ))}
-        </dl>
-      ) : null}
-      {finding.remediation ? (
-        <p className="text-[11px] text-amber-800">{finding.remediation}</p>
-      ) : null}
+      <span className="shrink-0 text-xs font-medium text-blue-600 group-hover:text-blue-800">
+        View details
+      </span>
     </button>
   </li>
 )
@@ -194,6 +266,7 @@ const IntelligenceView = ({
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("all")
   const [ruleFilter, setRuleFilter] = useState("all")
   const [activeDuplicateGroup, setActiveDuplicateGroup] = useState<DuplicateGroup | null>(null)
+  const [activeFinding, setActiveFinding] = useState<PolicyFinding | null>(null)
 
   const normalizedQuery = query.trim().toLowerCase()
   const policiesById = useMemo(
@@ -365,13 +438,23 @@ const IntelligenceView = ({
                       />
                     ))}
                   </ul>
+                ) : group.ruleId === DEFINITION_LIMIT_RULE_ID ? (
+                  <ul className="divide-y divide-slate-50">
+                    {group.findings.map((finding) => (
+                      <DefinitionLimitRow
+                        key={`${finding.ruleId}-${finding.policyId}`}
+                        finding={finding}
+                        onSelect={setActiveFinding}
+                      />
+                    ))}
+                  </ul>
                 ) : (
                   <ul className="divide-y divide-slate-50">
                     {group.findings.map((finding) => (
                       <FindingRow
                         key={`${finding.ruleId}-${finding.policyId}-${finding.title}`}
                         finding={finding}
-                        onOpenPolicy={onOpenPolicy}
+                        onSelect={setActiveFinding}
                       />
                     ))}
                   </ul>
@@ -395,6 +478,15 @@ const IntelligenceView = ({
           remediation={activeDuplicateGroup.remediation}
           policies={modalPolicies}
           onClose={() => setActiveDuplicateGroup(null)}
+          onOpenPolicy={onOpenPolicy}
+        />
+      ) : null}
+
+      {activeFinding ? (
+        <FindingDetailModal
+          finding={activeFinding}
+          policy={policiesById.get(activeFinding.policyId)}
+          onClose={() => setActiveFinding(null)}
           onOpenPolicy={onOpenPolicy}
         />
       ) : null}
