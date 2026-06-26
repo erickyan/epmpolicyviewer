@@ -100,7 +100,9 @@ export const buildDuplicateSummaryFromFindings = (
   for (const finding of duplicateFindings) {
     const groupKey = String(finding.evidence?.duplicateGroupKey ?? finding.policyId)
     const reason =
-      finding.title.includes("name") ? "Duplicate name" : "Same action & identical targets"
+      finding.title.includes("name")
+        ? "Duplicate name"
+        : "Same action, targets & user targeting"
     const bucket =
       groupsByKey.get(groupKey) ?? { reason, policies: new Map<string, typeof finding>() }
     bucket.policies.set(finding.policyId, finding)

@@ -3,6 +3,7 @@ import { Copy, ExternalLink, GitCompare, Sparkles } from "lucide-react"
 import type { IntelligenceReport, PolicyEntry, PolicyFinding } from "../types"
 import Badge from "./Badge"
 import DuplicateComparisonModal from "./DuplicateComparisonModal"
+import { shouldShowActionBadge } from "../lib/policyLabels"
 import { categoryTone } from "../lib/ui"
 
 interface IntelligenceViewProps {
@@ -156,7 +157,14 @@ const DuplicateGroupCard = ({
             className="mt-1 w-1 shrink-0 rounded-full bg-slate-200 group-hover:bg-slate-300"
           />
           <div className="flex min-w-0 flex-1 flex-wrap gap-2">
-            {policies.map((policy) => (
+            {policies.map((policy) => {
+              const showAction = shouldShowActionBadge(
+                policy.action,
+                policy.actionLabel,
+                policy.categoryLabel
+              )
+
+              return (
               <div
                 key={policy.id}
                 className="min-w-[10rem] flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm"
@@ -164,12 +172,12 @@ const DuplicateGroupCard = ({
                 <p className="truncate text-xs font-medium text-slate-900">{policy.name}</p>
                 <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                   <Badge tone={categoryTone(policy.categoryId)}>{policy.categoryLabel}</Badge>
-                  <Badge tone="slate">{policy.actionLabel}</Badge>
+                  {showAction ? <Badge tone="slate">{policy.actionLabel}</Badge> : null}
                   <span className="font-mono text-[10px] text-slate-400">#{policy.id}</span>
                 </div>
                 <p className="mt-1 text-[10px] text-slate-400">Order {policy.order}</p>
               </div>
-            ))}
+            )})}
           </div>
         </div>
       </button>

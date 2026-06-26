@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { ArrowRight, X } from "lucide-react"
 import type { PolicyEntry, TargetEntry } from "../types"
 import Badge from "./Badge"
+import { shouldShowActionBadge } from "../lib/policyLabels"
 import { categoryTone, cx } from "../lib/ui"
 
 interface DuplicateComparisonModalProps {
@@ -31,6 +32,11 @@ const PolicyColumn = ({
 }) => {
   const visibleTargets = policy.targets.slice(0, 12)
   const hiddenTargetCount = policy.targets.length - visibleTargets.length
+  const showAction = shouldShowActionBadge(
+    policy.action,
+    policy.actionLabel,
+    policy.categoryLabel
+  )
 
   return (
     <div className="flex min-w-[16rem] flex-1 flex-col rounded-xl border border-slate-200 bg-slate-50/40">
@@ -38,7 +44,7 @@ const PolicyColumn = ({
         <h3 className="text-sm font-semibold leading-snug text-slate-900">{policy.name}</h3>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <Badge tone={categoryTone(policy.categoryId)}>{policy.categoryLabel}</Badge>
-          <Badge tone="slate">{policy.actionLabel}</Badge>
+          {showAction ? <Badge tone="slate">{policy.actionLabel}</Badge> : null}
         </div>
       </div>
 

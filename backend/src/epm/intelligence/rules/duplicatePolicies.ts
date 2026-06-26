@@ -35,11 +35,35 @@ const targetSignature = (policy: PolicyEntry): string =>
     .sort()
     .join("|")
 
+const userGroupSignature = (policy: PolicyEntry): string =>
+  policy.userGroups
+    .map((group) =>
+      [group.kind, group.value, group.accountType ?? "", group.scopeId]
+        .join("~")
+        .toLowerCase()
+    )
+    .sort()
+    .join("|")
+
+const targetingSignature = (policy: PolicyEntry): string => {
+  if (policy.userGroups.length > 0) return userGroupSignature(policy)
+  if (policy.scopes.length > 0) {
+    return policy.scopes
+      .map((scope) => scope.id)
+      .sort()
+      .join("|")
+  }
+  return "all-users"
+}
+
+const contentSignature = (policy: PolicyEntry): string =>
+  `${policy.action}|${targetSignature(policy)}|${targetingSignature(policy)}`
+
 export const duplicatePoliciesRule: PolicyRule = {
   id: "duplicate-policies",
   title: "Potential duplicate policy",
   description:
-    "Multiple non-default policies share identical targets or the same policy name.",
+    "Multiple non-default policies share identical action, targets, and user targeting, or the same policy name.",
   severity: "info",
   evaluate: (ctx) => {
     const findings = []
@@ -52,7 +76,7 @@ export const duplicatePoliciesRule: PolicyRule = {
     const byContent = new Map<string, PolicyEntry[]>()
     for (const entry of candidates) {
       if (entry.targetCount === 0) continue
-      const signature = `${entry.action}|${targetSignature(entry)}`
+      const signature = contentSignature(entry)
       const list = byContent.get(signature) ?? []
       list.push(entry)
       byContent.set(signature, list)
@@ -73,9 +97,9 @@ export const duplicatePoliciesRule: PolicyRule = {
           makeFinding(
             duplicatePoliciesRule,
             policy,
-            `Same action and identical targets as ${others.length} other ${others.length === 1 ? "policy" : "policies"} (${others.map((entry) => entry.name).join("; ")}).`,
+            `Same action, targets, and user targeting as ${others.length} other ${others.length === 1 ? "policy" : "policies"} (${others.map((entry) => entry.name).join("; ")}).`,
             {
-              title: "Potential duplicate policy (identical targets)",
+              title: "Potential duplicate policy (identical configuration)",
               evidence: { duplicateCount: list.length, duplicateGroupKey: idKey },
               remediation:
                 "Review whether these policies can be consolidated to reduce precedence conflicts.",
