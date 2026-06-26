@@ -1,6 +1,5 @@
 import { useRef } from "react"
 import {
-  Copy,
   Layers,
   MonitorPlay,
   PackageCheck,
@@ -102,7 +101,6 @@ const SummaryView = ({
   onSelectCategory,
 }: SummaryViewProps) => {
   const categoryRef = useRef<HTMLDivElement>(null)
-  const duplicatesRef = useRef<HTMLDivElement>(null)
 
   const scrollTo = (ref: React.RefObject<HTMLDivElement>) =>
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -172,15 +170,6 @@ const SummaryView = ({
               : undefined
           }
         />
-        {summary.duplicateGroups.length > 0 ? (
-          <StatCard
-            label="Duplicate groups"
-            value={summary.duplicateGroups.length}
-            icon={Copy}
-            accent
-            onClick={() => scrollTo(duplicatesRef)}
-          />
-        ) : null}
       </div>
 
       {hasCategories && (
@@ -260,54 +249,6 @@ const SummaryView = ({
         </div>
       )}
     </SectionCard>
-
-    <div ref={duplicatesRef} className="scroll-mt-4">
-    <SectionCard
-      title="Potential duplicate policies"
-      badge={
-        summary.duplicateGroups.length > 0 ? (
-          <Badge tone="amber">
-            {summary.duplicateGroups.length} group
-            {summary.duplicateGroups.length === 1 ? "" : "s"} ·{" "}
-            {summary.duplicatePolicyCount} policies
-          </Badge>
-        ) : (
-          <Badge tone="emerald">None found</Badge>
-        )
-      }
-    >
-      {summary.duplicateGroups.length === 0 ? (
-        <p className="px-4 py-5 text-xs text-slate-500">
-          No duplicate policies detected (by identical action + targets or by name).
-        </p>
-      ) : (
-        <ul className="divide-y divide-slate-100">
-          {summary.duplicateGroups.map((group, index) => (
-            <li key={index} className="px-4 py-3">
-              <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                {group.reason}
-              </p>
-              <ul className="space-y-1">
-                {group.policies.map((policy) => (
-                  <li
-                    key={policy.id}
-                    className="flex items-center justify-between gap-3 text-xs"
-                  >
-                    <span className="min-w-0 truncate text-slate-700">{policy.name}</span>
-                    <span className="flex shrink-0 items-center gap-2 text-slate-400">
-                      <Badge tone="slate">{policy.categoryLabel}</Badge>
-                      <span>order {policy.order}</span>
-                      <span className="font-mono">#{policy.id}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      )}
-    </SectionCard>
-    </div>
     </div>
   )
 }

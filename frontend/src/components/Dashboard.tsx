@@ -330,6 +330,11 @@ const Dashboard = ({ response }: DashboardProps) => {
         {activeTab === "intelligence" && (
           <IntelligenceView
             intelligence={doc.intelligence}
+            policies={[
+              ...doc.normalPolicies,
+              ...doc.excludedPolicies,
+              ...doc.threatProtectionPolicies,
+            ]}
             query={deferredQuery}
             onOpenPolicy={openPolicyById}
           />
