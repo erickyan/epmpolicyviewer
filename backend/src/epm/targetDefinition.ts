@@ -214,6 +214,14 @@ export const enrichTargetDefinition = (
     locationPattern,
   }
 
+  const fileNameNode = (entry.FileName ?? dmgFile?.FileName) as XmlNode | undefined
+  if (fileNameNode && typeof fileNameNode === "object") {
+    const hash = attr(fileNameNode, "hash")
+    const hashAlgorithm = attr(fileNameNode, "hashAlgorithm")
+    if (hash) enriched.attributes.hash = hash
+    if (hashAlgorithm) enriched.attributes.hashAlgorithm = hashAlgorithm
+  }
+
   enriched.definitionSummary = formatTargetDefinition(enriched)
   return enriched
 }

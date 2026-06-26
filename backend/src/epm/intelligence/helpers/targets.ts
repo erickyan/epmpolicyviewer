@@ -74,3 +74,13 @@ export const PUBLISHER_TARGET_KINDS = new Set([
   "COM",
   "ActiveXInstall",
 ])
+
+export const APPLICATION_DEFINITION_KINDS = new Set([
+  ...PUBLISHER_TARGET_KINDS,
+  "MacDmg",
+  "MacPKG",
+  "MacScript",
+  "LinuxCommand",
+  "URL",
+  "MacURL",
+])

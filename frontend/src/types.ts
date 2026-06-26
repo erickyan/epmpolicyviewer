@@ -34,6 +34,7 @@ export interface TargetEntry {
   fileNamePattern?: PatternMatch
   locationPattern?: PatternMatch
   definitionSummary?: string
+  description?: string
   attributes: Record<string, string>
 }
 
@@ -128,6 +129,7 @@ export interface LcdPolicyConfig {
 export interface PolicyEntry {
   id: string
   name: string
+  description?: string
   action: string
   actionLabel: string
   order: string

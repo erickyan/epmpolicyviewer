@@ -85,6 +85,14 @@ const attr = (node: XmlNode, name: string): string | undefined => {
   return value === undefined || value === null ? undefined : String(value)
 }
 
+const parseDescription = (node: XmlNode): string | undefined => {
+  const fromAttr = attr(node, "desc") ?? attr(node, "description")
+  if (fromAttr?.trim()) return fromAttr.trim()
+  const fromChild = getText(node.Description)
+  if (fromChild?.trim()) return fromChild.trim()
+  return undefined
+}
+
 const getByPath = (root: unknown, path: string): string | undefined => {
   const segments = path.split(".")
   let current: unknown = root
@@ -172,6 +180,7 @@ const buildTargets = (
             attr(entry, "softwareDistributorName") ??
             (attr(entry, "name") || undefined) ??
             groupDef?.name,
+          description: parseDescription(entry),
           publisher: getText(entry.Publisher) ?? nestedPublisher,
           location: getText(entry.Location) ?? getText((entry.DmgFile as XmlNode | undefined)?.Location),
           fileName:
@@ -597,6 +606,7 @@ const buildPolicyEntry = (
   return {
     id: attr(policy, "id") ?? "",
     name,
+    description: parseDescription(policy),
     action,
     actionLabel: getActionLabel(action),
     order: attr(policy, "order") ?? "",
