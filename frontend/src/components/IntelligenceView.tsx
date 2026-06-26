@@ -9,6 +9,7 @@ import {
   Sparkles,
 } from "lucide-react"
 import type {
+  ApplicationGroupEntry,
   IntelligenceReport,
   IntelligenceRuleInfo,
   PolicyEntry,
@@ -17,12 +18,15 @@ import type {
 import Badge from "./Badge"
 import DuplicateComparisonModal from "./DuplicateComparisonModal"
 import FindingDetailModal from "./FindingDetailModal"
+import { policyHasCustomizedContent } from "../lib/appGroups"
 import { shouldShowActionBadge } from "../lib/policyLabels"
 import { categoryTone } from "../lib/ui"
 
 interface IntelligenceViewProps {
   intelligence: IntelligenceReport
   policies: PolicyEntry[]
+  applicationGroups: ApplicationGroupEntry[]
+  hideDefaults: boolean
   query: string
   onOpenPolicy: (policyId: string) => void
 }
@@ -273,6 +277,8 @@ const DuplicateGroupCard = ({
 const IntelligenceView = ({
   intelligence,
   policies,
+  applicationGroups,
+  hideDefaults,
   query,
   onOpenPolicy,
 }: IntelligenceViewProps) => {
@@ -287,7 +293,30 @@ const IntelligenceView = ({
     [policies]
   )
 
-  const rules = intelligence.rules ?? []
+  const scopedFindings = useMemo(() => {
+    if (!hideDefaults) return intelligence.findings
+    return intelligence.findings.filter((finding) => {
+      const policy = policiesById.get(finding.policyId)
+      if (!policy) return true
+      return policyHasCustomizedContent(policy, applicationGroups, true)
+    })
+  }, [applicationGroups, hideDefaults, intelligence.findings, policiesById])
+
+  const rules = useMemo(() => {
+    const base = intelligence.rules ?? []
+    if (!hideDefaults) return base
+    const findingCountByRule = new Map<string, number>()
+    for (const finding of scopedFindings) {
+      findingCountByRule.set(
+        finding.ruleId,
+        (findingCountByRule.get(finding.ruleId) ?? 0) + 1
+      )
+    }
+    return base.map((rule) => ({
+      ...rule,
+      findingCount: findingCountByRule.get(rule.id) ?? 0,
+    }))
+  }, [hideDefaults, intelligence.rules, scopedFindings])
 
   const ruleFilterOptions = useMemo(
     () => rules.map((rule) => ({ id: rule.id, title: rule.title })),
@@ -296,13 +325,13 @@ const IntelligenceView = ({
 
   const filtered = useMemo(
     () =>
-      intelligence.findings.filter(
+      scopedFindings.filter(
         (finding) =>
           (severityFilter === "all" || finding.severity === severityFilter) &&
           (ruleFilter === "all" || finding.ruleId === ruleFilter) &&
           matchesQuery(finding, normalizedQuery)
       ),
-    [intelligence.findings, normalizedQuery, ruleFilter, severityFilter]
+    [scopedFindings, normalizedQuery, ruleFilter, severityFilter]
   )
 
   const grouped = useMemo(() => {
@@ -323,8 +352,15 @@ const IntelligenceView = ({
     }))
   }, [filtered])
 
-  const totalActionable =
-    intelligence.counts.critical + intelligence.counts.warning
+  const scopedActionable = useMemo(() => {
+    let critical = 0
+    let warning = 0
+    for (const finding of scopedFindings) {
+      if (finding.severity === "critical") critical += 1
+      if (finding.severity === "warning") warning += 1
+    }
+    return critical + warning
+  }, [scopedFindings])
 
   const modalPolicies = useMemo(() => {
     if (!activeDuplicateGroup) return []
@@ -334,7 +370,7 @@ const IntelligenceView = ({
       .sort((a, b) => Number.parseInt(a.order, 10) - Number.parseInt(b.order, 10))
   }, [activeDuplicateGroup, policiesById])
 
-  if (intelligence.findings.length === 0) {
+  if (scopedFindings.length === 0) {
     return (
       <div className="space-y-4">
         <DisclaimerBanner />
@@ -345,7 +381,11 @@ const IntelligenceView = ({
         />
         <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
           <Sparkles className="mb-3 h-8 w-8 text-emerald-500" />
-          <p className="text-sm font-medium text-slate-900">No policy issues detected</p>
+          <p className="text-sm font-medium text-slate-900">
+            {hideDefaults
+              ? "No customized policy issues detected"
+              : "No policy issues detected"}
+          </p>
           <p className="mt-1 text-xs text-slate-500">
             {intelligence.rulesRun} intelligence rules checked this document.
           </p>
@@ -362,20 +402,6 @@ const IntelligenceView = ({
         selectedRuleId={ruleFilter}
         onSelectRule={setRuleFilter}
       />
-
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge tone={intelligence.counts.critical > 0 ? "red" : "slate"}>
-          {intelligence.counts.critical} critical
-        </Badge>
-        <Badge tone={intelligence.counts.warning > 0 ? "amber" : "slate"}>
-          {intelligence.counts.warning} warning
-        </Badge>
-        <Badge tone="slate">{intelligence.counts.info} info</Badge>
-        <span className="text-xs text-slate-500">
-          {filtered.length} of {intelligence.findings.length} findings
-          {normalizedQuery ? ` · “${query.trim()}”` : ""}
-        </span>
-      </div>
 
       <div className="flex flex-wrap gap-2">
         <select
@@ -487,7 +513,7 @@ const IntelligenceView = ({
         </div>
       )}
 
-      {totalActionable === 0 ? (
+      {scopedActionable === 0 ? (
         <p className="text-xs text-slate-500">
           Only informational findings remain. Review duplicates and other notes above.
         </p>
@@ -536,7 +562,7 @@ const IntelligenceRulesGuide = ({
   selectedRuleId: string
   onSelectRule: (ruleId: string) => void
 }) => {
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(false)
 
   if (rules.length === 0) return null
 

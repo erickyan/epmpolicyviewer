@@ -1,4 +1,3 @@
-import { useRef } from "react"
 import {
   Layers,
   MonitorPlay,
@@ -10,7 +9,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import type { DocumentSummary, IntelligenceReport } from "../types"
-import { categoryTone, cx } from "../lib/ui"
+import { cx } from "../lib/ui"
 import Badge from "./Badge"
 
 export type SummaryTarget =
@@ -26,7 +25,6 @@ interface SummaryViewProps {
   summary: DocumentSummary
   intelligence: IntelligenceReport
   onNavigate: (target: SummaryTarget) => void
-  onSelectCategory: (categoryId: string) => void
 }
 
 interface StatCardProps {
@@ -98,15 +96,7 @@ const SummaryView = ({
   summary,
   intelligence,
   onNavigate,
-  onSelectCategory,
 }: SummaryViewProps) => {
-  const categoryRef = useRef<HTMLDivElement>(null)
-
-  const scrollTo = (ref: React.RefObject<HTMLDivElement>) =>
-    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-
-  const hasCategories = summary.categoryCounts.length > 0
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-[repeat(auto-fit,minmax(10.75rem,1fr))]">
@@ -114,7 +104,7 @@ const SummaryView = ({
           label="Total policies"
           value={summary.totalPolicies}
           icon={Layers}
-          onClick={hasCategories ? () => scrollTo(categoryRef) : undefined}
+          onClick={() => onNavigate("normal")}
         />
         <StatCard
           label="Normal policies"
@@ -171,29 +161,6 @@ const SummaryView = ({
           }
         />
       </div>
-
-      {hasCategories && (
-        <div ref={categoryRef} className="scroll-mt-4">
-          <SectionCard title="Policies by category">
-            <div className="flex flex-wrap gap-2 px-4 py-3">
-              {summary.categoryCounts.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() => onSelectCategory(category.id)}
-                  title={`View ${category.label} policies`}
-                  className="rounded-full transition hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-1"
-                >
-                  <Badge tone={categoryTone(category.id)} className="cursor-pointer">
-                    {category.label}
-                    <span className="ml-1 font-semibold">{category.count}</span>
-                  </Badge>
-                </button>
-              ))}
-            </div>
-          </SectionCard>
-        </div>
-      )}
 
     <SectionCard
       title="Customized general configuration"

@@ -16,6 +16,7 @@ import {
 import type { GuiDialog, PolicyDocumentResponse } from "../types"
 import { cx } from "../lib/ui"
 import { availableOsesFor, type OsFilterValue } from "../lib/os"
+import { tabCountsForDocument } from "../lib/customizedCounts"
 import OsFilter from "./OsFilter"
 import SearchBar from "./SearchBar"
 import SummaryView, { type SummaryTarget } from "./SummaryView"
@@ -53,51 +54,65 @@ interface TabDef {
 
 const Dashboard = ({ response }: DashboardProps) => {
   const { document: doc } = response
+  const [hideDefaults, setHideDefaults] = useState(false)
 
   const tabs = useMemo<TabDef[]>(() => {
+    const counts = tabCountsForDocument(doc, hideDefaults)
     const list: TabDef[] = []
     list.push({ id: "overview", label: "Overview", icon: LayoutDashboard })
-    const actionableFindings =
-      doc.intelligence.counts.critical + doc.intelligence.counts.warning
     list.push({
       id: "intelligence",
       label: "Intelligence",
       icon: Sparkles,
-      count: actionableFindings > 0 ? actionableFindings : doc.intelligence.findings.length || undefined,
+      count: counts.intelligence,
     })
     if (doc.generalConfiguration) {
-      list.push({ id: "config", label: "General Configuration", icon: Settings2 })
+      list.push({
+        id: "config",
+        label: "General Configuration",
+        icon: Settings2,
+        count: counts.config,
+      })
     }
-    list.push({ id: "normal", label: "Normal Policies", icon: ShieldCheck, count: doc.normalPolicies.length })
-    list.push({ id: "excluded", label: "Excluded Policies", icon: ShieldOff, count: doc.excludedPolicies.length })
+    list.push({
+      id: "normal",
+      label: "Normal Policies",
+      icon: ShieldCheck,
+      count: counts.normal,
+    })
+    list.push({
+      id: "excluded",
+      label: "Excluded Policies",
+      icon: ShieldOff,
+      count: counts.excluded,
+    })
     if (doc.threatProtectionPolicies.length > 0) {
       list.push({
         id: "threat",
         label: "Threat Protection",
         icon: ShieldAlert,
-        count: doc.threatProtectionPolicies.length,
+        count: counts.threat,
       })
     }
-    list.push({ id: "gui", label: "GUI Dialogs", icon: MonitorPlay, count: doc.gui.length })
+    list.push({ id: "gui", label: "GUI Dialogs", icon: MonitorPlay, count: counts.gui })
     if (doc.applicationGroups.length > 0) {
       list.push({
         id: "appgroups",
         label: "Application Groups",
         icon: Boxes,
-        count: doc.applicationGroups.length,
+        count: counts.appGroups,
       })
     }
     list.push({ id: "raw", label: "Raw XML", icon: FileCode2 })
     return list
-  }, [doc])
+  }, [doc, hideDefaults])
 
   const [activeTab, setActiveTab] = useState<TabId>(tabs[0].id)
   const [osFilter, setOsFilter] = useState<OsFilterValue>("all")
   const [query, setQuery] = useState("")
   const deferredQuery = useDeferredValue(query)
-  const [hideDefaults, setHideDefaults] = useState(false)
   const [normalCategory, setNormalCategory] = useState("all")
-  const [excludedCategory, setExcludedCategory] = useState("all")
+  const [excludedCategory] = useState("all")
   const [threatCategory, setThreatCategory] = useState("all")
   const [selectedDialog, setSelectedDialog] = useState<GuiDialog | null>(null)
   const [selectedAppGroup, setSelectedAppGroup] = useState<string | null>(null)
@@ -140,16 +155,6 @@ const Dashboard = ({ response }: DashboardProps) => {
     }
   }, [activeTab, rawXml, response.source])
 
-  const excludedCategoryIds = useMemo(
-    () => new Set(doc.excludedPolicies.map((policy) => policy.categoryId)),
-    [doc.excludedPolicies]
-  )
-
-  const threatCategoryIds = useMemo(
-    () => new Set(doc.threatProtectionPolicies.map((policy) => policy.categoryId)),
-    [doc.threatProtectionPolicies]
-  )
-
   const handleSummaryNavigate = useCallback((target: SummaryTarget) => {
     if (target === "intelligence") {
       setActiveTab("intelligence")
@@ -164,29 +169,6 @@ const Dashboard = ({ response }: DashboardProps) => {
     if (target === "threat") setThreatCategory("all")
     setActiveTab(target)
   }, [])
-
-  const handleSelectCategory = useCallback(
-    (categoryId: string) => {
-      if (categoryId === "threat-protection" || categoryId === "eagles") {
-        setThreatCategory("all")
-        setActiveTab("threat")
-        return
-      }
-      if (threatCategoryIds.has(categoryId)) {
-        setThreatCategory(categoryId)
-        setActiveTab("threat")
-        return
-      }
-      if (excludedCategoryIds.has(categoryId)) {
-        setExcludedCategory(categoryId)
-        setActiveTab("excluded")
-        return
-      }
-      setNormalCategory(categoryId)
-      setActiveTab("normal")
-    },
-    [excludedCategoryIds, threatCategoryIds]
-  )
 
   const openDialogById = useCallback(
     (id: string) => {
@@ -241,31 +223,6 @@ const Dashboard = ({ response }: DashboardProps) => {
 
   return (
     <div className="space-y-6">
-      {showSearch && (
-        <div className="flex flex-wrap items-center gap-3">
-          <SearchBar value={query} onChange={setQuery} placeholder={searchPlaceholder} />
-          <button
-            type="button"
-            onClick={() => setHideDefaults((value) => !value)}
-            aria-pressed={hideDefaults}
-            title="Hide unchanged default configurations, policies and dialogs"
-            className={cx(
-              "inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2",
-              hideDefaults
-                ? "border-slate-900 bg-slate-900 text-white hover:bg-slate-800"
-                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-            )}
-          >
-            {hideDefaults ? (
-              <EyeOff className="h-3.5 w-3.5" />
-            ) : (
-              <Eye className="h-3.5 w-3.5" />
-            )}
-            Customized only
-          </button>
-        </div>
-      )}
-
       <div className="border-b border-slate-200">
         <nav className="flex flex-wrap gap-1">
           {tabs.map((tab) => {
@@ -292,7 +249,9 @@ const Dashboard = ({ response }: DashboardProps) => {
                       "rounded-full px-1.5 py-0.5 text-[11px] font-semibold",
                       isActive
                         ? "bg-slate-900 text-white"
-                        : "bg-slate-100 text-slate-500"
+                        : hideDefaults
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-slate-100 text-slate-500"
                     )}
                   >
                     {tab.count}
@@ -303,6 +262,39 @@ const Dashboard = ({ response }: DashboardProps) => {
           })}
         </nav>
       </div>
+
+      {activeTab !== "raw" && (
+        <div className="flex flex-wrap items-center gap-3">
+          {showSearch ? (
+            <div className="min-w-[16rem] flex-1">
+              <SearchBar
+                value={query}
+                onChange={setQuery}
+                placeholder={searchPlaceholder}
+              />
+            </div>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => setHideDefaults((value) => !value)}
+            aria-pressed={hideDefaults}
+            title="Show only customized policies, dialogs, settings, and application groups"
+            className={cx(
+              "inline-flex shrink-0 items-center gap-2 rounded-xl border-2 px-4 py-2.5 text-sm font-semibold shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2",
+              hideDefaults
+                ? "border-amber-500 bg-amber-500 text-white shadow-amber-200/60 hover:bg-amber-600"
+                : "border-slate-300 bg-white text-slate-800 hover:border-amber-300 hover:bg-amber-50"
+            )}
+          >
+            {hideDefaults ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+            Customized only
+          </button>
+        </div>
+      )}
 
       {showOsFilter && (
         <div className="flex flex-wrap items-center gap-3">
@@ -324,7 +316,6 @@ const Dashboard = ({ response }: DashboardProps) => {
               summary={doc.summary}
               intelligence={doc.intelligence}
               onNavigate={handleSummaryNavigate}
-              onSelectCategory={handleSelectCategory}
             />
           ))}
         {activeTab === "intelligence" && (
@@ -335,6 +326,8 @@ const Dashboard = ({ response }: DashboardProps) => {
               ...doc.excludedPolicies,
               ...doc.threatProtectionPolicies,
             ]}
+            applicationGroups={doc.applicationGroups}
+            hideDefaults={hideDefaults}
             query={deferredQuery}
             onOpenPolicy={openPolicyById}
           />
