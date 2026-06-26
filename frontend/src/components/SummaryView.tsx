@@ -8,7 +8,8 @@ import {
   SlidersHorizontal,
   type LucideIcon,
 } from "lucide-react"
-import type { DocumentSummary, IntelligenceReport } from "../types"
+import type { DocumentSummary } from "../types"
+import type { OverviewCounts } from "../lib/customizedCounts"
 import { cx } from "../lib/ui"
 import Badge from "./Badge"
 
@@ -23,7 +24,8 @@ export type SummaryTarget =
 
 interface SummaryViewProps {
   summary: DocumentSummary
-  intelligence: IntelligenceReport
+  counts: OverviewCounts
+  hideDefaults: boolean
   onNavigate: (target: SummaryTarget) => void
 }
 
@@ -94,70 +96,75 @@ const SectionCard = ({
 
 const SummaryView = ({
   summary,
-  intelligence,
+  counts,
+  hideDefaults,
   onNavigate,
 }: SummaryViewProps) => {
+  const filteredTone = hideDefaults
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-[repeat(auto-fit,minmax(10.75rem,1fr))]">
         <StatCard
           label="Total policies"
-          value={summary.totalPolicies}
+          value={counts.totalPolicies}
           icon={Layers}
+          accent={filteredTone}
           onClick={() => onNavigate("normal")}
         />
         <StatCard
           label="Normal policies"
-          value={summary.normalCount}
+          value={counts.normal}
           icon={ShieldCheck}
+          accent={filteredTone}
           onClick={() => onNavigate("normal")}
         />
         <StatCard
           label="Excluded policies"
-          value={summary.excludedCount}
+          value={counts.excluded}
           icon={ShieldOff}
+          accent={filteredTone}
           onClick={() => onNavigate("excluded")}
         />
-        {summary.threatProtectionCount > 0 ? (
+        {(hideDefaults ? counts.threat > 0 : summary.threatProtectionCount > 0) ? (
           <StatCard
             label="Threat protection"
-            value={summary.threatProtectionCount}
+            value={counts.threat}
             icon={ShieldAlert}
+            accent={filteredTone}
             onClick={() => onNavigate("threat")}
           />
         ) : null}
         <StatCard
           label="Default policies"
-          value={summary.defaultPolicyCount}
+          value={counts.defaultPolicies}
           icon={PackageCheck}
+          accent={filteredTone}
           onClick={
-            summary.defaultPolicyCount > 0 ? () => onNavigate("default") : undefined
+            counts.defaultPolicies > 0 ? () => onNavigate("default") : undefined
           }
         />
         <StatCard
           label="GUI dialogs"
-          value={summary.guiCount}
+          value={counts.gui}
           icon={MonitorPlay}
+          accent={filteredTone}
           onClick={() => onNavigate("gui")}
         />
         <StatCard
           label="Customized settings"
-          value={summary.customizedConfigCount}
+          value={counts.customizedSettings}
           icon={SlidersHorizontal}
-          accent={summary.customizedConfigCount > 0}
+          accent={counts.customizedSettings > 0 || filteredTone}
           onClick={() => onNavigate("config")}
         />
         <StatCard
           label="Policy findings"
-          value={intelligence.findings.length}
+          value={counts.findings}
           icon={ShieldAlert}
-          accent={
-            intelligence.counts.critical + intelligence.counts.warning > 0
-          }
+          accent={counts.findingsAccent || filteredTone}
           onClick={
-            intelligence.findings.length > 0
-              ? () => onNavigate("intelligence")
-              : undefined
+            counts.findings > 0 ? () => onNavigate("intelligence") : undefined
           }
         />
       </div>

@@ -87,6 +87,19 @@ export const tabCountsForDocument = (
     }
   }
 
+  const normal = countCustomizedPolicies(doc.normalPolicies, doc.applicationGroups)
+  const excluded = countCustomizedPolicies(
+    doc.excludedPolicies,
+    doc.applicationGroups
+  )
+  const threat =
+    doc.threatProtectionPolicies.length > 0
+      ? countCustomizedPolicies(
+          doc.threatProtectionPolicies,
+          doc.applicationGroups
+        )
+      : 0
+
   return {
     intelligence: intelligenceTabCount(
       doc.intelligence,
@@ -94,23 +107,63 @@ export const tabCountsForDocument = (
       allPolicies,
       doc.applicationGroups
     ),
-    normal: countCustomizedPolicies(doc.normalPolicies, doc.applicationGroups),
-    excluded: countCustomizedPolicies(
-      doc.excludedPolicies,
-      doc.applicationGroups
-    ),
-    threat:
-      doc.threatProtectionPolicies.length > 0
-        ? countCustomizedPolicies(
-            doc.threatProtectionPolicies,
-            doc.applicationGroups
-          )
-        : undefined,
+    normal,
+    excluded,
+    threat: doc.threatProtectionPolicies.length > 0 ? threat : undefined,
     gui: countCustomizedDialogs(doc.gui),
     appGroups:
       doc.applicationGroups.length > 0
         ? countCustomizedAppGroups(doc.applicationGroups)
         : undefined,
     config: doc.summary.customizedConfigCount || undefined,
+  }
+}
+
+export interface OverviewCounts {
+  totalPolicies: number
+  normal: number
+  excluded: number
+  threat: number
+  defaultPolicies: number
+  gui: number
+  customizedSettings: number
+  findings: number
+  findingsAccent: boolean
+}
+
+export const overviewCountsForDocument = (
+  doc: PolicyDocument,
+  hideDefaults: boolean
+): OverviewCounts => {
+  if (!hideDefaults) {
+    return {
+      totalPolicies: doc.summary.totalPolicies,
+      normal: doc.summary.normalCount,
+      excluded: doc.summary.excludedCount,
+      threat: doc.summary.threatProtectionCount,
+      defaultPolicies: doc.summary.defaultPolicyCount,
+      gui: doc.summary.guiCount,
+      customizedSettings: doc.summary.customizedConfigCount,
+      findings: doc.intelligence.findings.length,
+      findingsAccent:
+        doc.intelligence.counts.critical + doc.intelligence.counts.warning > 0,
+    }
+  }
+
+  const tabCounts = tabCountsForDocument(doc, true)
+  const normal = tabCounts.normal ?? 0
+  const excluded = tabCounts.excluded ?? 0
+  const threat = tabCounts.threat ?? 0
+
+  return {
+    totalPolicies: normal + excluded + threat,
+    normal,
+    excluded,
+    threat,
+    defaultPolicies: 0,
+    gui: tabCounts.gui ?? 0,
+    customizedSettings: doc.summary.customizedConfigCount,
+    findings: tabCounts.intelligence ?? 0,
+    findingsAccent: (tabCounts.intelligence ?? 0) > 0,
   }
 }

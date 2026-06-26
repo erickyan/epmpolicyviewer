@@ -16,7 +16,7 @@ import {
 import type { GuiDialog, PolicyDocumentResponse } from "../types"
 import { cx } from "../lib/ui"
 import { availableOsesFor, type OsFilterValue } from "../lib/os"
-import { tabCountsForDocument } from "../lib/customizedCounts"
+import { tabCountsForDocument, overviewCountsForDocument } from "../lib/customizedCounts"
 import OsFilter from "./OsFilter"
 import SearchBar from "./SearchBar"
 import SummaryView, { type SummaryTarget } from "./SummaryView"
@@ -55,6 +55,11 @@ interface TabDef {
 const Dashboard = ({ response }: DashboardProps) => {
   const { document: doc } = response
   const [hideDefaults, setHideDefaults] = useState(false)
+
+  const overviewCounts = useMemo(
+    () => overviewCountsForDocument(doc, hideDefaults),
+    [doc, hideDefaults]
+  )
 
   const tabs = useMemo<TabDef[]>(() => {
     const counts = tabCountsForDocument(doc, hideDefaults)
@@ -314,7 +319,8 @@ const Dashboard = ({ response }: DashboardProps) => {
           ) : (
             <SummaryView
               summary={doc.summary}
-              intelligence={doc.intelligence}
+              counts={overviewCounts}
+              hideDefaults={hideDefaults}
               onNavigate={handleSummaryNavigate}
             />
           ))}
