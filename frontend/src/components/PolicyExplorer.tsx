@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from "react"
+import { Fragment, useEffect, useMemo, useState } from "react"
 import {
   ArrowDown,
   ArrowUp,
@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Rows3,
   ShieldOff,
+  Sparkles,
   Users,
 } from "lucide-react"
 import type {
@@ -23,6 +24,7 @@ import type {
   LcdPolicyConfig,
   LinkedDialog,
   PolicyEntry,
+  PolicyFinding,
   TargetEntry,
   UserGroupEntry,
 } from "../types"
@@ -49,8 +51,48 @@ interface PolicyExplorerProps {
   query: string
   hideDefaults: boolean
   initialCategory?: string
+  highlightPolicyId?: string | null
+  onHighlightHandled?: () => void
   onOpenDialog: (id: string) => void
   onOpenAppGroup: (id: string) => void
+}
+
+const findingBadgeTone = (findings?: PolicyFinding[]) => {
+  if (!findings?.length) return null
+  if (findings.some((finding) => finding.severity === "critical")) return "red"
+  if (findings.some((finding) => finding.severity === "warning")) return "amber"
+  return "slate"
+}
+
+const FindingsPanel = ({ findings }: { findings: PolicyFinding[] }) => {
+  if (findings.length === 0) return null
+  return (
+    <div className="border-t border-amber-100 bg-amber-50/40 px-4 py-3">
+      <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
+        <Sparkles className="h-3.5 w-3.5" />
+        Policy intelligence ({findings.length})
+      </p>
+      <ul className="space-y-2">
+        {findings.map((finding) => (
+          <li
+            key={`${finding.ruleId}-${finding.title}`}
+            className="rounded-lg border border-amber-200/80 bg-white px-3 py-2"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone={finding.severity === "critical" ? "red" : finding.severity === "warning" ? "amber" : "slate"}>
+                {finding.severity}
+              </Badge>
+              <span className="text-xs font-medium text-slate-800">{finding.title}</span>
+            </div>
+            <p className="mt-1 text-xs text-slate-600">{finding.message}</p>
+            {finding.remediation ? (
+              <p className="mt-1 text-[11px] text-amber-900">{finding.remediation}</p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 const PlatformBadges = ({ policy }: { policy: PolicyEntry }) => {
@@ -687,6 +729,8 @@ const GroupedView = ({
   appGroups,
   hideDefaults,
   query,
+  highlightPolicyId,
+  onHighlightHandled,
   onOpenDialog,
   onOpenAppGroup,
 }: {
@@ -694,10 +738,27 @@ const GroupedView = ({
   appGroups: ApplicationGroupEntry[]
   hideDefaults: boolean
   query: string
+  highlightPolicyId?: string | null
+  onHighlightHandled?: () => void
   onOpenDialog: (id: string) => void
   onOpenAppGroup: (id: string) => void
 }) => {
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (!highlightPolicyId) return
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      next.add(highlightPolicyId)
+      return next
+    })
+    window.requestAnimationFrame(() => {
+      document
+        .getElementById(`policy-row-${highlightPolicyId}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" })
+      onHighlightHandled?.()
+    })
+  }, [highlightPolicyId, onHighlightHandled])
 
   const toggle = (id: string) => {
     setExpanded((prev) => {
@@ -723,10 +784,17 @@ const GroupedView = ({
           appGroups,
           hideDefaults
         )
+        const findingsTone = findingBadgeTone(policy.findings)
         return (
           <div
+            id={`policy-row-${policy.id}`}
             key={policy.id}
-            className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+            className={cx(
+              "overflow-hidden rounded-xl border bg-white shadow-sm",
+              highlightPolicyId === policy.id
+                ? "border-amber-400 ring-2 ring-amber-200"
+                : "border-slate-200"
+            )}
           >
             <button
               type="button"
@@ -772,6 +840,12 @@ const GroupedView = ({
                   {policy.linkedDialogs.length}
                 </Badge>
               ) : null}
+              {findingsTone ? (
+                <Badge tone={findingsTone}>
+                  <Sparkles className="h-3 w-3" />
+                  {policy.findings?.length}
+                </Badge>
+              ) : null}
               {definitionCount > 0 ? (
                 <DefinitionCountBadge count={definitionCount} />
               ) : null}
@@ -779,6 +853,9 @@ const GroupedView = ({
             {isOpen && (
               <div className="border-t border-slate-100">
                 <PolicySettingsStrip policy={policy} />
+                {policy.findings?.length ? (
+                  <FindingsPanel findings={policy.findings} />
+                ) : null}
                 <TargetingPanel userGroups={policy.userGroups} />
                 <LinkedDialogsPanel
                   dialogs={policy.linkedDialogs}
@@ -984,6 +1061,8 @@ const PolicyExplorer = ({
   query,
   hideDefaults,
   initialCategory,
+  highlightPolicyId,
+  onHighlightHandled,
   onOpenDialog,
   onOpenAppGroup,
 }: PolicyExplorerProps) => {
@@ -1081,6 +1160,8 @@ const PolicyExplorer = ({
           appGroups={applicationGroups}
           hideDefaults={hideDefaults}
           query={normalizedQuery}
+          highlightPolicyId={highlightPolicyId}
+          onHighlightHandled={onHighlightHandled}
           onOpenDialog={onOpenDialog}
           onOpenAppGroup={onOpenAppGroup}
         />

@@ -10,12 +10,13 @@ import {
   SlidersHorizontal,
   type LucideIcon,
 } from "lucide-react"
-import type { DocumentSummary } from "../types"
+import type { DocumentSummary, IntelligenceReport } from "../types"
 import { categoryTone, cx } from "../lib/ui"
 import Badge from "./Badge"
 
 export type SummaryTarget =
   | "config"
+  | "intelligence"
   | "normal"
   | "excluded"
   | "threat"
@@ -24,6 +25,7 @@ export type SummaryTarget =
 
 interface SummaryViewProps {
   summary: DocumentSummary
+  intelligence: IntelligenceReport
   onNavigate: (target: SummaryTarget) => void
   onSelectCategory: (categoryId: string) => void
 }
@@ -93,7 +95,12 @@ const SectionCard = ({
   </section>
 )
 
-const SummaryView = ({ summary, onNavigate, onSelectCategory }: SummaryViewProps) => {
+const SummaryView = ({
+  summary,
+  intelligence,
+  onNavigate,
+  onSelectCategory,
+}: SummaryViewProps) => {
   const categoryRef = useRef<HTMLDivElement>(null)
   const duplicatesRef = useRef<HTMLDivElement>(null)
 
@@ -153,14 +160,27 @@ const SummaryView = ({ summary, onNavigate, onSelectCategory }: SummaryViewProps
           onClick={() => onNavigate("config")}
         />
         <StatCard
-          label="Duplicate groups"
-          value={summary.duplicateGroups.length}
-          icon={Copy}
-          accent={summary.duplicateGroups.length > 0}
+          label="Policy findings"
+          value={intelligence.findings.length}
+          icon={ShieldAlert}
+          accent={
+            intelligence.counts.critical + intelligence.counts.warning > 0
+          }
           onClick={
-            summary.duplicateGroups.length > 0 ? () => scrollTo(duplicatesRef) : undefined
+            intelligence.findings.length > 0
+              ? () => onNavigate("intelligence")
+              : undefined
           }
         />
+        {summary.duplicateGroups.length > 0 ? (
+          <StatCard
+            label="Duplicate groups"
+            value={summary.duplicateGroups.length}
+            icon={Copy}
+            accent
+            onClick={() => scrollTo(duplicatesRef)}
+          />
+        ) : null}
       </div>
 
       {hasCategories && (

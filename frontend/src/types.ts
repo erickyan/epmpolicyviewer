@@ -155,6 +155,35 @@ export interface PolicyEntry {
   linkedDialogs: LinkedDialog[]
   endpointSignIn?: EndpointSignInConfig
   lcdPolicy?: LcdPolicyConfig
+  findings?: PolicyFinding[]
+}
+
+export type IntelligenceSeverity = "critical" | "warning" | "info"
+
+export interface PolicyFinding {
+  ruleId: string
+  severity: IntelligenceSeverity
+  title: string
+  message: string
+  policyId: string
+  policyName: string
+  categoryLabel: string
+  policyCategory: Exclude<PolicyCategory, "configuration">
+  evidence?: Record<string, string | number>
+  remediation?: string
+  docUrl?: string
+}
+
+export interface IntelligenceCounts {
+  critical: number
+  warning: number
+  info: number
+}
+
+export interface IntelligenceReport {
+  findings: PolicyFinding[]
+  counts: IntelligenceCounts
+  rulesRun: number
 }
 
 export interface ConfigItem {
@@ -273,6 +302,7 @@ export interface ApplicationGroupEntry {
 export interface PolicyDocument {
   meta: PolicyDocumentMeta
   summary: DocumentSummary
+  intelligence: IntelligenceReport
   generalConfiguration: GeneralConfiguration | null
   normalPolicies: PolicyEntry[]
   excludedPolicies: PolicyEntry[]

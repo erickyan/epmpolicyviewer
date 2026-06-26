@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   ShieldOff,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react"
 import type { GuiDialog, PolicyDocumentResponse } from "../types"
@@ -25,6 +26,7 @@ import GuiDialogs from "./GuiDialogs"
 import ApplicationGroupsView from "./ApplicationGroupsView"
 import DialogModal from "./DialogModal"
 import RawXmlView from "./RawXmlView"
+import IntelligenceView from "./IntelligenceView"
 import { fetchRawXml } from "../api"
 
 interface DashboardProps {
@@ -33,6 +35,7 @@ interface DashboardProps {
 
 type TabId =
   | "overview"
+  | "intelligence"
   | "config"
   | "normal"
   | "excluded"
@@ -54,6 +57,14 @@ const Dashboard = ({ response }: DashboardProps) => {
   const tabs = useMemo<TabDef[]>(() => {
     const list: TabDef[] = []
     list.push({ id: "overview", label: "Overview", icon: LayoutDashboard })
+    const actionableFindings =
+      doc.intelligence.counts.critical + doc.intelligence.counts.warning
+    list.push({
+      id: "intelligence",
+      label: "Intelligence",
+      icon: Sparkles,
+      count: actionableFindings > 0 ? actionableFindings : doc.intelligence.findings.length || undefined,
+    })
     if (doc.generalConfiguration) {
       list.push({ id: "config", label: "General Configuration", icon: Settings2 })
     }
@@ -90,6 +101,7 @@ const Dashboard = ({ response }: DashboardProps) => {
   const [threatCategory, setThreatCategory] = useState("all")
   const [selectedDialog, setSelectedDialog] = useState<GuiDialog | null>(null)
   const [selectedAppGroup, setSelectedAppGroup] = useState<string | null>(null)
+  const [highlightPolicyId, setHighlightPolicyId] = useState<string | null>(null)
   const [rawXml, setRawXml] = useState<string | null>(null)
   const [rawXmlLoading, setRawXmlLoading] = useState(false)
   const [rawXmlError, setRawXmlError] = useState<string | null>(null)
@@ -139,6 +151,10 @@ const Dashboard = ({ response }: DashboardProps) => {
   )
 
   const handleSummaryNavigate = useCallback((target: SummaryTarget) => {
+    if (target === "intelligence") {
+      setActiveTab("intelligence")
+      return
+    }
     if (target === "default") {
       setNormalCategory("default")
       setActiveTab("normal")
@@ -187,6 +203,7 @@ const Dashboard = ({ response }: DashboardProps) => {
 
   const openPolicyById = useCallback(
     (id: string) => {
+      setHighlightPolicyId(id)
       if (doc.threatProtectionPolicies.some((policy) => policy.id === id)) {
         setActiveTab("threat")
         return
@@ -196,6 +213,10 @@ const Dashboard = ({ response }: DashboardProps) => {
     },
     [doc.excludedPolicies, doc.threatProtectionPolicies]
   )
+
+  const handleHighlightHandled = useCallback(() => {
+    setHighlightPolicyId(null)
+  }, [])
 
   const showOsFilter =
     (activeTab === "normal" ||
@@ -208,7 +229,9 @@ const Dashboard = ({ response }: DashboardProps) => {
   const searchPlaceholder =
     activeTab === "overview"
       ? "Search the entire policy — settings, policies, dialogs…"
-      : activeTab === "config"
+      : activeTab === "intelligence"
+        ? "Search intelligence findings…"
+        : activeTab === "config"
         ? "Search settings, alerts, messages…"
         : activeTab === "gui"
           ? "Search dialogs…"
@@ -299,10 +322,18 @@ const Dashboard = ({ response }: DashboardProps) => {
           ) : (
             <SummaryView
               summary={doc.summary}
+              intelligence={doc.intelligence}
               onNavigate={handleSummaryNavigate}
               onSelectCategory={handleSelectCategory}
             />
           ))}
+        {activeTab === "intelligence" && (
+          <IntelligenceView
+            intelligence={doc.intelligence}
+            query={deferredQuery}
+            onOpenPolicy={openPolicyById}
+          />
+        )}
         {activeTab === "config" && doc.generalConfiguration && (
           <GeneralConfigView
             config={doc.generalConfiguration}
@@ -322,6 +353,8 @@ const Dashboard = ({ response }: DashboardProps) => {
             initialCategory={normalCategory}
             onOpenDialog={openDialogById}
             onOpenAppGroup={openAppGroupById}
+            highlightPolicyId={highlightPolicyId}
+            onHighlightHandled={handleHighlightHandled}
           />
         )}
         {activeTab === "excluded" && (
@@ -336,6 +369,8 @@ const Dashboard = ({ response }: DashboardProps) => {
             initialCategory={excludedCategory}
             onOpenDialog={openDialogById}
             onOpenAppGroup={openAppGroupById}
+            highlightPolicyId={highlightPolicyId}
+            onHighlightHandled={handleHighlightHandled}
           />
         )}
         {activeTab === "threat" && (
@@ -350,6 +385,8 @@ const Dashboard = ({ response }: DashboardProps) => {
             initialCategory={threatCategory}
             onOpenDialog={openDialogById}
             onOpenAppGroup={openAppGroupById}
+            highlightPolicyId={highlightPolicyId}
+            onHighlightHandled={handleHighlightHandled}
           />
         )}
         {activeTab === "gui" && (

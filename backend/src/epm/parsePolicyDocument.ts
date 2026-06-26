@@ -8,8 +8,6 @@ import type {
   ConfigItem,
   DialogUser,
   DocumentSummary,
-  DuplicateGroup,
-  DuplicatePolicy,
   EndpointSignInConfig,
   FileVerInfoEntry,
   GeneralConfiguration,
@@ -39,6 +37,11 @@ import {
   isDefaultPolicy,
 } from "./labels"
 import { CONFIG_GROUP_SPECS } from "./configGroups"
+import {
+  attachFindingsToPolicies,
+  buildDuplicateSummaryFromFindingsWithPolicies,
+  runPolicyIntelligence,
+} from "./intelligence/engine"
 import { enrichTargetDefinition } from "./targetDefinition"
 
 // Per EPM domain rules + the format spec, attributes hold the metadata and must
@@ -728,94 +731,6 @@ export const extractConsoleDefaults = (jsonText: string): ConsoleDefaults => {
   return { appGroupNames, policyNames }
 }
 
-const targetSignature = (policy: PolicyEntry): string =>
-  policy.targets
-    .map((t) =>
-      [
-        t.kind,
-        t.platform,
-        t.publisher ?? "",
-        t.location ?? "",
-        t.fileName ?? "",
-        t.accessType ?? "",
-        t.name ?? "",
-        t.refId ?? "",
-      ]
-        .join("~")
-        .toLowerCase()
-    )
-    .sort()
-    .join("|")
-
-const toDuplicatePolicy = (policy: PolicyEntry): DuplicatePolicy => ({
-  id: policy.id,
-  name: policy.name,
-  categoryLabel: policy.categoryLabel,
-  order: policy.order,
-})
-
-// internalType values of the "installed by" half of a main/installed-by pair.
-const INSTALLED_BY_INTERNAL_TYPES = new Set([
-  "221", "231", "244", "265", "281", "291", "1281",
-])
-
-// A "main + installed-by" pair is by design (the companion matches files installed
-// BY the trusted app), not a duplicate. These are excluded from duplicate detection.
-const isInstalledByCompanion = (policy: PolicyEntry): boolean =>
-  /^installed by:/i.test(policy.name.trim()) ||
-  INSTALLED_BY_INTERNAL_TYPES.has(policy.internalType ?? "")
-
-// Best-effort duplicate detection: policies with identical action + targets, or
-// sharing an identical name. Name groups already covered by a content group are skipped.
-// Default/implicit baseline policies and installed-by companions are excluded because
-// their parallel structures are by design rather than admin-introduced redundancy.
-const buildDuplicateGroups = (entries: PolicyEntry[]): DuplicateGroup[] => {
-  const groups: DuplicateGroup[] = []
-  const seenIdSets = new Set<string>()
-
-  const candidates = entries.filter(
-    (entry) => !entry.implicit && !isInstalledByCompanion(entry)
-  )
-
-  const byContent = new Map<string, PolicyEntry[]>()
-  for (const entry of candidates) {
-    if (entry.targetCount === 0) continue
-    const signature = `${entry.action}|${targetSignature(entry)}`
-    const list = byContent.get(signature) ?? []
-    list.push(entry)
-    byContent.set(signature, list)
-  }
-  for (const list of byContent.values()) {
-    if (list.length < 2) continue
-    seenIdSets.add(list.map((e) => e.id).sort().join(","))
-    groups.push({
-      reason: "Same action & identical targets",
-      policies: list.map(toDuplicatePolicy),
-    })
-  }
-
-  const byName = new Map<string, PolicyEntry[]>()
-  for (const entry of candidates) {
-    const key = entry.name.trim().toLowerCase()
-    if (!key) continue
-    const list = byName.get(key) ?? []
-    list.push(entry)
-    byName.set(key, list)
-  }
-  for (const list of byName.values()) {
-    if (list.length < 2) continue
-    const idKey = list.map((e) => e.id).sort().join(",")
-    if (seenIdSets.has(idKey)) continue
-    seenIdSets.add(idKey)
-    groups.push({
-      reason: "Duplicate name",
-      policies: list.map(toDuplicatePolicy),
-    })
-  }
-
-  return groups
-}
-
 interface ParseOptions {
   baseline?: Record<string, string>
   consoleDefaults?: ConsoleDefaults
@@ -995,11 +910,17 @@ export const parsePolicyDocument = (
     .flatMap((group) => group.items)
     .filter((item) => item.customized === true)
 
-  const duplicateGroups = buildDuplicateGroups(allEntries)
-  const duplicatePolicyCount = duplicateGroups.reduce(
-    (sum, group) => sum + group.policies.length,
-    0
-  )
+  const intelligence = runPolicyIntelligence({
+    normalPolicies,
+    excludedPolicies,
+    threatProtectionPolicies,
+    applicationGroups,
+  })
+
+  attachFindingsToPolicies(allEntries, intelligence.findings)
+
+  const { duplicateGroups, duplicatePolicyCount } =
+    buildDuplicateSummaryFromFindingsWithPolicies(intelligence.findings, allEntries)
 
   const configCount = policies.filter(
     (p) => (attr(p, "action") ?? "") === "10"
@@ -1033,6 +954,7 @@ export const parsePolicyDocument = (
       dialogCount: gui.length,
     },
     summary,
+    intelligence,
     generalConfiguration,
     normalPolicies,
     excludedPolicies,
