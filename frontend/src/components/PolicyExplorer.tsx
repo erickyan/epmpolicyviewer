@@ -57,17 +57,27 @@ interface PolicyExplorerProps {
   onOpenAppGroup: (id: string) => void
 }
 
+const ACTIONABLE_FINDING_SEVERITIES = new Set<PolicyFinding["severity"]>([
+  "critical",
+  "warning",
+])
+
+const actionablePolicyFindings = (findings?: PolicyFinding[]): PolicyFinding[] =>
+  findings?.filter((finding) => ACTIONABLE_FINDING_SEVERITIES.has(finding.severity)) ?? []
+
 const findingBadgeTone = (findings?: PolicyFinding[]) => {
-  if (!findings?.length) return null
-  if (findings.some((finding) => finding.severity === "critical")) return "red"
-  if (findings.some((finding) => finding.severity === "warning")) return "amber"
-  return "slate"
+  const actionable = actionablePolicyFindings(findings)
+  if (actionable.length === 0) return null
+  if (actionable.some((finding) => finding.severity === "critical")) return "red"
+  if (actionable.some((finding) => finding.severity === "warning")) return "amber"
+  return null
 }
 
 const FindingsPanel = ({ findings }: { findings: PolicyFinding[] }) => {
-  if (findings.length === 0) return null
+  const actionable = actionablePolicyFindings(findings)
+  if (actionable.length === 0) return null
 
-  const sortedFindings = [...findings].sort((a, b) => {
+  const sortedFindings = [...actionable].sort((a, b) => {
     const rank = { critical: 0, warning: 1, info: 2 } as const
     const severityDiff = rank[a.severity] - rank[b.severity]
     if (severityDiff !== 0) return severityDiff
@@ -78,7 +88,7 @@ const FindingsPanel = ({ findings }: { findings: PolicyFinding[] }) => {
     <div className="border-t border-amber-100 bg-amber-50/40 px-4 py-3">
       <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-amber-800">
         <Sparkles className="h-3.5 w-3.5" />
-        Policy intelligence ({findings.length})
+        Policy intelligence ({actionable.length})
       </p>
       <ul className="space-y-2">
         {sortedFindings.map((finding) => (
@@ -793,6 +803,7 @@ const GroupedView = ({
           hideDefaults
         )
         const findingsTone = findingBadgeTone(policy.findings)
+        const policyFindings = actionablePolicyFindings(policy.findings)
         return (
           <div
             id={`policy-row-${policy.id}`}
@@ -851,7 +862,7 @@ const GroupedView = ({
               {findingsTone ? (
                 <Badge tone={findingsTone}>
                   <Sparkles className="h-3 w-3" />
-                  {policy.findings?.length}
+                  {policyFindings.length}
                 </Badge>
               ) : null}
               {definitionCount > 0 ? (
@@ -861,8 +872,8 @@ const GroupedView = ({
             {isOpen && (
               <div className="border-t border-slate-100">
                 <PolicySettingsStrip policy={policy} />
-                {policy.findings?.length ? (
-                  <FindingsPanel findings={policy.findings} />
+                {policyFindings.length > 0 ? (
+                  <FindingsPanel findings={policy.findings ?? []} />
                 ) : null}
                 <TargetingPanel userGroups={policy.userGroups} />
                 <LinkedDialogsPanel
