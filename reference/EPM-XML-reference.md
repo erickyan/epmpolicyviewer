@@ -50,6 +50,7 @@ Value types: `Number` = 0–4294967295; `Boolean` = "False"/"0" → false, "True
 ```
 
 - `<Policies>` attrs: `version` (XML format version), `changeId` (64-bit), `merge`.
+- `changeId` packs a SQL Server `datetime` (days since 1900-01-01 UTC in the high 32 bits, 1/300-second ticks since midnight UTC in the low 32 bits). The viewer decodes this to a human-readable export timestamp in the header.
 - A single child collapses to an object (not array) in fast-xml-parser — always normalize to array.
 
 ---

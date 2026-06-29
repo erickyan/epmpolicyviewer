@@ -42,6 +42,7 @@ import {
   buildDuplicateSummaryFromFindingsWithPolicies,
   runPolicyIntelligence,
 } from "./intelligence/engine"
+import { decodePolicyChangeId } from "./changeId"
 import { enrichTargetDefinition } from "./targetDefinition"
 
 // Per EPM domain rules + the format spec, attributes hold the metadata and must
@@ -956,6 +957,7 @@ export const parsePolicyDocument = (
     meta: {
       version: attr(root, "version"),
       changeId: attr(root, "changeId"),
+      changeIdAt: decodePolicyChangeId(attr(root, "changeId"))?.toISOString(),
       merge: attr(root, "merge"),
       policyCount: policies.length,
       normalCount: normalPolicies.length,

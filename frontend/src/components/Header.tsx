@@ -1,6 +1,7 @@
 import { FileText, LogOut, RotateCcw, ShieldCheck } from "lucide-react"
 import { logoutSession } from "../api"
 import { clearAuthSession, formatBuildTimestamp, type AuthSession } from "../lib/auth"
+import { formatPolicyExportTime } from "../lib/changeId"
 import type { PolicyDocumentResponse } from "../types"
 import Badge from "./Badge"
 
@@ -11,16 +12,31 @@ interface HeaderProps {
   onSignOut: () => void
 }
 
-const MetaItem = ({ label, value }: { label: string; value: string }) => (
-  <div className="hidden flex-col lg:flex">
+const MetaItem = ({
+  label,
+  value,
+  hint,
+  title,
+}: {
+  label: string
+  value: string
+  hint?: string
+  title?: string
+}) => (
+  <div className="hidden flex-col lg:flex" title={title}>
     <span className="text-[11px] uppercase tracking-wide text-slate-400">
       {label}
     </span>
     <span className="text-sm font-medium text-slate-800">{value}</span>
+    {hint ? <span className="text-[11px] text-slate-500">{hint}</span> : null}
   </div>
 )
 
 const Header = ({ response, session, onReset, onSignOut }: HeaderProps) => {
+  const changeId = response?.document.meta.changeId
+  const changeIdAt = response?.document.meta.changeIdAt
+  const exportTimeLabel = formatPolicyExportTime(changeId, changeIdAt)
+
   const handleSignOut = async () => {
     await logoutSession().catch(() => clearAuthSession())
     onSignOut()
@@ -70,8 +86,17 @@ const Header = ({ response, session, onReset, onSignOut }: HeaderProps) => {
           {response?.document.meta.version ? (
             <MetaItem label="Version" value={response.document.meta.version} />
           ) : null}
-          {response?.document.meta.changeId ? (
-            <MetaItem label="Change ID" value={response.document.meta.changeId} />
+          {exportTimeLabel || changeId ? (
+            <MetaItem
+              label="Export time"
+              value={exportTimeLabel ?? changeId ?? "—"}
+              hint={exportTimeLabel && changeId ? `UTC · changeId ${changeId}` : undefined}
+              title={
+                exportTimeLabel && changeId
+                  ? `EPM policy export timestamp (UTC). Raw changeId: ${changeId}`
+                  : changeId ?? undefined
+              }
+            />
           ) : null}
 
           {onReset ? (

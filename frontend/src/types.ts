@@ -254,6 +254,7 @@ export interface GuiDialog {
 export interface PolicyDocumentMeta {
   version?: string
   changeId?: string
+  changeIdAt?: string
   merge?: string
   policyCount: number
   normalCount: number
