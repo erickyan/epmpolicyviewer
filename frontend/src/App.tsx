@@ -5,13 +5,14 @@ import Landing from "./components/Landing"
 import Dashboard from "./components/Dashboard"
 import { loadDefaultPolicy, uploadPolicyXml } from "./api"
 import { loadAuthSession, type AuthSession } from "./lib/auth"
-import type { PolicyDocumentResponse } from "./types"
+import type { DefaultPolicyPlatform, PolicyDocumentResponse } from "./types"
 
 const App = () => {
   const [session, setSession] = useState<AuthSession | null>(() => loadAuthSession())
   const [result, setResult] = useState<PolicyDocumentResponse | null>(null)
   const [isUploading, setIsUploading] = useState(false)
-  const [loadingDefault, setLoadingDefault] = useState(false)
+  const [loadingDefaultPlatform, setLoadingDefaultPlatform] =
+    useState<DefaultPolicyPlatform | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const handleFileSelected = async (file: File) => {
@@ -30,11 +31,11 @@ const App = () => {
     }
   }
 
-  const handleLoadDefault = async () => {
-    setLoadingDefault(true)
+  const handleLoadDefault = async (platform: DefaultPolicyPlatform) => {
+    setLoadingDefaultPlatform(platform)
     setError(null)
     try {
-      setResult(await loadDefaultPolicy())
+      setResult(await loadDefaultPolicy(platform))
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
       if (err instanceof Error && err.message.includes("session has expired")) {
@@ -42,7 +43,7 @@ const App = () => {
         setResult(null)
       }
     } finally {
-      setLoadingDefault(false)
+      setLoadingDefaultPlatform(null)
     }
   }
 
@@ -77,7 +78,7 @@ const App = () => {
             onFileSelected={handleFileSelected}
             onLoadDefault={handleLoadDefault}
             isLoading={isUploading}
-            loadingDefault={loadingDefault}
+            loadingDefaultPlatform={loadingDefaultPlatform}
             error={error}
           />
         )}

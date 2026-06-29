@@ -73,7 +73,11 @@ const Header = ({ response, session, onReset, onSignOut }: HeaderProps) => {
                     {response.fileName}
                   </span>
                   {response.source === "default" ? (
-                    <Badge tone="blue">Default standard</Badge>
+                    <Badge tone="blue">
+                      {response.defaultPlatform === "windows"
+                        ? "Windows standard"
+                        : "macOS standard"}
+                    </Badge>
                   ) : (
                     <Badge tone="emerald">Uploaded</Badge>
                   )}

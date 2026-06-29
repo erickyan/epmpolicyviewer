@@ -324,8 +324,11 @@ export interface PolicyDocument {
   applicationGroups: ApplicationGroupEntry[]
 }
 
+export type DefaultPolicyPlatform = "mac" | "windows"
+
 export interface PolicyDocumentResponse {
   document: PolicyDocument
   source: "default" | "upload"
+  defaultPlatform?: "mac" | "windows"
   fileName: string
 }

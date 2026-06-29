@@ -154,7 +154,7 @@ const Dashboard = ({ response }: DashboardProps) => {
     setRawXml(null)
     setRawXmlError(null)
     setRawXmlLoading(false)
-  }, [response.fileName, response.source])
+  }, [response.fileName, response.source, response.defaultPlatform])
 
   useEffect(() => {
     if (activeTab !== "raw" || rawXml) return
@@ -163,7 +163,7 @@ const Dashboard = ({ response }: DashboardProps) => {
     setRawXmlLoading(true)
     setRawXmlError(null)
 
-    fetchRawXml(response.source)
+    fetchRawXml(response.source, response.defaultPlatform)
       .then((xml) => {
         if (!cancelled) setRawXml(xml)
       })
@@ -181,7 +181,7 @@ const Dashboard = ({ response }: DashboardProps) => {
     return () => {
       cancelled = true
     }
-  }, [activeTab, rawXml, response.source])
+  }, [activeTab, rawXml, response.source, response.defaultPlatform])
 
   const handleSummaryNavigate = useCallback((target: SummaryTarget) => {
     if (target === "intelligence") {

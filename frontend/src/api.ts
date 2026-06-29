@@ -1,4 +1,4 @@
-import type { PolicyDocumentResponse } from "./types"
+import type { DefaultPolicyPlatform, PolicyDocumentResponse } from "./types"
 import {
   clearAuthSession,
   getAuthToken,
@@ -83,16 +83,23 @@ export const uploadPolicyXml = async (
   return (await response.json()) as PolicyDocumentResponse
 }
 
-export const loadDefaultPolicy = async (): Promise<PolicyDocumentResponse> => {
-  const response = await request("/api/default-policy")
+export const loadDefaultPolicy = async (
+  platform: DefaultPolicyPlatform = "mac"
+): Promise<PolicyDocumentResponse> => {
+  const response = await request(`/api/default-policy?platform=${platform}`)
   if (!response.ok) throw new Error(await parseError(response))
   return (await response.json()) as PolicyDocumentResponse
 }
 
 export const fetchRawXml = async (
-  source: PolicyDocumentResponse["source"]
+  source: PolicyDocumentResponse["source"],
+  defaultPlatform?: DefaultPolicyPlatform
 ): Promise<string> => {
-  const response = await request(`/api/raw-xml?source=${source}`)
+  const params = new URLSearchParams({ source })
+  if (source === "default" && defaultPlatform) {
+    params.set("platform", defaultPlatform)
+  }
+  const response = await request(`/api/raw-xml?${params.toString()}`)
   if (!response.ok) throw new Error(await parseError(response))
   const data = (await response.json()) as { xml: string }
   return data.xml

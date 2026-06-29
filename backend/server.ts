@@ -29,16 +29,28 @@ app.use(express.json({ limit: "16kb" }))
 
 const appBuildInfo = getAppBuildInfo()
 
-// Resolve the bundled default ("standard") policy across dev (tsx) and built
-// (dist) layouts by checking a few candidate locations.
-const DEFAULT_POLICY_CANDIDATES = [
-  path.resolve(process.cwd(), "data/default_policy.xml"),
-  path.resolve(__dirname, "data/default_policy.xml"),
-  path.resolve(__dirname, "../data/default_policy.xml"),
-]
+type DefaultPolicyPlatform = "mac" | "windows"
 
-const resolveDefaultPolicyPath = (): string | null =>
-  DEFAULT_POLICY_CANDIDATES.find((candidate) => existsSync(candidate)) ?? null
+const DEFAULT_POLICY_FILES: Record<DefaultPolicyPlatform, string> = {
+  mac: "default_policy.xml",
+  windows: "default_policy_windows.xml",
+}
+
+const parseDefaultPlatform = (value: unknown): DefaultPolicyPlatform =>
+  value === "windows" ? "windows" : "mac"
+
+// Resolve bundled default ("standard") policies across dev (tsx) and built layouts.
+const resolveDefaultPolicyPath = (
+  platform: DefaultPolicyPlatform = "mac"
+): string | null => {
+  const fileName = DEFAULT_POLICY_FILES[platform]
+  const candidates = [
+    path.resolve(process.cwd(), "data", fileName),
+    path.resolve(__dirname, "data", fileName),
+    path.resolve(__dirname, "../data", fileName),
+  ]
+  return candidates.find((candidate) => existsSync(candidate)) ?? null
+}
 
 // Built frontend assets (Cloud Run / production). Dev uses Vite on port 5173.
 const PUBLIC_DIR_CANDIDATES = [
@@ -49,12 +61,13 @@ const PUBLIC_DIR_CANDIDATES = [
 const resolvePublicDir = (): string | null =>
   PUBLIC_DIR_CANDIDATES.find((candidate) => existsSync(candidate)) ?? null
 
-// The bundled default policy's configuration is the "standard" baseline used to
-// detect customized settings. Parse it once and cache the path->value map.
+// The bundled macOS default policy's configuration is the "standard" baseline used
+// to detect customized settings. Windows OOB uses the same General configuration
+// values; mac default remains the canonical baseline for uploads.
 let baselineCache: Record<string, string> | undefined
 const getDefaultBaseline = (): Record<string, string> | undefined => {
   if (baselineCache) return baselineCache
-  const filePath = resolveDefaultPolicyPath()
+  const filePath = resolveDefaultPolicyPath("mac")
   if (!filePath) return undefined
   try {
     baselineCache = extractConfigBaseline(decodeXmlBuffer(readFileSync(filePath)))
@@ -68,7 +81,7 @@ const getDefaultBaseline = (): Record<string, string> | undefined => {
 let excludeBaselineCache: Map<string, Set<string>> | undefined
 const getExcludeBaseline = (): Map<string, Set<string>> | undefined => {
   if (excludeBaselineCache) return excludeBaselineCache
-  const filePath = resolveDefaultPolicyPath()
+  const filePath = resolveDefaultPolicyPath("mac")
   if (!filePath) return undefined
   try {
     excludeBaselineCache = extractExcludeBaseline(decodeXmlBuffer(readFileSync(filePath)))
@@ -126,13 +139,15 @@ const getConsoleDefaults = (): ConsoleDefaults | undefined => {
 // Raw XML is fetched on demand (Raw XML tab) so the main parse response stays smaller.
 let cachedUploadXml: string | null = null
 
-const getDefaultPolicyXml = (): string | null => {
-  const filePath = resolveDefaultPolicyPath()
+const getDefaultPolicyXml = (
+  platform: DefaultPolicyPlatform = "mac"
+): string | null => {
+  const filePath = resolveDefaultPolicyPath(platform)
   if (!filePath) return null
   try {
     return decodeXmlBuffer(readFileSync(filePath)).replace(/^\uFEFF/, "").trim()
   } catch (error) {
-    console.error("Failed to read default policy XML:", error)
+    console.error(`Failed to read default policy XML (${platform}):`, error)
     return null
   }
 }
@@ -190,8 +205,9 @@ app.get("/api/auth/session", (req: Request, res: Response) => {
   res.json({ status: "ok", ...appBuildInfo })
 })
 
-app.get("/api/default-policy", requireAuth, (_req: Request, res: Response) => {
-  const filePath = resolveDefaultPolicyPath()
+app.get("/api/default-policy", requireAuth, (req: Request, res: Response) => {
+  const platform = parseDefaultPlatform(req.query.platform)
+  const filePath = resolveDefaultPolicyPath(platform)
   if (!filePath) {
     res.status(404).json({ error: "Bundled default policy file was not found" })
     return
@@ -200,7 +216,12 @@ app.get("/api/default-policy", requireAuth, (_req: Request, res: Response) => {
   try {
     const xml = decodeXmlBuffer(readFileSync(filePath))
     const document = parsePolicyDocument(xml, getParseOptions())
-    res.json({ document, source: "default", fileName: "default_policy.xml" })
+    res.json({
+      document,
+      source: "default",
+      defaultPlatform: platform,
+      fileName: DEFAULT_POLICY_FILES[platform],
+    })
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error)
     console.error("Failed to parse default policy:", error)
@@ -210,8 +231,9 @@ app.get("/api/default-policy", requireAuth, (_req: Request, res: Response) => {
 
 app.get("/api/raw-xml", requireAuth, (req: Request, res: Response) => {
   const source = req.query.source === "default" ? "default" : "upload"
+  const platform = parseDefaultPlatform(req.query.platform)
   const xml =
-    source === "default" ? getDefaultPolicyXml() : cachedUploadXml
+    source === "default" ? getDefaultPolicyXml(platform) : cachedUploadXml
 
   if (!xml) {
     res.status(404).json({
