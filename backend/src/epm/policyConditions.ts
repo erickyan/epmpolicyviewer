@@ -83,43 +83,16 @@ const buildConditionSummary = (condition: Omit<PolicyCondition, "summary">): str
     )
   }
 
-  if (condition.additionalCondition) {
-    lines.push(`Additional condition: ${condition.additionalCondition}`)
-  }
-
-  if (condition.inCorporateNetwork !== undefined) {
-    lines.push(
-      condition.inCorporateNetwork
-        ? "Applies when condition is true"
-        : "Applies when condition is false"
-    )
-  }
-
-  if (condition.enforcementScriptName) {
-    lines.push(`Validation script: ${condition.enforcementScriptName}`)
-  }
-
   return lines
 }
 
 const parseConditionNode = (node: XmlNode): PolicyCondition => {
-  const type = attr(node, "type") ?? ""
-  const enforcementScript = node.EmbeddedScript as XmlNode | undefined
-  const enforcementScriptName = getText(enforcementScript?.ScriptName)?.trim()
-  const inCorporateNetworkRaw = attr(node, "InCorporateNetwork")
-  const inCorporateNetwork =
-    inCorporateNetworkRaw === undefined
-      ? undefined
-      : inCorporateNetworkRaw.toLowerCase() === "true"
-
+  const type = attr(node, "type") ?? "5"
   const base = {
     type,
     typeLabel: getPolicyConditionTypeLabel(type),
     includeAdComputerGroups: parseAdGroups(node.IncludeADComputerGroup),
     excludeAdComputerGroups: parseAdGroups(node.ExcludeADComputerGroup),
-    additionalCondition: getText(node.AdditionalCondition)?.trim(),
-    inCorporateNetwork,
-    enforcementScriptName,
   }
 
   return {
@@ -129,7 +102,9 @@ const parseConditionNode = (node: XmlNode): PolicyCondition => {
 }
 
 export const parsePolicyConditions = (policy: XmlNode): PolicyCondition[] =>
-  asArray(policy.Condition as XmlNode | XmlNode[]).map(parseConditionNode)
+  asArray(policy.Condition as XmlNode | XmlNode[])
+    .filter((node) => attr(node, "type") === "5")
+    .map(parseConditionNode)
 
 const parseActionTriggers = (policy: XmlNode) =>
   asArray(policy.ActionTrigger as XmlNode | XmlNode[]).map((trigger) => {

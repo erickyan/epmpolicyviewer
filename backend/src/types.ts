@@ -155,9 +155,24 @@ export interface PolicyCondition {
   typeLabel: string
   includeAdComputerGroups: PolicyAdGroup[]
   excludeAdComputerGroups: PolicyAdGroup[]
+  summary: string[]
+}
+
+export interface ConditionalEnforcementScript {
+  fileName?: string
+  content?: string
+  encoding?: "base64" | "plain"
+  shortcutName?: string
+}
+
+export interface ConditionalEnforcementEntry {
+  conditionType: string
+  conditionTypeLabel: string
   additionalCondition?: string
   inCorporateNetwork?: boolean
-  enforcementScriptName?: string
+  networkScopeLabel?: string
+  conditionChoiceLabel: string
+  script?: ConditionalEnforcementScript
   summary: string[]
 }
 
@@ -171,6 +186,43 @@ export interface RunScriptPolicyConfig {
   scriptContent?: string
   scriptEncoding?: "base64" | "plain"
   actionTriggers: RunScriptActionTrigger[]
+}
+
+export interface UserGroupExclusionEntry {
+  kind: string
+  value: string
+  sid?: string
+  accountType?: string
+}
+
+export interface UserGroupExclusions {
+  operator?: string
+  entries: UserGroupExclusionEntry[]
+  summary: string
+}
+
+export interface PolicyAdditionalFile {
+  fileName: string
+  content?: string
+  encoding?: "base64" | "plain"
+}
+
+export interface PolicyActivationSchedule {
+  schedulerDays: boolean[]
+  dayLabels: string[]
+  startTime?: string
+  endTime?: string
+  isFullDay?: boolean
+  mode: "anytime" | "specific-times"
+}
+
+export interface PolicyActivation {
+  enabled: boolean
+  activateDate?: string
+  deactivateDate?: string
+  autoDelete?: boolean
+  scheduler?: PolicyActivationSchedule
+  summary: string[]
 }
 
 export interface PolicyEntry {
@@ -216,6 +268,10 @@ export interface PolicyEntry {
   runScript?: RunScriptPolicyConfig
   // Advanced targeting / conditional enforcement on the policy.
   conditions?: PolicyCondition[]
+  conditionalEnforcement?: ConditionalEnforcementEntry[]
+  userGroupExclusions?: UserGroupExclusions
+  additionalFiles?: PolicyAdditionalFile[]
+  activation?: PolicyActivation
   findings?: PolicyFinding[]
 }
 

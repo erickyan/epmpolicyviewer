@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Policies version="5" changeId="0">
+  <Policy action="4" id="{57328d45-4483-4737-8c81-348e7015b3c7}" internalType="3" name="test" order="40" serverPolicyId="{57328d45-4483-4737-8c81-348e7015b3c7}">
+    <Targets>
+      <FileName compareAs="exact" caseSensitive="False">cmd.exe</FileName>
+    </Targets>
+    <Activation>
+      <ActivateDate>2026-07-02T11:32:42</ActivateDate>
+      <DeactivateDate>2026-07-14T11:32:00</DeactivateDate>
+      <AutoDelete>false</AutoDelete>
+      <Scheduler IsFullDay="true">
+        <StartTime>2026-07-02T00:00:00</StartTime>
+        <EndTime>2026-07-02T23:59:59</EndTime>
+        <SchedulerDays>true</SchedulerDays>
+        <SchedulerDays>true</SchedulerDays>
+        <SchedulerDays>false</SchedulerDays>
+        <SchedulerDays>false</SchedulerDays>
+        <SchedulerDays>true</SchedulerDays>
+        <SchedulerDays>true</SchedulerDays>
+        <SchedulerDays>true</SchedulerDays>
+      </Scheduler>
+    </Activation>
+  </Policy>
+</Policies>

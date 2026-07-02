@@ -13,11 +13,14 @@ import {
   KeyRound,
   LayoutGrid,
   MessageSquare,
+  Network,
   Rows3,
   ShieldCheck,
   ShieldOff,
   Sparkles,
   Terminal,
+  Timer,
+  UserX,
   Users,
 } from "lucide-react"
 import type {
@@ -25,12 +28,16 @@ import type {
   EndpointSignInConfig,
   LcdPolicyConfig,
   LinkedDialog,
+  PolicyAdditionalFile,
+  PolicyActivation,
   PolicyCondition,
+  ConditionalEnforcementEntry,
   PolicyEntry,
   PolicyFinding,
   RunScriptPolicyConfig,
   TargetEntry,
   UserGroupEntry,
+  UserGroupExclusions,
 } from "../types"
 import { resolveTargetMemberCount, resolveTargetMembers, resolvePolicyDefinitionCount, policyHasCustomizedContent, filterVisibleTargets, isVisibleTarget, formatDefinitionCount } from "../lib/appGroups"
 import { shouldShowActionBadge } from "../lib/policyLabels"
@@ -42,6 +49,16 @@ import {
 import { categoryTone, cx, platformTone, scopeTone } from "../lib/ui"
 import { getPolicyPlatforms, policyMatchesOs, type OsFilterValue } from "../lib/os"
 import { policyMatchesQuery, targetMatchesQuery } from "../lib/search"
+import {
+  formatPolicyDateTime,
+  getActivationEnabledLabel,
+  getAutoDeleteLabel,
+  getDailyWindowLabel,
+  getFullDayLabel,
+  getPeriodToggleLabel,
+  getSchedulerModeLabel,
+  POLICY_WEEKDAY_LABELS,
+} from "../lib/policyActivation"
 import Badge from "./Badge"
 import PaginatedMembersTable from "./PaginatedMembersTable"
 
@@ -438,7 +455,7 @@ const ConditionsPanel = ({ conditions }: { conditions: PolicyCondition[] }) => (
     <div className="flex items-center gap-2 border-b border-slate-100 bg-violet-50/40 px-4 py-2">
       <ShieldCheck className="h-3.5 w-3.5 text-violet-700" />
       <span className="text-xs font-semibold text-violet-900">
-        Policy conditions
+        Computer targeting
       </span>
       <Badge tone="violet">{conditions.length}</Badge>
     </div>
@@ -499,7 +516,72 @@ const ConditionsPanel = ({ conditions }: { conditions: PolicyCondition[] }) => (
   </div>
 )
 
-const RunScriptPanel = ({ config }: { config: RunScriptPolicyConfig }) => (
+const ConditionalEnforcementPanel = ({
+  entries,
+}: {
+  entries: ConditionalEnforcementEntry[]
+}) => (
+  <div className="divide-y divide-slate-100 border-t border-slate-100">
+    <div className="flex items-center gap-2 border-b border-slate-100 bg-indigo-50/50 px-4 py-2">
+      <Network className="h-3.5 w-3.5 text-indigo-700" />
+      <span className="text-xs font-semibold text-indigo-900">
+        Conditional enforcement
+      </span>
+      <Badge tone="blue">{entries.length}</Badge>
+    </div>
+    {entries.map((entry, index) => (
+      <div key={`${entry.conditionType}-${index}`} className="px-4 py-3">
+        <p className="text-xs font-semibold text-slate-800">
+          {entry.conditionTypeLabel}
+        </p>
+        {entry.networkScopeLabel ? (
+          <p className="mt-1 text-xs text-slate-600">{entry.networkScopeLabel}</p>
+        ) : null}
+        <p className="mt-1 text-xs font-medium text-slate-700">
+          {entry.conditionChoiceLabel}
+        </p>
+        {entry.additionalCondition ? (
+          <ConfigRow label="Target" value={entry.additionalCondition} mono />
+        ) : null}
+        {entry.script?.fileName ? (
+          <ConfigRow label="Validation script" value={entry.script.fileName} mono />
+        ) : null}
+        {entry.script?.content ? (
+          <div className="mt-3">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Script content
+              </p>
+              {entry.script.encoding === "base64" ? (
+                <Badge tone="slate">Decoded from base64</Badge>
+              ) : null}
+            </div>
+            <pre className="max-h-96 overflow-auto rounded-lg border border-slate-200 bg-slate-950 p-3 text-[11px] leading-relaxed text-slate-100">
+              {entry.script.content}
+            </pre>
+          </div>
+        ) : null}
+        {entry.summary.length > 0 ? (
+          <ul className="mt-3 space-y-1 border-t border-slate-100 pt-3">
+            {entry.summary.map((line) => (
+              <li key={line} className="text-xs leading-relaxed text-slate-600">
+                {line}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    ))}
+  </div>
+)
+
+const RunScriptPanel = ({
+  config,
+  additionalFiles,
+}: {
+  config: RunScriptPolicyConfig
+  additionalFiles?: PolicyAdditionalFile[]
+}) => (
   <div className="divide-y divide-slate-100">
     <div className="flex items-center gap-2 border-b border-slate-100 bg-emerald-50/40 px-4 py-2">
       <Terminal className="h-3.5 w-3.5 text-emerald-700" />
@@ -545,8 +627,181 @@ const RunScriptPanel = ({ config }: { config: RunScriptPolicyConfig }) => (
         No embedded script content found in XML.
       </p>
     )}
+
+    {additionalFiles && additionalFiles.length > 0 ? (
+      <div className="px-4 py-3">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          Additional files
+        </p>
+        <div className="space-y-3">
+          {additionalFiles.map((file) => (
+            <div
+              key={file.fileName}
+              className="rounded-lg border border-slate-200 bg-slate-50/80 p-3"
+            >
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="font-mono text-xs font-medium text-slate-800">
+                  {file.fileName}
+                </span>
+                {file.encoding === "base64" ? (
+                  <Badge tone="slate">Decoded from base64</Badge>
+                ) : null}
+              </div>
+              {file.content ? (
+                <pre className="max-h-64 overflow-auto rounded-lg border border-slate-200 bg-slate-950 p-3 text-[11px] leading-relaxed text-slate-100">
+                  {file.content}
+                </pre>
+              ) : (
+                <p className="text-xs text-slate-400">No file content in XML.</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    ) : null}
   </div>
 )
+
+const UserGroupExclusionsPanel = ({
+  exclusions,
+}: {
+  exclusions: UserGroupExclusions
+}) => (
+  <div className="border-t border-slate-100 bg-red-50/30 px-4 py-3">
+    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-red-700">
+      <UserX className="h-3.5 w-3.5" />
+      User group exclusions
+      {exclusions.operator ? (
+        <Badge tone="red">{exclusions.operator}</Badge>
+      ) : null}
+    </p>
+    <p className="mt-1 text-xs text-slate-600">{exclusions.summary}</p>
+    <ul className="mt-2 flex flex-wrap gap-1.5">
+      {exclusions.entries.map((entry, index) => (
+        <li key={`${entry.kind}-${entry.value}-${index}`}>
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-white px-2 py-1 text-xs text-slate-700">
+            <span className="text-slate-400">{entry.kind}</span>
+            {entry.value}
+            {entry.sid ? (
+              <span className="font-mono text-[10px] text-slate-400">{entry.sid}</span>
+            ) : null}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+)
+
+const ScheduledEnforcementPanel = ({
+  activation,
+}: {
+  activation: PolicyActivation
+}) => {
+  const scheduler = activation.scheduler
+  const dailyWindow = getDailyWindowLabel(scheduler)
+
+  return (
+    <div className="divide-y divide-slate-100 border-t border-slate-100">
+      <div className="flex items-center gap-2 border-b border-slate-100 bg-amber-50/50 px-4 py-2">
+        <Timer className="h-3.5 w-3.5 text-amber-700" />
+        <span className="text-xs font-semibold text-amber-900">
+          Scheduled enforcement
+        </span>
+        <Badge tone="amber">{getActivationEnabledLabel(activation)}</Badge>
+      </div>
+
+      <div className="px-4 py-3">
+        <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          Enforcement period
+        </p>
+        <p className="mb-2 text-[11px] text-slate-500">
+          Uses endpoint local time zone, not the console time zone.
+        </p>
+        <ConfigRow
+          label="Start"
+          value={
+            activation.activateDate
+              ? `${getPeriodToggleLabel(activation.activateDate)} · ${formatPolicyDateTime(activation.activateDate) ?? activation.activateDate}`
+              : "Off"
+          }
+        />
+        <ConfigRow
+          label="End"
+          value={
+            activation.deactivateDate
+              ? `${getPeriodToggleLabel(activation.deactivateDate)} · ${formatPolicyDateTime(activation.deactivateDate) ?? activation.deactivateDate}`
+              : "Off"
+          }
+        />
+      </div>
+
+      <div className="px-4 py-3">
+        <ConfigRow
+          label="Automatic policy deletion"
+          value={getAutoDeleteLabel(activation.autoDelete)}
+        />
+        {activation.autoDelete ? (
+          <p className="mt-1 text-[11px] text-slate-500">
+            Policy is deleted 3 months after the scheduled end date.
+          </p>
+        ) : null}
+      </div>
+
+      {scheduler ? (
+        <div className="px-4 py-3">
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Enforcement timetable
+          </p>
+          <p className="mb-2 text-[11px] text-slate-500">
+            Recurring weekly schedule on selected days.
+          </p>
+          <ConfigRow label="Mode" value={getSchedulerModeLabel(scheduler)} />
+          <div className="mt-3">
+            <p className="mb-2 text-[11px] font-medium text-slate-600">Days</p>
+            <div className="flex flex-wrap gap-1.5">
+              {POLICY_WEEKDAY_LABELS.map((label, index) => {
+                const enabled = scheduler.schedulerDays[index]
+                return (
+                  <span
+                    key={label}
+                    className={cx(
+                      "inline-flex min-w-[2.75rem] items-center justify-center rounded-md border px-2 py-1 text-[11px] font-semibold",
+                      enabled
+                        ? "border-amber-300 bg-amber-100 text-amber-900"
+                        : "border-slate-200 bg-slate-50 text-slate-400"
+                    )}
+                  >
+                    {label}
+                  </span>
+                )
+              })}
+            </div>
+          </div>
+          <ConfigRow
+            label="Daily window"
+            value={
+              scheduler.isFullDay
+                ? `${getFullDayLabel(true)} · ${dailyWindow ?? "12:00 AM – 11:59 PM"}`
+                : dailyWindow ?? "Custom window"
+            }
+          />
+        </div>
+      ) : null}
+
+      {activation.summary.length > 0 ? (
+        <div className="border-t border-slate-100 bg-slate-50/40 px-4 py-3">
+          <ul className="space-y-1">
+            {activation.summary.map((line) => (
+              <li key={line} className="text-xs leading-relaxed text-slate-600">
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  )
+}
 
 const PolicySettingsStrip = ({ policy }: { policy: PolicyEntry }) => (
   <div className="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-slate-100 bg-slate-50/50 px-4 py-2 text-[11px] text-slate-500">
@@ -995,6 +1250,9 @@ const GroupedView = ({
                   <FindingsPanel findings={policy.findings ?? []} />
                 ) : null}
                 <TargetingPanel userGroups={policy.userGroups} />
+                {policy.userGroupExclusions ? (
+                  <UserGroupExclusionsPanel exclusions={policy.userGroupExclusions} />
+                ) : null}
                 <LinkedDialogsPanel
                   dialogs={policy.linkedDialogs}
                   onOpenDialog={onOpenDialog}
@@ -1002,12 +1260,23 @@ const GroupedView = ({
                 {policy.conditions?.length ? (
                   <ConditionsPanel conditions={policy.conditions} />
                 ) : null}
+                {policy.conditionalEnforcement?.length ? (
+                  <ConditionalEnforcementPanel
+                    entries={policy.conditionalEnforcement}
+                  />
+                ) : null}
+                {policy.activation ? (
+                  <ScheduledEnforcementPanel activation={policy.activation} />
+                ) : null}
                 {policy.endpointSignIn ? (
                   <EndpointSignInPanel config={policy.endpointSignIn} />
                 ) : policy.lcdPolicy ? (
                   <LcdPolicyPanel config={policy.lcdPolicy} />
                 ) : policy.runScript ? (
-                  <RunScriptPanel config={policy.runScript} />
+                  <RunScriptPanel
+                    config={policy.runScript}
+                    additionalFiles={policy.additionalFiles}
+                  />
                 ) : null}
                 {policy.targets.length > 0 ? (
                   <TargetTable

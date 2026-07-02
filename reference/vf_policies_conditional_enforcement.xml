@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-16"?>
+<Policies version="5" changeId="0">
+  <Policy action="4" id="{57328d45-4483-4737-8c81-348e7015b3c7}" internalType="3" name="test" order="40" serverPolicyId="{57328d45-4483-4737-8c81-348e7015b3c7}">
+    <Targets>
+      <FileName compareAs="exact" caseSensitive="False">cmd.exe</FileName>
+    </Targets>
+    <Condition type="2" InCorporateNetwork="true">
+      <AdditionalCondition>https://cursor.com</AdditionalCondition>
+    </Condition>
+  </Policy>
+</Policies>

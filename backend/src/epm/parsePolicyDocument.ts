@@ -46,6 +46,9 @@ import {
 import { decodePolicyChangeId } from "./changeId"
 import { enrichTargetDefinition } from "./targetDefinition"
 import { buildRunScriptPolicy, parsePolicyConditions } from "./policyConditions"
+import { parseConditionalEnforcement } from "./policyConditionalEnforcement"
+import { parsePolicyActivation } from "./policyActivation"
+import { parseAdditionalFiles, parseUserGroupExclusions } from "./policyExtras"
 
 // Per EPM domain rules + the format spec, attributes hold the metadata and must
 // be preserved. Entity limits are raised because real exports contain thousands
@@ -647,6 +650,13 @@ const buildPolicyEntry = (
       const conditions = parsePolicyConditions(policy)
       return conditions.length > 0 ? conditions : undefined
     })(),
+    conditionalEnforcement: (() => {
+      const entries = parseConditionalEnforcement(policy)
+      return entries.length > 0 ? entries : undefined
+    })(),
+    userGroupExclusions: parseUserGroupExclusions(policy),
+    additionalFiles: parseAdditionalFiles(policy),
+    activation: parsePolicyActivation(policy),
   }
 }
 
