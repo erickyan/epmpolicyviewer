@@ -14,8 +14,10 @@ import {
   LayoutGrid,
   MessageSquare,
   Rows3,
+  ShieldCheck,
   ShieldOff,
   Sparkles,
+  Terminal,
   Users,
 } from "lucide-react"
 import type {
@@ -23,8 +25,10 @@ import type {
   EndpointSignInConfig,
   LcdPolicyConfig,
   LinkedDialog,
+  PolicyCondition,
   PolicyEntry,
   PolicyFinding,
+  RunScriptPolicyConfig,
   TargetEntry,
   UserGroupEntry,
 } from "../types"
@@ -428,6 +432,121 @@ const LcdPolicyPanel = ({ config }: { config: LcdPolicyConfig }) => {
     </div>
   )
 }
+
+const ConditionsPanel = ({ conditions }: { conditions: PolicyCondition[] }) => (
+  <div className="divide-y divide-slate-100">
+    <div className="flex items-center gap-2 border-b border-slate-100 bg-violet-50/40 px-4 py-2">
+      <ShieldCheck className="h-3.5 w-3.5 text-violet-700" />
+      <span className="text-xs font-semibold text-violet-900">
+        Policy conditions
+      </span>
+      <Badge tone="violet">{conditions.length}</Badge>
+    </div>
+    {conditions.map((condition, index) => (
+      <div key={`${condition.type}-${index}`} className="px-4 py-3">
+        <p className="text-xs font-semibold text-slate-800">{condition.typeLabel}</p>
+        {condition.summary.length > 0 ? (
+          <ul className="mt-2 space-y-1">
+            {condition.summary.map((line) => (
+              <li key={line} className="text-xs leading-relaxed text-slate-600">
+                {line}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {condition.includeAdComputerGroups.length > 0 ? (
+          <div className="mt-3">
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              Include computer groups
+            </p>
+            <ul className="space-y-1">
+              {condition.includeAdComputerGroups.map((group) => (
+                <li
+                  key={`${group.sid ?? group.name}`}
+                  className="break-all font-mono text-[11px] text-slate-700"
+                >
+                  {group.name}
+                  {group.sid ? (
+                    <span className="ml-2 font-sans text-slate-400">{group.sid}</span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        {condition.excludeAdComputerGroups.length > 0 ? (
+          <div className="mt-3">
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              Exclude computer groups
+            </p>
+            <ul className="space-y-1">
+              {condition.excludeAdComputerGroups.map((group) => (
+                <li
+                  key={`${group.sid ?? group.name}`}
+                  className="break-all font-mono text-[11px] text-slate-700"
+                >
+                  {group.name}
+                  {group.sid ? (
+                    <span className="ml-2 font-sans text-slate-400">{group.sid}</span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+    ))}
+  </div>
+)
+
+const RunScriptPanel = ({ config }: { config: RunScriptPolicyConfig }) => (
+  <div className="divide-y divide-slate-100">
+    <div className="flex items-center gap-2 border-b border-slate-100 bg-emerald-50/40 px-4 py-2">
+      <Terminal className="h-3.5 w-3.5 text-emerald-700" />
+      <span className="text-xs font-semibold text-emerald-900">Run script</span>
+      {config.scriptName ? (
+        <span className="truncate font-mono text-[11px] text-emerald-800">
+          {config.scriptName}
+        </span>
+      ) : null}
+    </div>
+
+    {config.actionTriggers.length > 0 ? (
+      <div className="px-4 py-3">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          Execution triggers
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {config.actionTriggers.map((trigger) => (
+            <Badge key={trigger.type} tone="emerald">
+              {trigger.label}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    ) : null}
+
+    {config.scriptContent ? (
+      <div className="px-4 py-3">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Script content
+          </p>
+          {config.scriptEncoding === "base64" ? (
+            <Badge tone="slate">Decoded from base64</Badge>
+          ) : null}
+        </div>
+        <pre className="max-h-96 overflow-auto rounded-lg border border-slate-200 bg-slate-950 p-3 text-[11px] leading-relaxed text-slate-100">
+          {config.scriptContent}
+        </pre>
+      </div>
+    ) : (
+      <p className="px-4 py-4 text-xs text-slate-400">
+        No embedded script content found in XML.
+      </p>
+    )}
+  </div>
+)
 
 const PolicySettingsStrip = ({ policy }: { policy: PolicyEntry }) => (
   <div className="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-slate-100 bg-slate-50/50 px-4 py-2 text-[11px] text-slate-500">
@@ -880,18 +999,30 @@ const GroupedView = ({
                   dialogs={policy.linkedDialogs}
                   onOpenDialog={onOpenDialog}
                 />
+                {policy.conditions?.length ? (
+                  <ConditionsPanel conditions={policy.conditions} />
+                ) : null}
                 {policy.endpointSignIn ? (
                   <EndpointSignInPanel config={policy.endpointSignIn} />
                 ) : policy.lcdPolicy ? (
                   <LcdPolicyPanel config={policy.lcdPolicy} />
-                ) : (
+                ) : policy.runScript ? (
+                  <RunScriptPanel config={policy.runScript} />
+                ) : null}
+                {policy.targets.length > 0 ? (
                   <TargetTable
                     targets={policy.targets}
                     appGroups={appGroups}
                     hideDefaults={hideDefaults}
                     onOpenAppGroup={onOpenAppGroup}
                   />
-                )}
+                ) : !policy.endpointSignIn &&
+                  !policy.lcdPolicy &&
+                  !policy.runScript ? (
+                  <p className="px-4 py-4 text-xs text-slate-400">
+                    No application targets defined for this policy.
+                  </p>
+                ) : null}
               </div>
             )}
           </div>

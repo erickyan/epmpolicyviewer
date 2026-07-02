@@ -126,6 +126,35 @@ export interface LcdPolicyConfig {
   scheduler?: LcdScheduler
 }
 
+export interface PolicyAdGroup {
+  name: string
+  sid?: string
+  accountType?: string
+}
+
+export interface PolicyCondition {
+  type: string
+  typeLabel: string
+  includeAdComputerGroups: PolicyAdGroup[]
+  excludeAdComputerGroups: PolicyAdGroup[]
+  additionalCondition?: string
+  inCorporateNetwork?: boolean
+  enforcementScriptName?: string
+  summary: string[]
+}
+
+export interface RunScriptActionTrigger {
+  type: string
+  label: string
+}
+
+export interface RunScriptPolicyConfig {
+  scriptName?: string
+  scriptContent?: string
+  scriptEncoding?: "base64" | "plain"
+  actionTriggers: RunScriptActionTrigger[]
+}
+
 export interface PolicyEntry {
   id: string
   name: string
@@ -157,6 +186,8 @@ export interface PolicyEntry {
   linkedDialogs: LinkedDialog[]
   endpointSignIn?: EndpointSignInConfig
   lcdPolicy?: LcdPolicyConfig
+  runScript?: RunScriptPolicyConfig
+  conditions?: PolicyCondition[]
   findings?: PolicyFinding[]
 }
 

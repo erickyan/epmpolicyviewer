@@ -15,6 +15,7 @@ import type {
   LinkedDialog,
   LcdPolicyConfig,
   MessageEntry,
+  PolicyCondition,
   PolicyCategory,
   PolicyDocument,
   PolicyEntry,
@@ -44,6 +45,7 @@ import {
 } from "./intelligence/engine"
 import { decodePolicyChangeId } from "./changeId"
 import { enrichTargetDefinition } from "./targetDefinition"
+import { buildRunScriptPolicy, parsePolicyConditions } from "./policyConditions"
 
 // Per EPM domain rules + the format spec, attributes hold the metadata and must
 // be preserved. Entity limits are raised because real exports contain thousands
@@ -640,6 +642,11 @@ const buildPolicyEntry = (
     endpointSignIn:
       action === "24" ? buildEndpointSignIn(policy) : undefined,
     lcdPolicy: action === "17" ? buildLcdPolicy(policy) : undefined,
+    runScript: buildRunScriptPolicy(policy),
+    conditions: (() => {
+      const conditions = parsePolicyConditions(policy)
+      return conditions.length > 0 ? conditions : undefined
+    })(),
   }
 }
 
